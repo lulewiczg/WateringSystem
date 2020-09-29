@@ -1,8 +1,8 @@
 package com.github.lulewiczg.watering.config.dto;
 
 /**
- * Enum for vale type
+ * Water valve type.
  */
 public enum ValveType {
-    TANK, TAP, OUTPUT
+    INPUT, OUTPUT
 }

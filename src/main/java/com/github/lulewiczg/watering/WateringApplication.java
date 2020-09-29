@@ -1,18 +1,17 @@
 package com.github.lulewiczg.watering;
 
-import com.github.lulewiczg.watering.config.ValveConfig;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.github.lulewiczg.watering.config.AppConfig;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 
+/**
+ * Watering application.
+ */
 @SpringBootApplication
-@EnableConfigurationProperties(ValveConfig.class)
+@EnableConfigurationProperties(AppConfig.class)
 public class WateringApplication implements CommandLineRunner {
-
-    @Autowired
-    private ValveConfig config;
 
     public static void main(String[] args) {
         SpringApplication.run(WateringApplication.class, args);
@@ -20,6 +19,6 @@ public class WateringApplication implements CommandLineRunner {
 
     @Override
     public void run(String... args) {
-        System.out.println("Ready");
+
     }
 }

@@ -1,0 +1,5 @@
+Andrzej,INPUT,true,
+Zbigniew,OUTPUT,false,
+Stasiek,OUTPUT,false,
+,INPUT,true,valves[test].name must not be null
+Alojzy,,false,valves[test].type must not be null
