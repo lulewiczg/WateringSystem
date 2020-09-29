@@ -42,7 +42,7 @@ class AppConfigAutoLoadTest {
         Map<String, Tank> tanks = new HashMap<>();
         tanks.put("tank1", new Tank(123, "sensor1", "valve1", TankType.DEFAULT));
         tanks.put("tank2", new Tank(321, "sensor2", "valve2", TankType.DEFAULT));
-        tanks.put("tap", new Tank(0, null, "tap", TankType.UNLIMITED));
+        tanks.put("tap", new Tank(null, null, "tap", TankType.UNLIMITED));
         Map<String, Tank> configuredTanks = config.getTanks();
         assertEquals(tanks, configuredTanks);
 

@@ -19,6 +19,6 @@ public class WateringApplication implements CommandLineRunner {
 
     @Override
     public void run(String... args) {
-
+// Do nothing
     }
 }
