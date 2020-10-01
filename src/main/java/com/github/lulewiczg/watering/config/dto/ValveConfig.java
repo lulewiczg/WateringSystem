@@ -15,7 +15,7 @@ import javax.validation.constraints.NotNull;
 @Validated
 @AllArgsConstructor
 @RequiredArgsConstructor
-public class Valve {
+public class ValveConfig {
 
     @Valid
     @NotNull

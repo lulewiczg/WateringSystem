@@ -15,7 +15,7 @@ import javax.validation.constraints.NotNull;
 @Data
 @Validated
 @RequiredArgsConstructor
-public class Tank {
+public class TankConfig {
 
     @Valid
     @Min(0)
@@ -33,12 +33,12 @@ public class Tank {
     private TankType type;
 
     @EqualsAndHashCode.Exclude
-    private WaterLevelSensor sensor;
+    private WaterLevelSensorConfig sensor;
 
     @EqualsAndHashCode.Exclude
-    private Valve valve;
+    private ValveConfig valve;
 
-    public Tank(Integer volume, String sensorId, String valveId, TankType type) {
+    public TankConfig(Integer volume, String sensorId, String valveId, TankType type) {
         this.volume = volume;
         this.sensorId = sensorId;
         this.valveId = valveId;

@@ -16,7 +16,7 @@ import javax.validation.constraints.Min;
 @Validated
 @RequiredArgsConstructor
 @AllArgsConstructor
-public class WaterLevelSensor {
+public class WaterLevelSensorConfig {
 
     @Valid
     @Min(0)

@@ -26,8 +26,8 @@ class AppConfigTest {
 
     @Test
     void testPropsNoTank() {
-        Map<String, Valve> valves = Map.of("test", new Valve("abc", ValveType.INPUT, false));
-        Map<String, WaterLevelSensor> sensors = Map.of("test", new WaterLevelSensor(12, 21));
+        Map<String, ValveConfig> valves = Map.of("test", new ValveConfig("abc", ValveType.INPUT, false));
+        Map<String, WaterLevelSensorConfig> sensors = Map.of("test", new WaterLevelSensorConfig(12, 21));
 
         AppConfig config = new AppConfig(Map.of(), valves, sensors, validator);
 
@@ -38,8 +38,8 @@ class AppConfigTest {
 
     @Test
     void testPropsNoValve() {
-        Map<String, Tank> tanks = Map.of("tank", new Tank(123, "sensor1", "valve1", TankType.DEFAULT));
-        Map<String, WaterLevelSensor> sensors = Map.of("test", new WaterLevelSensor(12, 21));
+        Map<String, TankConfig> tanks = Map.of("tank", new TankConfig(123, "sensor1", "valve1", TankType.DEFAULT));
+        Map<String, WaterLevelSensorConfig> sensors = Map.of("test", new WaterLevelSensorConfig(12, 21));
 
         AppConfig config = new AppConfig(tanks, Map.of(), sensors, validator);
 
@@ -49,8 +49,8 @@ class AppConfigTest {
 
     @Test
     void testPropsNoSensor() {
-        Map<String, Valve> valves = Map.of("test", new Valve("abc", ValveType.INPUT, false));
-        Map<String, Tank> tanks = Map.of("tank", new Tank(123, null, "test", TankType.DEFAULT));
+        Map<String, ValveConfig> valves = Map.of("test", new ValveConfig("abc", ValveType.INPUT, false));
+        Map<String, TankConfig> tanks = Map.of("tank", new TankConfig(123, null, "test", TankType.DEFAULT));
 
         AppConfig config = new AppConfig(tanks, valves, Map.of(), validator);
 
@@ -60,9 +60,9 @@ class AppConfigTest {
     @ParameterizedTest
     @CsvFileSource(resources = "/testData/sensor-test.csv")
     void testSensor(int min, int max, String error) {
-        Map<String, Valve> valves = Map.of("test", new Valve("abc", ValveType.INPUT, false));
-        Map<String, WaterLevelSensor> sensors = Map.of("test", new WaterLevelSensor(min, max));
-        Map<String, Tank> tanks = Map.of("tank", new Tank(123, "test", "test", TankType.DEFAULT));
+        Map<String, ValveConfig> valves = Map.of("test", new ValveConfig("abc", ValveType.INPUT, false));
+        Map<String, WaterLevelSensorConfig> sensors = Map.of("test", new WaterLevelSensorConfig(min, max));
+        Map<String, TankConfig> tanks = Map.of("tank", new TankConfig(123, "test", "test", TankType.DEFAULT));
 
         AppConfig config = new AppConfig(tanks, valves, sensors, validator);
 
@@ -77,9 +77,9 @@ class AppConfigTest {
     @ParameterizedTest
     @CsvFileSource(resources = "/testData/valve-test.csv")
     void testValve(String name, ValveType type, boolean open, String error) {
-        Map<String, Valve> valves = Map.of("test", new Valve(name, type, open));
-        Map<String, WaterLevelSensor> sensors = Map.of("test", new WaterLevelSensor(1, 2));
-        Map<String, Tank> tanks = Map.of("tank", new Tank(123, "test", "test", TankType.DEFAULT));
+        Map<String, ValveConfig> valves = Map.of("test", new ValveConfig(name, type, open));
+        Map<String, WaterLevelSensorConfig> sensors = Map.of("test", new WaterLevelSensorConfig(1, 2));
+        Map<String, TankConfig> tanks = Map.of("tank", new TankConfig(123, "test", "test", TankType.DEFAULT));
 
         AppConfig config = new AppConfig(tanks, valves, sensors, validator);
 
@@ -94,9 +94,9 @@ class AppConfigTest {
     @ParameterizedTest
     @CsvFileSource(resources = "/testData/tank-test.csv")
     void testTank(Integer volume, String sensorId, String valveId, TankType type, String error) {
-        Map<String, Valve> valves = Map.of("testValve", new Valve("test valve", ValveType.INPUT, true));
-        Map<String, WaterLevelSensor> sensors = Map.of("testSensor", new WaterLevelSensor(1, 2));
-        Map<String, Tank> tanks = Map.of("tank", new Tank(volume, sensorId, valveId, type));
+        Map<String, ValveConfig> valves = Map.of("testValve", new ValveConfig("test valve", ValveType.INPUT, true));
+        Map<String, WaterLevelSensorConfig> sensors = Map.of("testSensor", new WaterLevelSensorConfig(1, 2));
+        Map<String, TankConfig> tanks = Map.of("tank", new TankConfig(volume, sensorId, valveId, type));
 
         AppConfig config = new AppConfig(tanks, valves, sensors, validator);
 

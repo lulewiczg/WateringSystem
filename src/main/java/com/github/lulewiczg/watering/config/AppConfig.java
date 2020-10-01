@@ -1,8 +1,8 @@
 package com.github.lulewiczg.watering.config;
 
-import com.github.lulewiczg.watering.config.dto.Tank;
-import com.github.lulewiczg.watering.config.dto.Valve;
-import com.github.lulewiczg.watering.config.dto.WaterLevelSensor;
+import com.github.lulewiczg.watering.config.dto.TankConfig;
+import com.github.lulewiczg.watering.config.dto.ValveConfig;
+import com.github.lulewiczg.watering.config.dto.WaterLevelSensorConfig;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
@@ -34,15 +34,15 @@ public class AppConfig {
 
     @Valid
     @NotNull
-    private final Map<String, Tank> tanks;
+    private final Map<String, TankConfig> tanks;
 
     @Valid
     @NotNull
-    private final Map<String, Valve> valves;
+    private final Map<String, ValveConfig> valves;
 
     @Valid
     @NotNull
-    private final Map<String, WaterLevelSensor> sensors;
+    private final Map<String, WaterLevelSensorConfig> sensors;
 
     private final Validator validator;
 
@@ -70,16 +70,16 @@ public class AppConfig {
         tanks.forEach(this::validate);
     }
 
-    private void validate(String tankId, Tank tank) {
+    private void validate(String tankId, TankConfig tank) {
         validateFields();
-        Valve valve = valves.get(tank.getValveId());
+        ValveConfig valve = valves.get(tank.getValveId());
         if (valve == null) {
             throw new IllegalStateException("Can not find valve for tank " + tankId);
         }
         tank.setValve(valve);
 
         if (tank.getSensorId() != null) {
-            WaterLevelSensor waterLevelSensor = sensors.get(tank.getSensorId());
+            WaterLevelSensorConfig waterLevelSensor = sensors.get(tank.getSensorId());
             if (waterLevelSensor == null) {
                 throw new IllegalStateException("Can not find water level sensor for tank " + tankId);
             }
