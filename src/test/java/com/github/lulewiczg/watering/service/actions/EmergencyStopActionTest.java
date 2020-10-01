@@ -10,17 +10,21 @@ import com.github.lulewiczg.watering.state.Tank;
 import com.github.lulewiczg.watering.state.Valve;
 import com.pi4j.io.gpio.RaspiPin;
 import org.junit.jupiter.api.Test;
-import org.springframework.boot.test.context.SpringBootTest;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.context.annotation.Import;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.util.List;
 
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-@SpringBootTest
 @ActiveProfiles("test")
+@Import(EmergencyStopAction.class)
+@ExtendWith(SpringExtension.class)
 class EmergencyStopActionTest {
 
     @MockBean
@@ -28,6 +32,9 @@ class EmergencyStopActionTest {
 
     @MockBean
     private AppState state;
+
+    @Autowired
+    private EmergencyStopAction action;
 
     @Test
     void testAction() {
@@ -37,7 +44,6 @@ class EmergencyStopActionTest {
                 new Tank(new TankConfig(1, null, null, TankType.DEFAULT, null, new ValveConfig("test", ValveType.OUTPUT, "", true, RaspiPin.GPIO_04))));
         when(state.getOutputValves()).thenReturn(valves);
         when(state.getTanks()).thenReturn(tanks);
-        EmergencyStopAction action = new EmergencyStopAction(state, ioService);
 
         action.doAction(null);
 

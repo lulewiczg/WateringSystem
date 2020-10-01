@@ -2,12 +2,13 @@ package com.github.lulewiczg.watering.config;
 
 import com.github.lulewiczg.watering.config.dto.*;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvFileSource;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.test.context.TestPropertySource;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.validation.beanvalidation.LocalValidatorFactoryBean;
 
 import java.util.Map;
@@ -15,14 +16,13 @@ import java.util.Map;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-@SpringBootTest()
+@ExtendWith(SpringExtension.class)
 @Import(LocalValidatorFactoryBean.class)
 @TestPropertySource(locations = "classpath:application-appConfigTest.properties")
 class AppConfigTest {
 
     @Autowired
     private LocalValidatorFactoryBean validator;
-
 
     @Test
     void testPropsNoTank() {
@@ -34,7 +34,6 @@ class AppConfigTest {
         String message = assertThrows(IllegalStateException.class, config::validate).getMessage();
         assertEquals("No tanks found!", message);
     }
-
 
     @Test
     void testPropsNoValve() {
