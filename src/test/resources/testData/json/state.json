@@ -1,0 +1,118 @@
+{
+  "tanks": [
+    {
+      "config": {
+        "volume": 123,
+        "sensorId": "sensor1",
+        "valveId": "valve1",
+        "type": "DEFAULT",
+        "sensor": {
+          "minLevel": 12,
+          "maxLevel": 21,
+          "pinName": "GPIO 1"
+        },
+        "valve": {
+          "name": "Tank 1",
+          "type": "INPUT",
+          "pinName": "GPIO 3",
+          "open": false
+        }
+      },
+      "valve": {
+        "config": {
+          "name": "Tank 1",
+          "type": "INPUT",
+          "pinName": "GPIO 3",
+          "open": false
+        },
+        "opened": false
+      },
+      "sensor": {
+        "config": {
+          "minLevel": 12,
+          "maxLevel": 21,
+          "pinName": "GPIO 1"
+        },
+        "level": 0
+      },
+      "remaining": 0
+    },
+    {
+      "config": {
+        "volume": 321,
+        "sensorId": "sensor2",
+        "valveId": "valve2",
+        "type": "DEFAULT",
+        "sensor": {
+          "minLevel": 99,
+          "maxLevel": 100,
+          "pinName": "GPIO 2"
+        },
+        "valve": {
+          "name": "Tank 2",
+          "type": "INPUT",
+          "pinName": "GPIO 4",
+          "open": false
+        }
+      },
+      "valve": {
+        "config": {
+          "name": "Tank 2",
+          "type": "INPUT",
+          "pinName": "GPIO 4",
+          "open": false
+        },
+        "opened": false
+      },
+      "sensor": {
+        "config": {
+          "minLevel": 99,
+          "maxLevel": 100,
+          "pinName": "GPIO 2"
+        },
+        "level": 0
+      },
+      "remaining": 0
+    },
+    {
+      "config": {
+        "volume": null,
+        "sensorId": null,
+        "valveId": "tap",
+        "type": "UNLIMITED",
+        "sensor": null,
+        "valve": {
+          "name": "tap water",
+          "type": "INPUT",
+          "pinName": "GPIO 5",
+          "open": false
+        }
+      },
+      "valve": {
+        "config": {
+          "name": "tap water",
+          "type": "INPUT",
+          "pinName": "GPIO 5",
+          "open": false
+        },
+        "opened": false
+      },
+      "sensor": {
+        "config": null,
+        "level": 0
+      },
+      "remaining": -1
+    }
+  ],
+  "outputValves": [
+    {
+      "config": {
+        "name": "out",
+        "type": "OUTPUT",
+        "pinName": "GPIO 6",
+        "open": true
+      },
+      "opened": false
+    }
+  ]
+}

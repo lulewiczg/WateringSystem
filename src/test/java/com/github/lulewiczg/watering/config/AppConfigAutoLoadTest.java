@@ -12,7 +12,7 @@ import java.util.Map;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 
-@SpringBootTest()
+@SpringBootTest
 @TestPropertySource(locations = "classpath:application-test.properties")
 class AppConfigAutoLoadTest {
 
@@ -21,29 +21,29 @@ class AppConfigAutoLoadTest {
 
     @Test
     void testPropsLoad() {
-        Map<String, Valve> valves = new HashMap<>();
-        Valve valve = new Valve("Tank 1", ValveType.INPUT, false);
-        Valve valve2 = new Valve("Tank 2", ValveType.INPUT, false);
-        Valve valve3 = new Valve("tap water", ValveType.INPUT, false);
-        Valve valve4 = new Valve("out", ValveType.OUTPUT, true);
+        Map<String, ValveConfig> valves = new HashMap<>();
+        ValveConfig valve = new ValveConfig("Tank 1", ValveType.INPUT, "GPIO 3", false);
+        ValveConfig valve2 = new ValveConfig("Tank 2", ValveType.INPUT, "GPIO 4", false);
+        ValveConfig valve3 = new ValveConfig("tap water", ValveType.INPUT, "GPIO 5", false);
+        ValveConfig valve4 = new ValveConfig("out", ValveType.OUTPUT, "GPIO 6", true);
         valves.put("valve1", valve);
         valves.put("valve2", valve2);
         valves.put("tap", valve3);
         valves.put("garden", valve4);
         assertEquals(valves, config.getValves());
 
-        Map<String, WaterLevelSensor> sensors = new HashMap<>();
-        WaterLevelSensor sensor = new WaterLevelSensor(12, 21);
-        WaterLevelSensor sensor2 = new WaterLevelSensor(99, 100);
+        Map<String, WaterLevelSensorConfig> sensors = new HashMap<>();
+        WaterLevelSensorConfig sensor = new WaterLevelSensorConfig(12, 21, "GPIO 1");
+        WaterLevelSensorConfig sensor2 = new WaterLevelSensorConfig(99, 100,"GPIO 2");
         sensors.put("sensor1", sensor);
         sensors.put("sensor2", sensor2);
         assertEquals(sensors, config.getSensors());
 
-        Map<String, Tank> tanks = new HashMap<>();
-        tanks.put("tank1", new Tank(123, "sensor1", "valve1", TankType.DEFAULT));
-        tanks.put("tank2", new Tank(321, "sensor2", "valve2", TankType.DEFAULT));
-        tanks.put("tap", new Tank(null, null, "tap", TankType.UNLIMITED));
-        Map<String, Tank> configuredTanks = config.getTanks();
+        Map<String, TankConfig> tanks = new HashMap<>();
+        tanks.put("tank1", new TankConfig(123, "sensor1", "valve1", TankType.DEFAULT));
+        tanks.put("tank2", new TankConfig(321, "sensor2", "valve2", TankType.DEFAULT));
+        tanks.put("tap", new TankConfig(null, null, "tap", TankType.UNLIMITED));
+        Map<String, TankConfig> configuredTanks = config.getTanks();
         assertEquals(tanks, configuredTanks);
 
         assertEquals(configuredTanks.get("tank1").getSensor(), sensor);
