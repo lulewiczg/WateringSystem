@@ -1,5 +1,6 @@
 package com.github.lulewiczg.watering.service;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.github.lulewiczg.watering.config.AppConfig;
 import com.github.lulewiczg.watering.config.dto.ValveType;
 import com.github.lulewiczg.watering.state.Tank;
@@ -17,6 +18,7 @@ import java.util.stream.Collectors;
 @Service
 public class AppState {
 
+    @JsonIgnore
     private final AppConfig config;
 
     private List<Tank> tanks;

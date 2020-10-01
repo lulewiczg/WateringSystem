@@ -1,5 +1,6 @@
 package com.github.lulewiczg.watering.config;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.github.lulewiczg.watering.config.dto.Steerable;
 import com.github.lulewiczg.watering.config.dto.TankConfig;
 import com.github.lulewiczg.watering.config.dto.ValveConfig;
@@ -44,11 +45,12 @@ public class AppConfig {
     @NotNull
     private final Map<String, WaterLevelSensorConfig> sensors;
 
+    @JsonIgnore
     private final Validator validator;
 
+    @JsonIgnore
     @Value("${app.config.appConfig.runPostConstruct:true}")
     private boolean runPostConstruct;
-
 
     @PostConstruct
     void postConstruct() {
