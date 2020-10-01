@@ -1,8 +1,11 @@
 package com.github.lulewiczg.watering.config;
 
+import com.github.lulewiczg.watering.config.dto.Steerable;
 import com.github.lulewiczg.watering.config.dto.TankConfig;
 import com.github.lulewiczg.watering.config.dto.ValveConfig;
 import com.github.lulewiczg.watering.config.dto.WaterLevelSensorConfig;
+import com.pi4j.io.gpio.Pin;
+import com.pi4j.io.gpio.RaspiPin;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
@@ -16,10 +19,7 @@ import javax.validation.ConstraintViolation;
 import javax.validation.Valid;
 import javax.validation.Validator;
 import javax.validation.constraints.NotNull;
-import java.util.Comparator;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 
 /**
  * Bean for holding system configuration.
@@ -67,11 +67,12 @@ public class AppConfig {
         if (valves.size() == 0) {
             throw new IllegalStateException("No valves found!");
         }
+        validateFields();
         tanks.forEach(this::validate);
+        validatePins();
     }
 
     private void validate(String tankId, TankConfig tank) {
-        validateFields();
         ValveConfig valve = valves.get(tank.getValveId());
         if (valve == null) {
             throw new IllegalStateException("Can not find valve for tank " + tankId);
@@ -94,6 +95,25 @@ public class AppConfig {
         error.ifPresent(i -> {
             throw new IllegalStateException(i.getPropertyPath() + " " + i.getMessage());
         });
+    }
+
+    private void validatePins() {
+        List<String> usedPins = new ArrayList<>();
+        valves.values().forEach(i -> validatePin(usedPins, i));
+        sensors.values().forEach(i -> validatePin(usedPins, i));
+    }
+
+    private void validatePin(List<String> usedPins, Steerable i) {
+        String name = i.getPinName();
+        if (usedPins.contains(name)) {
+            throw new IllegalStateException("Pin already in use: " + name);
+        }
+        Pin pin = RaspiPin.getPinByName(name);
+        if (pin == null) {
+            throw new IllegalStateException("Could not find pin: " + name);
+        }
+        i.setPin(pin);
+        usedPins.add(name);
     }
 
 }

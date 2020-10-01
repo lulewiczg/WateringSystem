@@ -1,5 +1,6 @@
 package com.github.lulewiczg.watering.config.dto;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.RequiredArgsConstructor;
@@ -14,6 +15,7 @@ import javax.validation.constraints.NotNull;
  */
 @Data
 @Validated
+@AllArgsConstructor
 @RequiredArgsConstructor
 public class TankConfig {
 
