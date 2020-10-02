@@ -35,7 +35,6 @@ public class WaterLevelSensorConfig implements Steerable {
     @NotNull
     private String pinName;
 
-    @JsonIgnore
     @EqualsAndHashCode.Exclude
     private Pin pin;
 

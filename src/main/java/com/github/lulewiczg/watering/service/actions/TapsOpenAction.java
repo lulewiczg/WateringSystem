@@ -1,7 +1,7 @@
 package com.github.lulewiczg.watering.service.actions;
 
 import com.github.lulewiczg.watering.config.dto.TankType;
-import com.github.lulewiczg.watering.service.AppState;
+import com.github.lulewiczg.watering.state.AppState;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Component;
@@ -21,7 +21,7 @@ public class TapsOpenAction implements Action<Void, Void> {
     @Override
     public Void doAction(Void param) {
         log.info("Opening taps...");
-        state.getTanks().stream().filter(i -> i.getConfig().getType() == TankType.UNLIMITED).forEach(i -> openAction.doAction(i.getValve()));
+        state.getTaps().forEach(i -> openAction.doAction(i.getValve()));
         return null;
     }
 }

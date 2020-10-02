@@ -1,7 +1,7 @@
 package com.github.lulewiczg.watering.service.actions;
 
 import com.github.lulewiczg.watering.service.io.IOService;
-import com.github.lulewiczg.watering.state.Valve;
+import com.github.lulewiczg.watering.state.dto.Valve;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Component;
@@ -18,8 +18,8 @@ public class ValveOpenAction implements Action<Valve, Void> {
 
     @Override
     public Void doAction(Valve valve) {
-        log.info("Opening valve: {}", valve.getConfig().getName());
-        service.toggleOn(valve.getConfig().getPin());
+        log.info("Opening valve: {}", valve.getName());
+        service.toggleOn(valve.getPin());
         return null;
     }
 }

@@ -1,6 +1,6 @@
 package com.github.lulewiczg.watering.service.actions;
 
-import com.github.lulewiczg.watering.service.AppState;
+import com.github.lulewiczg.watering.state.AppState;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Component;
@@ -20,7 +20,7 @@ public class OutputsCloseAction implements Action<Void, Void> {
     @Override
     public Void doAction(Void param) {
         log.info("Closing outputs...");
-        state.getOutputValves().forEach(closeAction::doAction);
+        state.getOutputs().forEach(closeAction::doAction);
         return null;
     }
 }
