@@ -1,7 +1,5 @@
 package com.github.lulewiczg.watering.service.actions;
 
-import com.github.lulewiczg.watering.service.AppState;
-import com.github.lulewiczg.watering.service.io.IOService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Component;
@@ -14,15 +12,18 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class EmergencyStopAction implements Action<Void, Void> {
 
-    private final AppState state;
+    private final TanksCloseAction tanksCloseAction;
 
-    private final IOService service;
+    private final TapsCloseAction tapsCloseAction;
+
+    private final OutputsCloseAction outputsCloseAction;
 
     @Override
     public Void doAction(Void param) {
         log.info("System emergency stop...");
-        state.getTanks().forEach(i -> service.toggleOff(i.getValve().getConfig().getPin()));
-        state.getOutputValves().forEach(i -> service.toggleOff(i.getConfig().getPin()));
+        tanksCloseAction.doAction(null);
+        tapsCloseAction.doAction(null);
+        outputsCloseAction.doAction(null);
         return null;
     }
 }

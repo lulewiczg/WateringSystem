@@ -1,6 +1,5 @@
 package com.github.lulewiczg.watering.config.dto;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.pi4j.io.gpio.Pin;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -35,7 +34,6 @@ public class WaterLevelSensorConfig implements Steerable {
     @NotNull
     private String pinName;
 
-    @JsonIgnore
     @EqualsAndHashCode.Exclude
     private Pin pin;
 

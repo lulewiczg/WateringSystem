@@ -1,6 +1,6 @@
 package com.github.lulewiczg.watering.service.actions;
 
-import com.github.lulewiczg.watering.service.AppState;
+import com.github.lulewiczg.watering.state.AppState;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Component;
@@ -20,7 +20,7 @@ public class OutputsOpenAction implements Action<Void, Void> {
     @Override
     public Void doAction(Void param) {
         log.info("Opening outputs...");
-        state.getOutputValves().forEach(openAction::doAction);
+        state.getOutputs().forEach(openAction::doAction);
         return null;
     }
 }

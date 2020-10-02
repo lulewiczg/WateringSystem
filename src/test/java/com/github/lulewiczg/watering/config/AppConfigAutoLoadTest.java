@@ -34,7 +34,7 @@ class AppConfigAutoLoadTest {
 
         Map<String, WaterLevelSensorConfig> sensors = new HashMap<>();
         WaterLevelSensorConfig sensor = new WaterLevelSensorConfig(12, 21, "GPIO 1");
-        WaterLevelSensorConfig sensor2 = new WaterLevelSensorConfig(99, 100,"GPIO 2");
+        WaterLevelSensorConfig sensor2 = new WaterLevelSensorConfig(99, 100, "GPIO 2");
         sensors.put("sensor1", sensor);
         sensors.put("sensor2", sensor2);
         assertEquals(sensors, config.getSensors());
