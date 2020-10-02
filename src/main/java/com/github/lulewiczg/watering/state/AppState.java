@@ -1,9 +1,7 @@
 package com.github.lulewiczg.watering.state;
 
 import com.github.lulewiczg.watering.config.AppConfig;
-import com.github.lulewiczg.watering.config.dto.TankConfig;
 import com.github.lulewiczg.watering.config.dto.TankType;
-import com.github.lulewiczg.watering.config.dto.ValveConfig;
 import com.github.lulewiczg.watering.config.dto.ValveType;
 import com.github.lulewiczg.watering.state.dto.Tank;
 import com.github.lulewiczg.watering.state.dto.Valve;
@@ -31,16 +29,13 @@ public class AppState {
     private List<Valve> outputs;
 
     public AppState(AppConfig config, ValveMapper valveMapper, TankMapper tankMapper, WaterSourceMapper waterSourceMapper) {
-        List<TankConfig> tanks = config.getTanks().values().stream()
-                .filter(i -> i.getType() == TankType.DEFAULT).collect(Collectors.toList());
-        this.tanks = tankMapper.map(tanks);
+        this.tanks = tankMapper.map(config.getTanks().values().stream()
+                .filter(i1 -> i1.getType() == TankType.DEFAULT).collect(Collectors.toList()));
 
-        List<TankConfig> taps = config.getTanks().values().stream()
-                .filter(i -> i.getType() == TankType.UNLIMITED).collect(Collectors.toList());
-        this.taps = waterSourceMapper.map(taps);
+        this.taps = waterSourceMapper.map(config.getTanks().values().stream()
+                .filter(i1 -> i1.getType() == TankType.UNLIMITED).collect(Collectors.toList()));
 
-        List<ValveConfig> outputs = config.getValves().values().stream()
-                .filter(i -> i.getType() == ValveType.OUTPUT).collect(Collectors.toList());
-        this.outputs = valveMapper.map(outputs);
+        this.outputs = valveMapper.map(config.getValves().values().stream()
+                .filter(i -> i.getType() == ValveType.OUTPUT).collect(Collectors.toList()));
     }
 }
