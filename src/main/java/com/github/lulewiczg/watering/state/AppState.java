@@ -9,8 +9,6 @@ import com.github.lulewiczg.watering.state.dto.Tank;
 import com.github.lulewiczg.watering.state.dto.Valve;
 import com.github.lulewiczg.watering.state.mapper.TankConfigToTankMapper;
 import com.github.lulewiczg.watering.state.mapper.ValveConfigToValveMapper;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
 import org.springframework.stereotype.Service;
 

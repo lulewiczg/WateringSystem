@@ -1,7 +1,5 @@
 package com.github.lulewiczg.watering.service.actions;
 
-import com.github.lulewiczg.watering.state.AppState;
-import com.github.lulewiczg.watering.service.io.IOService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Component;

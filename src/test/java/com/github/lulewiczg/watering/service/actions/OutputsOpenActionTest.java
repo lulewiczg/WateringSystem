@@ -1,8 +1,5 @@
 package com.github.lulewiczg.watering.service.actions;
 
-import com.github.lulewiczg.watering.config.dto.TankConfig;
-import com.github.lulewiczg.watering.config.dto.TankType;
-import com.github.lulewiczg.watering.config.dto.ValveConfig;
 import com.github.lulewiczg.watering.config.dto.ValveType;
 import com.github.lulewiczg.watering.state.AppState;
 import com.github.lulewiczg.watering.state.dto.Tank;
@@ -41,8 +38,8 @@ class OutputsOpenActionTest {
         Valve valve3 = new Valve("test3", ValveType.INPUT, true, RaspiPin.GPIO_03);
         Valve valve4 = new Valve("test4", ValveType.INPUT, true, RaspiPin.GPIO_04);
         List<Valve> valves = List.of(valve, valve2);
-        List<Tank> tanks = List.of(new Tank(1, TankType.DEFAULT, null, valve3));
-        List<Tank> taps = List.of(new Tank(1, TankType.UNLIMITED, null, valve4));
+        List<Tank> tanks = List.of(new Tank(1, null, valve3));
+        List<Tank> taps = List.of(new Tank(1, null, valve4));
         when(state.getOutputs()).thenReturn(valves);
         when(state.getTanks()).thenReturn(tanks);
         when(state.getTaps()).thenReturn(taps);

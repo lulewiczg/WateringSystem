@@ -1,7 +1,8 @@
 package com.github.lulewiczg.watering.state.dto;
 
-import com.github.lulewiczg.watering.config.dto.TankType;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 /**
  * Tank state.
@@ -13,10 +14,6 @@ public class Tank {
 
     private Integer volume;
 
-    private TankType type;
-
     private Sensor sensor;
-
-    private Valve valve;
 
 }

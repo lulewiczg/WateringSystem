@@ -1,6 +1,5 @@
 package com.github.lulewiczg.watering.service.actions;
 
-import com.github.lulewiczg.watering.config.dto.TankType;
 import com.github.lulewiczg.watering.state.AppState;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
