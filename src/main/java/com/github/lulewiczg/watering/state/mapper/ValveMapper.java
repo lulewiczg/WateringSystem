@@ -10,7 +10,7 @@ import java.util.List;
  * Mapper for valve.
  */
 @Mapper(componentModel = "spring")
-public interface ValveConfigToValveMapper {
+public interface ValveMapper {
 
     Valve map(ValveConfig valve);
 

@@ -4,6 +4,7 @@ import com.github.lulewiczg.watering.config.dto.ValveType;
 import com.github.lulewiczg.watering.state.AppState;
 import com.github.lulewiczg.watering.state.dto.Tank;
 import com.github.lulewiczg.watering.state.dto.Valve;
+import com.github.lulewiczg.watering.state.dto.WaterSource;
 import com.pi4j.io.gpio.RaspiPin;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -39,7 +40,7 @@ class TapsCloseActionTest {
         Valve valve4 = new Valve("test4", ValveType.INPUT, true, RaspiPin.GPIO_04);
         List<Valve> valves = List.of(valve, valve2);
         List<Tank> tanks = List.of(new Tank(1, null, valve3));
-        List<Tank> taps = List.of(new Tank(1, null, valve4));
+        List<WaterSource> taps = List.of(new WaterSource(valve4));
         when(state.getOutputs()).thenReturn(valves);
         when(state.getTanks()).thenReturn(tanks);
         when(state.getTaps()).thenReturn(taps);

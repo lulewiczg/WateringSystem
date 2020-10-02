@@ -29,8 +29,6 @@
   ],
   "taps": [
     {
-      "volume": null,
-      "sensor": null,
       "valve": {
         "name": "tap water",
         "type": "INPUT",

@@ -5,17 +5,12 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 /**
- * Tank state.
+ * Base class for water source.
  */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class Tank {
-
-    private Integer volume;
-
-    private Sensor sensor;
+public class WaterSource {
 
     private Valve valve;
-
 }

@@ -9,7 +9,7 @@ import org.mapstruct.Mapping;
  * Mapper for sensor.
  */
 @Mapper(componentModel = "spring")
-public interface SensorConfigToSensorMapper {
+public interface SensorMapper {
 
     @Mapping(target = "level", ignore = true)
     Sensor map(WaterLevelSensorConfig sensor);

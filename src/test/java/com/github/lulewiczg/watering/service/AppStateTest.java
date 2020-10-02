@@ -1,11 +1,10 @@
 package com.github.lulewiczg.watering.service;
 
 import com.github.lulewiczg.watering.config.AppConfig;
-import com.github.lulewiczg.watering.config.dto.TankConfig;
 import com.github.lulewiczg.watering.state.AppState;
-import com.github.lulewiczg.watering.state.dto.Tank;
-import com.github.lulewiczg.watering.state.mapper.TankConfigToTankMapper;
-import com.github.lulewiczg.watering.state.mapper.ValveConfigToValveMapper;
+import com.github.lulewiczg.watering.state.mapper.TankMapper;
+import com.github.lulewiczg.watering.state.mapper.ValveMapper;
+import com.github.lulewiczg.watering.state.mapper.WaterSourceMapper;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -24,10 +23,13 @@ class AppStateTest {
     private AppState state;
 
     @Autowired
-    private TankConfigToTankMapper tankMapper;
+    private TankMapper tankMapper;
 
     @Autowired
-    private ValveConfigToValveMapper valveMapper;
+    private ValveMapper valveMapper;
+
+    @Autowired
+    private WaterSourceMapper waterSourceMapper;
 
     @Test
     void testStateCreation() {
@@ -36,12 +38,10 @@ class AppStateTest {
         assertEquals(2, state.getTanks().size());
         assertEquals(1, state.getTaps().size());
 
-        testTank(config.getTanks().get("tank1"), state.getTanks().get(0));
-        testTank(config.getTanks().get("tap"), state.getTaps().get(0));
-        testTank(config.getTanks().get("tank2"), state.getTanks().get(1));
+        assertEquals(tankMapper.map(config.getTanks().get("tank1")), state.getTanks().get(0));
+        assertEquals(tankMapper.map(config.getTanks().get("tank2")), state.getTanks().get(1));
+        assertEquals(waterSourceMapper.map(config.getTanks().get("tap")), state.getTaps().get(0));
+
     }
 
-    private void testTank(TankConfig tankConfig, Tank tank) {
-        assertEquals(tankMapper.map(tankConfig), tank);
-    }
 }
