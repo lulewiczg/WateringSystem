@@ -30,7 +30,7 @@ public class ScheduledOverflowWaterControl {
     private final AppState state;
 
     @Scheduled(cron = "${com.github.lulewiczg.watering.schedule.fill.cron}")
-    void water() {
+    void run() {
         log.info("Staring overflow control job...");
         if (state.getState() == SystemStatus.DRAINING) {
             log.info("Already draining");

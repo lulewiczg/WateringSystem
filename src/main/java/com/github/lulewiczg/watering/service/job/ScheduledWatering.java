@@ -39,7 +39,7 @@ public class ScheduledWatering {
     private final ScheduledExecutorService exec = Executors.newSingleThreadScheduledExecutor();
 
     @Scheduled(cron = "${com.github.lulewiczg.watering.schedule.watering.cron}")
-    void water() {
+    void run() {
         log.info("Staring watering job...");
         if (state.getState() == SystemStatus.WATERING) {
             log.info("Already watering, finishing.");
