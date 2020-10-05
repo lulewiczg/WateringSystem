@@ -1,8 +1,11 @@
 package com.github.lulewiczg.watering.service.job;
 
+import com.github.lulewiczg.watering.service.actions.OutputsCloseAction;
+import com.github.lulewiczg.watering.service.actions.OutputsOpenAction;
+import com.github.lulewiczg.watering.service.actions.TanksCloseAction;
+import com.github.lulewiczg.watering.service.actions.TanksOpenAction;
 import com.github.lulewiczg.watering.state.AppState;
 import com.github.lulewiczg.watering.state.SystemStatus;
-import com.github.lulewiczg.watering.service.actions.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Value;
@@ -39,7 +42,7 @@ public class ScheduledWatering {
     private final ScheduledExecutorService exec = Executors.newSingleThreadScheduledExecutor();
 
     @Scheduled(cron = "${com.github.lulewiczg.watering.schedule.watering.cron}")
-    void run() {
+    public void run() {
         log.info("Staring watering job...");
         if (state.getState() == SystemStatus.WATERING) {
             log.info("Already watering, finishing.");

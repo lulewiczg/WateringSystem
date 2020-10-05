@@ -10,6 +10,8 @@ import com.github.lulewiczg.watering.state.mapper.TankMapper;
 import com.github.lulewiczg.watering.state.mapper.ValveMapper;
 import com.github.lulewiczg.watering.state.mapper.WaterSourceMapper;
 import lombok.Data;
+import lombok.NoArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -20,6 +22,7 @@ import java.util.stream.Collectors;
  */
 @Data
 @Service
+@NoArgsConstructor
 public class AppState {
 
     private List<Tank> tanks;
@@ -30,6 +33,7 @@ public class AppState {
 
     private SystemStatus state = SystemStatus.IDLE;
 
+    @Autowired
     public AppState(AppConfig config, ValveMapper valveMapper, TankMapper tankMapper, WaterSourceMapper waterSourceMapper) {
         this.tanks = tankMapper.map(config.getTanks().stream()
                 .filter(i1 -> i1.getType() == TankType.DEFAULT).collect(Collectors.toList()));

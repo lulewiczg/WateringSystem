@@ -20,6 +20,7 @@ public class ValveOpenAction implements Action<Valve, Void> {
     public Void doAction(Valve valve) {
         log.info("Opening valve: {}", valve.getName());
         service.toggleOn(valve.getPin());
+        valve.setOpen(true);
         return null;
     }
 }

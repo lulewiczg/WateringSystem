@@ -1,6 +1,7 @@
 package com.github.lulewiczg.watering.state.dto;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.github.lulewiczg.watering.config.dto.ValveType;
 import com.pi4j.io.gpio.Pin;
 import lombok.AllArgsConstructor;
@@ -24,8 +25,8 @@ public class Valve {
 
     private boolean open;
 
-    @JsonIgnore
     @EqualsAndHashCode.Exclude
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private Pin pin;
 
 }

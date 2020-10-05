@@ -4,9 +4,12 @@ import com.github.lulewiczg.watering.service.actions.ValveCloseAction;
 import com.github.lulewiczg.watering.service.actions.ValveOpenAction;
 import com.github.lulewiczg.watering.state.AppState;
 import com.github.lulewiczg.watering.state.dto.Tank;
+import com.github.lulewiczg.watering.state.dto.Valve;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
+import org.springframework.context.annotation.DependsOn;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
@@ -44,7 +47,7 @@ public class SetDefaults {
         state.getOutputs().forEach(this::setValveState);
     }
 
-    private void setValveState(com.github.lulewiczg.watering.state.dto.Valve i) {
+    private void setValveState(Valve i) {
         if (i.isOpen()) {
             openAction.doAction(i);
         } else {

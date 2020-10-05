@@ -24,6 +24,11 @@ public class IOServiceImpl implements IOService {
     }
 
     @Override
+    public boolean readPin(Pin pin) {
+        throw new IllegalStateException("Not yet implemented!");
+    }
+
+    @Override
     public double analogRead(Pin pin) {
         throw new IllegalStateException("Not yet implemented!");
     }

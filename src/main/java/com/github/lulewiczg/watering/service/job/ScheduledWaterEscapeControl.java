@@ -1,7 +1,6 @@
 package com.github.lulewiczg.watering.service.job;
 
 import com.github.lulewiczg.watering.service.actions.EmergencyStopAction;
-import com.github.lulewiczg.watering.service.actions.WaterLevelReadAction;
 import com.github.lulewiczg.watering.state.AppState;
 import com.github.lulewiczg.watering.state.SystemStatus;
 import lombok.RequiredArgsConstructor;
@@ -30,7 +29,7 @@ public class ScheduledWaterEscapeControl {
     private List<Integer> prevLevels;
 
     @Scheduled(cron = "${com.github.lulewiczg.watering.schedule.escapeControl.cron}")
-    void run() {
+    public void run() {
         log.info("Staring escape control job...");
         if (state.getState() == SystemStatus.WATERING || state.getState() == SystemStatus.DRAINING) {
             log.info("Water output in progress, stopping...");
@@ -45,7 +44,7 @@ public class ScheduledWaterEscapeControl {
         List<Integer> damagedTanks = IntStream.range(0, levels.size()).boxed()
                 .filter(i -> levels.get(i) < prevLevels.get(i)).collect(Collectors.toList());
         if (!damagedTanks.isEmpty()) {
-            log.info("Water leak in tanks: {}", damagedTanks);
+            log.error("Water leak in tanks: {}", damagedTanks);
             state.setState(SystemStatus.ERROR);
             emergencyStopAction.doAction(null);
         }

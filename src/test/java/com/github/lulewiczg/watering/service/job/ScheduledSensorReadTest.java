@@ -55,6 +55,6 @@ class ScheduledSensorReadTest {
         verify(readAction).doAction(sensor2);
         assertEquals(11, sensor.getLevel());
         assertEquals(22, sensor2.getLevel());
-
     }
+
 }
