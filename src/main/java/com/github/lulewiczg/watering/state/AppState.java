@@ -31,13 +31,13 @@ public class AppState {
     private SystemStatus state = SystemStatus.IDLE;
 
     public AppState(AppConfig config, ValveMapper valveMapper, TankMapper tankMapper, WaterSourceMapper waterSourceMapper) {
-        this.tanks = tankMapper.map(config.getTanks().values().stream()
+        this.tanks = tankMapper.map(config.getTanks().stream()
                 .filter(i1 -> i1.getType() == TankType.DEFAULT).collect(Collectors.toList()));
 
-        this.taps = waterSourceMapper.map(config.getTanks().values().stream()
+        this.taps = waterSourceMapper.map(config.getTanks().stream()
                 .filter(i1 -> i1.getType() == TankType.UNLIMITED).collect(Collectors.toList()));
 
-        this.outputs = valveMapper.map(config.getValves().values().stream()
+        this.outputs = valveMapper.map(config.getValves().stream()
                 .filter(i -> i.getType() == ValveType.OUTPUT).collect(Collectors.toList()));
     }
 }

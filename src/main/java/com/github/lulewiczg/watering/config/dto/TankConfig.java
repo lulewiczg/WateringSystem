@@ -1,9 +1,6 @@
 package com.github.lulewiczg.watering.config.dto;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.RequiredArgsConstructor;
+import lombok.*;
 import org.springframework.validation.annotation.Validated;
 
 import javax.validation.Valid;
@@ -15,9 +12,12 @@ import javax.validation.constraints.NotNull;
  */
 @Data
 @Validated
+@NoArgsConstructor
 @AllArgsConstructor
-@RequiredArgsConstructor
 public class TankConfig {
+
+    @NotNull
+    private String id;
 
     @Valid
     @Min(0)
@@ -40,10 +40,12 @@ public class TankConfig {
     @EqualsAndHashCode.Exclude
     private ValveConfig valve;
 
-    public TankConfig(Integer volume, String sensorId, String valveId, TankType type) {
+    public TankConfig(String id, Integer volume, String sensorId, String valveId, TankType type) {
+        this.id = id;
         this.volume = volume;
         this.sensorId = sensorId;
         this.valveId = valveId;
         this.type = type;
     }
+
 }

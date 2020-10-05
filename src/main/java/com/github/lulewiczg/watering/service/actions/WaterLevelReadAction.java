@@ -7,7 +7,7 @@ import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Component;
 
 /**
- * Action reading water level.
+ * Action for reading water level.
  */
 @Log4j2
 @Component

@@ -34,13 +34,13 @@ class TanksCloseActionTest {
 
     @Test
     void testAction() {
-        Valve valve = new Valve("test", ValveType.OUTPUT, true, RaspiPin.GPIO_00);
-        Valve valve2 = new Valve("test2", ValveType.OUTPUT, true, RaspiPin.GPIO_01);
-        Valve valve3 = new Valve("test3", ValveType.INPUT, true, RaspiPin.GPIO_03);
-        Valve valve4 = new Valve("test4", ValveType.INPUT, true, RaspiPin.GPIO_04);
+        Valve valve = new Valve("test", "test", ValveType.OUTPUT, true, RaspiPin.GPIO_00);
+        Valve valve2 = new Valve("test2", "test2", ValveType.OUTPUT, true, RaspiPin.GPIO_01);
+        Valve valve3 = new Valve("test3", "test3", ValveType.INPUT, true, RaspiPin.GPIO_03);
+        Valve valve4 = new Valve("test4", "test4", ValveType.INPUT, true, RaspiPin.GPIO_04);
         List<Valve> valves = List.of(valve, valve2);
-        List<Tank> tanks = List.of(new Tank(1, null, valve3));
-        List<WaterSource> taps = List.of(new WaterSource(valve4));
+        List<Tank> tanks = List.of(new Tank("tank", 1, null, valve3));
+        List<WaterSource> taps = List.of(new WaterSource("tap", valve4));
         when(state.getOutputs()).thenReturn(valves);
         when(state.getTanks()).thenReturn(tanks);
         when(state.getTaps()).thenReturn(taps);

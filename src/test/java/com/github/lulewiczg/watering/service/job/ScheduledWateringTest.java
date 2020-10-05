@@ -73,10 +73,10 @@ class ScheduledWateringTest {
     @EnumSource(value = SystemStatus.class, mode = EnumSource.Mode.EXCLUDE, names = "WATERING")
     void testOverflowOk(SystemStatus status) throws InterruptedException {
         when(state.getState()).thenReturn(status);
-        Valve valve = new Valve("valve", ValveType.OUTPUT, true, RaspiPin.GPIO_00);
-        Tank tank = new Tank(100, null, valve);
-        Valve valve2 = new Valve("valve2", ValveType.OUTPUT, true, RaspiPin.GPIO_01);
-        Tank tank2 = new Tank(100, null, valve2);
+        Valve valve = new Valve("valve","valve", ValveType.OUTPUT, true, RaspiPin.GPIO_00);
+        Tank tank = new Tank("tank",100, null, valve);
+        Valve valve2 = new Valve("valve2","valve2", ValveType.OUTPUT, true, RaspiPin.GPIO_01);
+        Tank tank2 = new Tank("tank2",100, null, valve2);
         when(state.getTanks()).thenReturn(List.of(tank, tank2));
 
         job.run();

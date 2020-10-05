@@ -16,6 +16,8 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class Valve {
 
+    private String id;
+
     private String name;
 
     private ValveType type;

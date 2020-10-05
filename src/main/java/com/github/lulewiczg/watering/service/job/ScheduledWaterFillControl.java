@@ -33,10 +33,11 @@ public class ScheduledWaterFillControl {
     private final AppState state;
 
     @Scheduled(cron = "${com.github.lulewiczg.watering.schedule.overflow.cron}")
-    void water() {
+    void run() {
         log.info("Staring flow level control job...");
         if (state.getState() == SystemStatus.FILLING) {
             log.info("Already filling");
+            return;
         }
         state.setState(SystemStatus.FILLING);
         List<Tank> tanks = state.getTanks().stream().filter(i -> i.getSensor().getLevel() < i.getSensor().getMinLevel())
@@ -48,6 +49,7 @@ public class ScheduledWaterFillControl {
             return;
         }
         log.info("Water level too low for {}", tanks);
+        state.setState(SystemStatus.WATERING);
         outputsCloseAction.doAction(null);
         tapsOpenAction.doAction(null);
         tanks.forEach(i -> valveOpenAction.doAction(i.getValve()));

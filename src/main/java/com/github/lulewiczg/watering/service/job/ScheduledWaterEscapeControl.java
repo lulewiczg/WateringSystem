@@ -25,14 +25,12 @@ public class ScheduledWaterEscapeControl {
 
     private final EmergencyStopAction emergencyStopAction;
 
-    private final WaterLevelReadAction waterLevelReadAction;
-
     private final AppState state;
 
     private List<Integer> prevLevels;
 
     @Scheduled(cron = "${com.github.lulewiczg.watering.schedule.escapeControl.cron}")
-    void water() {
+    void run() {
         log.info("Staring escape control job...");
         if (state.getState() == SystemStatus.WATERING || state.getState() == SystemStatus.DRAINING) {
             log.info("Water output in progress, stopping...");
@@ -48,6 +46,7 @@ public class ScheduledWaterEscapeControl {
                 .filter(i -> levels.get(i) < prevLevels.get(i)).collect(Collectors.toList());
         if (!damagedTanks.isEmpty()) {
             log.info("Water leak in tanks: {}", damagedTanks);
+            state.setState(SystemStatus.ERROR);
             emergencyStopAction.doAction(null);
         }
         log.info("Escape control finished.");

@@ -14,11 +14,13 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class Sensor {
 
+    private String id;
+
     private Integer minLevel;
 
     private Integer maxLevel;
 
-    private int level;
+    private Integer level;
 
     @JsonIgnore
     private Pin pin;

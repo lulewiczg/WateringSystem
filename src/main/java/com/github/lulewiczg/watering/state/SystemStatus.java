@@ -10,6 +10,6 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public enum SystemStatus {
 
-    IDLE, WATERING, DRAINING, FILLING
+    IDLE, WATERING, DRAINING, FILLING, ERROR
 
 }

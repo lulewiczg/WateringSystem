@@ -12,5 +12,8 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class WaterSource {
 
+    private String id;
+
     private Valve valve;
+
 }
