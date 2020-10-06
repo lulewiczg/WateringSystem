@@ -23,6 +23,14 @@ public interface IOService {
     void toggleOff(Pin pin);
 
     /**
+     * Reads pin state.
+     *
+     * @param pin pin
+     * @return state
+     */
+    boolean readPin(Pin pin);
+
+    /**
      * Reads analog value from pin
      *
      * @param pin pin

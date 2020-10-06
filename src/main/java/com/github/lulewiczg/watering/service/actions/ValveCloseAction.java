@@ -20,6 +20,7 @@ public class ValveCloseAction implements Action<Valve, Void> {
     public Void doAction(Valve valve) {
         log.info("Closing valve: {}", valve.getName());
         service.toggleOff(valve.getPin());
+        valve.setOpen(false);
         return null;
     }
 }

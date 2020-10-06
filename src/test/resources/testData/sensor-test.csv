@@ -1,14 +1,15 @@
-1,2,
-10,20,
-0,0,
-100,100,
-50,50,
--1,-1,sensors[test].maxLevel must be greater than or equal to 0
--1, 5,sensors[test].minLevel must be greater than or equal to 0
-10,101,sensors[test].maxLevel must be less than or equal to 100
-101,101,sensors[test].maxLevel must be less than or equal to 100
-999,999,sensors[test].maxLevel must be less than or equal to 100
-16,2,Min water level can not be higher than max!
-99,98,Min water level can not be higher than max!
-2,1,Min water level can not be higher than max!
-0,101,sensors[test].maxLevel must be less than or equal to 100
+sensor,1,2,
+sensor,10,20,
+sensor,0,0,
+sensor,100,100,
+sensor,50,50,
+sensor,-1,-1,sensors[0].maxLevel must be greater than or equal to 0
+sensor,-1, 5,sensors[0].minLevel must be greater than or equal to 0
+sensor,10,101,sensors[0].maxLevel must be less than or equal to 100
+sensor,101,101,sensors[0].maxLevel must be less than or equal to 100
+sensor,999,999,sensors[0].maxLevel must be less than or equal to 100
+sensor,16,2,Min water level can not be higher than max!
+sensor,99,98,Min water level can not be higher than max!
+sensor,2,1,Min water level can not be higher than max!
+sensor,0,101,sensors[0].maxLevel must be less than or equal to 100
+,1,2,sensors[0].id must not be null

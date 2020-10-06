@@ -12,6 +12,8 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class Tank {
 
+    private String id;
+
     private Integer volume;
 
     private Sensor sensor;

@@ -28,7 +28,7 @@ class WaterLevelReadActionTest {
     @Test
     void testAction() {
         when(service.analogRead(RaspiPin.GPIO_01)).thenReturn(12.34);
-        Sensor sensor = new Sensor(null, null, 12, RaspiPin.GPIO_01);
+        Sensor sensor = new Sensor("test", null, null, 12, RaspiPin.GPIO_01);
 
         Double result = action.doAction(sensor);
         assertEquals(12.34, result);

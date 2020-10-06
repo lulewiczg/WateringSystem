@@ -1,26 +1,32 @@
 {
   "tanks": [
     {
+      "id": "tank1",
       "volume": 123,
       "sensor": {
+        "id": "sensor1",
         "minLevel": 12,
         "maxLevel": 21,
-        "level": 0
+        "level": null
       },
       "valve": {
+        "id": "valve1",
         "name": "Tank 1",
         "type": "INPUT",
         "open": false
       }
     },
     {
+      "id": "tank2",
       "volume": 321,
       "sensor": {
+        "id": "sensor2",
         "minLevel": 99,
         "maxLevel": 100,
-        "level": 0
+        "level": null
       },
       "valve": {
+        "id": "valve2",
         "name": "Tank 2",
         "type": "INPUT",
         "open": false
@@ -29,7 +35,9 @@
   ],
   "taps": [
     {
+      "id": "tap",
       "valve": {
+        "id": "tap",
         "name": "tap water",
         "type": "INPUT",
         "open": false
@@ -38,9 +46,11 @@
   ],
   "outputs": [
     {
+      "id": "out",
       "name": "out",
       "type": "OUTPUT",
       "open": true
     }
-  ]
+  ],
+  "state": "IDLE"
 }

@@ -10,21 +10,28 @@ import org.springframework.stereotype.Service;
  */
 @Log4j2
 @Service
-@ConditionalOnExpression("!${com.github.lulewiczg.watering.mockedIO}")
+@ConditionalOnExpression("${com.github.lulewiczg.watering.mockedIO:true}")
 public class IOServiceImpl implements IOService {
+
+    private static final String ERR = "Not yet implemented!";
 
     @Override
     public void toggleOn(Pin pin) {
-        throw new IllegalStateException("Not yet implemented!");
+        throw new IllegalStateException(ERR);
     }
 
     @Override
     public void toggleOff(Pin pin) {
-        throw new IllegalStateException("Not yet implemented!");
+        throw new IllegalStateException(ERR);
+    }
+
+    @Override
+    public boolean readPin(Pin pin) {
+        throw new IllegalStateException(ERR);
     }
 
     @Override
     public double analogRead(Pin pin) {
-        throw new IllegalStateException("Not yet implemented!");
+        throw new IllegalStateException(ERR);
     }
 }
