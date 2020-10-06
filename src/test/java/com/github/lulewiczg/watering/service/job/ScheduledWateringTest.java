@@ -10,7 +10,6 @@ import com.github.lulewiczg.watering.state.SystemStatus;
 import com.github.lulewiczg.watering.state.dto.Tank;
 import com.github.lulewiczg.watering.state.dto.Valve;
 import com.pi4j.io.gpio.RaspiPin;
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
@@ -54,9 +53,10 @@ class ScheduledWateringTest {
     @Autowired
     private ScheduledWatering job;
 
-    @Test
-    void testAlreadyRunning() {
-        when(state.getState()).thenReturn(SystemStatus.WATERING);
+    @ParameterizedTest
+    @EnumSource(value = SystemStatus.class, names = {"WATERING", "ERROR", "FILLING"})
+    void testNotStart(SystemStatus status) {
+        when(state.getState()).thenReturn(status);
 
         job.run();
 
@@ -68,13 +68,13 @@ class ScheduledWateringTest {
     }
 
     @ParameterizedTest
-    @EnumSource(value = SystemStatus.class, mode = EnumSource.Mode.EXCLUDE, names = "WATERING")
-    void testOverflowOk(SystemStatus status) throws InterruptedException {
+    @EnumSource(value = SystemStatus.class, names = {"IDLE", "DRAINING"})
+    void testWateringOk(SystemStatus status) throws InterruptedException {
         when(state.getState()).thenReturn(status);
-        Valve valve = new Valve("valve","valve", ValveType.OUTPUT, true, RaspiPin.GPIO_00);
-        Tank tank = new Tank("tank",100, null, valve);
-        Valve valve2 = new Valve("valve2","valve2", ValveType.OUTPUT, true, RaspiPin.GPIO_01);
-        Tank tank2 = new Tank("tank2",100, null, valve2);
+        Valve valve = new Valve("valve", "valve", ValveType.OUTPUT, true, RaspiPin.GPIO_00);
+        Tank tank = new Tank("tank", 100, null, valve);
+        Valve valve2 = new Valve("valve2", "valve2", ValveType.OUTPUT, true, RaspiPin.GPIO_01);
+        Tank tank2 = new Tank("tank2", 100, null, valve2);
         when(state.getTanks()).thenReturn(List.of(tank, tank2));
 
         job.run();

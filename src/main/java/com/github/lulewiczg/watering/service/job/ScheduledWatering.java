@@ -24,7 +24,7 @@ import java.util.concurrent.TimeUnit;
 @Service
 @RequiredArgsConstructor
 @ConditionalOnProperty("com.github.lulewiczg.watering.schedule.watering.enabled")
-public class ScheduledWatering {
+public class ScheduledWatering extends ScheduledJob {
 
     @Value("${com.github.lulewiczg.watering.schedule.watering.duration}")
     private Long wateringLength;
@@ -42,12 +42,32 @@ public class ScheduledWatering {
     private final ScheduledExecutorService exec = Executors.newSingleThreadScheduledExecutor();
 
     @Scheduled(cron = "${com.github.lulewiczg.watering.schedule.watering.cron}")
-    public void run() {
-        log.info("Staring watering job...");
-        if (state.getState() == SystemStatus.WATERING) {
-            log.info("Already watering, finishing.");
-            return;
-        }
+    void schedule() {
+        run();
+    }
+
+    @Override
+    protected String getName() {
+        return "Watering";
+    }
+
+    @Override
+    protected SystemStatus getJobStatus() {
+        return SystemStatus.WATERING;
+    }
+
+    @Override
+    protected SystemStatus getState() {
+        return state.getState();
+    }
+
+    @Override
+    protected boolean isRunning() {
+        return false;
+    }
+
+    @Override
+    protected void doJob() {
         state.setState(SystemStatus.WATERING);
         tanksOpenAction.doAction(null);
         outputsOpenAction.doAction(null);

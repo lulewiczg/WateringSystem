@@ -45,7 +45,10 @@ class ScheduledValveReadTest {
         Valve valve2 = new Valve("valve2", "valve2", ValveType.OUTPUT, false, RaspiPin.GPIO_01);
         Sensor sensor2 = new Sensor("sensor2", 10, 90, 10, RaspiPin.GPIO_02);
         Tank tank2 = new Tank("tank2", 100, sensor2, valve2);
+        Valve valve3 = new Valve("valve3", "valve3", ValveType.OUTPUT, false, RaspiPin.GPIO_02);
+
         when(state.getTanks()).thenReturn(List.of(tank, tank2));
+        when(state.getOutputs()).thenReturn(List.of(valve3));
         when(ioService.readPin(valve.getPin())).thenReturn(true);
         when(ioService.readPin(valve2.getPin())).thenReturn(false);
 
@@ -53,6 +56,7 @@ class ScheduledValveReadTest {
 
         verify(ioService).readPin(valve.getPin());
         verify(ioService).readPin(valve2.getPin());
+        verify(ioService).readPin(valve3.getPin());
         verify(state, never()).setState(any());
     }
 

@@ -31,7 +31,7 @@ public class AppState {
 
     private List<Valve> outputs;
 
-    private SystemStatus state = SystemStatus.IDLE;
+    private volatile SystemStatus state = SystemStatus.IDLE;
 
     @Autowired
     public AppState(AppConfig config, ValveMapper valveMapper, TankMapper tankMapper, WaterSourceMapper waterSourceMapper) {

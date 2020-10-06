@@ -23,7 +23,7 @@ import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor
 @ConditionalOnProperty("com.github.lulewiczg.watering.schedule.overflow.enabled")
-public class ScheduledWaterFillControl {
+public class ScheduledWaterFillControl extends ScheduledJob {
 
     private final TanksCloseAction tanksCloseAction;
 
@@ -36,26 +36,53 @@ public class ScheduledWaterFillControl {
     private final AppState state;
 
     @Scheduled(cron = "${com.github.lulewiczg.watering.schedule.overflow.cron}")
-    public void run() {
-        log.info("Staring flow level control job...");
-        if (state.getState() == SystemStatus.FILLING) {
-            log.info("Already filling");
-            return;
-        }
-        state.setState(SystemStatus.FILLING);
-        List<Tank> tanks = state.getTanks().stream().filter(i -> i.getSensor().getLevel() != null && i.getSensor().getLevel() < i.getSensor().getMinLevel())
-                .collect(Collectors.toList());
+    void schedule() {
+        run();
+    }
+
+    @Override
+    protected String getName() {
+        return "Water fill";
+    }
+
+    @Override
+    protected SystemStatus getJobStatus() {
+        return SystemStatus.FILLING;
+    }
+
+    @Override
+    protected SystemStatus getState() {
+        return state.getState();
+    }
+
+    @Override
+    protected void doJob() {
+        List<Tank> tanks = findTanks();
         if (tanks.isEmpty()) {
-            log.info("Water levels are OK");
-            tanksCloseAction.doAction(null);
-            state.setState(SystemStatus.IDLE);
+            log.debug("Water levels are OK");
             return;
         }
         log.info("Water level too low for {}", tanks);
-        state.setState(SystemStatus.WATERING);
+        state.setState(SystemStatus.FILLING);
         outputsCloseAction.doAction(null);
         tapsOpenAction.doAction(null);
         tanks.forEach(i -> valveOpenAction.doAction(i.getValve()));
         log.info("Filling tanks started.");
+    }
+
+
+    @Override
+    protected void doJobRunning() {
+        List<Tank> tanks = findTanks();
+        if (tanks.isEmpty()) {
+            log.info("Water levels are OK, filling finished");
+            tanksCloseAction.doAction(null);
+            state.setState(SystemStatus.IDLE);
+        }
+    }
+
+    private List<Tank> findTanks() {
+        return state.getTanks().stream().filter(i -> i.getSensor().getLevel() != null && i.getSensor().getLevel() < i.getSensor().getMinLevel())
+                .collect(Collectors.toList());
     }
 }

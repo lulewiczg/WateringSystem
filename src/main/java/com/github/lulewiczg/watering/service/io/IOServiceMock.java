@@ -4,6 +4,7 @@ import com.github.lulewiczg.watering.state.AppState;
 import com.github.lulewiczg.watering.state.dto.Tank;
 import com.github.lulewiczg.watering.state.dto.Valve;
 import com.pi4j.io.gpio.Pin;
+import lombok.Generated;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
@@ -16,6 +17,7 @@ import java.util.Optional;
  */
 @Log4j2
 @Service
+@Generated
 @RequiredArgsConstructor
 @ConditionalOnMissingBean(IOServiceImpl.class)
 public class IOServiceMock implements IOService {

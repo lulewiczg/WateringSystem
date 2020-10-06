@@ -15,21 +15,28 @@ import org.springframework.stereotype.Service;
 @Service
 @RequiredArgsConstructor
 @ConditionalOnProperty("com.github.lulewiczg.watering.schedule.sensorsRead.enabled")
-public class ScheduledSensorRead {
+public class ScheduledSensorRead extends ScheduledIoJob {
 
     private final AppState state;
 
     private final WaterLevelReadAction readAction;
 
-    /**
-     * Runs action.
-     */
     @Scheduled(cron = "${com.github.lulewiczg.watering.schedule.sensorsRead.cron}")
-    public void run() {
-        log.info("Reading sensors...");
+    void schedule() {
+        run();
+    }
+
+    @Override
+    protected String getName() {
+        return "Sensors read";
+    }
+
+    @Override
+    protected void doJob() {
+        log.debug("Reading sensors...");
         state.getTanks().forEach(i -> {
             double result = readAction.doAction(i.getSensor());
-            log.info("Read water level for {}: {}", i.getId(), result);
+            log.debug("Read water level for {}: {}", i.getId(), result);
             i.getSensor().setLevel((int) result);
         });
     }

@@ -63,10 +63,10 @@ public class AppConfig {
     }
 
     void validate() {
-        if (tanks.size() == 0) {
+        if (tanks.isEmpty()) {
             throw new IllegalStateException("No tanks found!");
         }
-        if (valves.size() == 0) {
+        if (valves.isEmpty()) {
             throw new IllegalStateException("No valves found!");
         }
         validateFields();

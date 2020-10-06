@@ -3,6 +3,7 @@ package com.github.lulewiczg.watering.service.job;
 import com.github.lulewiczg.watering.service.io.IOService;
 import com.github.lulewiczg.watering.state.AppState;
 import com.github.lulewiczg.watering.state.SystemStatus;
+import com.github.lulewiczg.watering.state.dto.Tank;
 import com.github.lulewiczg.watering.state.dto.Valve;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
@@ -17,27 +18,36 @@ import org.springframework.stereotype.Service;
 @Service
 @RequiredArgsConstructor
 @ConditionalOnProperty("com.github.lulewiczg.watering.schedule.sensorsRead.enabled")
-public class ScheduledValveRead {
+public class ScheduledValveRead extends ScheduledIoJob {
 
     private final AppState state;
 
     private final IOService ioService;
 
-    /**
-     * Runs action.
-     */
     @Scheduled(cron = "${com.github.lulewiczg.watering.schedule.sensorsRead.cron}")
-    public void run() {
-        log.info("Checking valves...");
-        state.getTanks().forEach(i -> {
-            Valve valve = i.getValve();
-            boolean result = ioService.readPin(valve.getPin());
-            if (valve.isOpen() != result) {
-                log.error("Invalid state for valve {}, should be {}", valve.getId(), valve.isOpen());
-                state.setState(SystemStatus.ERROR);
-            }
-        });
-        log.info("Valves check finished.");
+    void schedule() {
+        run();
+    }
+
+    @Override
+    protected String getName() {
+        return "Valves state read";
+    }
+
+    @Override
+    protected void doJob() {
+        log.debug("Checking valves...");
+        state.getOutputs().forEach(this::readValve);
+        state.getTanks().stream().map(Tank::getValve).forEach(this::readValve);
+        log.debug("Valves check finished.");
+    }
+
+    private void readValve(Valve i) {
+        boolean result = ioService.readPin(i.getPin());
+        if (i.isOpen() != result) {
+            log.error("Invalid state for valve {}, should be {}", i.getId(), i.isOpen());
+            state.setState(SystemStatus.ERROR);
+        }
     }
 
 }

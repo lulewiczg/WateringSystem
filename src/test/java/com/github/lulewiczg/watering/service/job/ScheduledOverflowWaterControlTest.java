@@ -9,10 +9,10 @@ import com.github.lulewiczg.watering.state.dto.Sensor;
 import com.github.lulewiczg.watering.state.dto.Tank;
 import com.github.lulewiczg.watering.state.dto.Valve;
 import com.pi4j.io.gpio.RaspiPin;
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvFileSource;
+import org.junit.jupiter.params.provider.EnumSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
@@ -43,9 +43,10 @@ class ScheduledOverflowWaterControlTest {
     @Autowired
     private ScheduledOverflowWaterControl job;
 
-    @Test
-    void testAlreadyRunning() {
-        when(state.getState()).thenReturn(SystemStatus.DRAINING);
+    @ParameterizedTest
+    @EnumSource(value = SystemStatus.class, names = {"ERROR", "WATERING"})
+    void testNotStart(SystemStatus status) {
+        when(state.getState()).thenReturn(status);
 
         job.run();
 
@@ -55,8 +56,24 @@ class ScheduledOverflowWaterControlTest {
     }
 
     @ParameterizedTest
-    @CsvFileSource(resources = "/testData/overflow-ok-test.csv")
-    void testOverflowOk(SystemStatus status, int minLevel, int maxLevel, int level) {
+    @CsvFileSource(resources = "/testData/overflow-running-test.csv")
+    void testAlreadyRunning(SystemStatus status, int minLevel, int maxLevel, Integer level) {
+        when(state.getState()).thenReturn(status);
+        Valve valve = new Valve("valve", "valve", ValveType.OUTPUT, true, RaspiPin.GPIO_00);
+        Sensor sensor = new Sensor("sensor", minLevel, maxLevel, level, RaspiPin.GPIO_01);
+        Tank tank = new Tank("tank", 100, sensor, valve);
+        when(state.getTanks()).thenReturn(List.of(tank));
+
+        job.run();
+
+        verify(tanksCloseAction, never()).doAction(any());
+        verify(valveOpenAction, never()).doAction(any());
+        verify(state, never()).setState(any());
+    }
+
+    @ParameterizedTest
+    @CsvFileSource(resources = "/testData/overflow-running-finished-test.csv")
+    void testAlreadyRunningNotFinished(SystemStatus status, int minLevel, int maxLevel, Integer level) {
         when(state.getState()).thenReturn(status);
         Valve valve = new Valve("valve", "valve", ValveType.OUTPUT, true, RaspiPin.GPIO_00);
         Sensor sensor = new Sensor("sensor", minLevel, maxLevel, level, RaspiPin.GPIO_01);
@@ -67,6 +84,22 @@ class ScheduledOverflowWaterControlTest {
 
         verify(tanksCloseAction).doAction(null);
         verify(state).setState(SystemStatus.IDLE);
+        verify(valveOpenAction, never()).doAction(any());
+    }
+
+    @ParameterizedTest
+    @CsvFileSource(resources = "/testData/overflow-ok-test.csv")
+    void testOverflowOk(SystemStatus status, int minLevel, int maxLevel, Integer level) {
+        when(state.getState()).thenReturn(status);
+        Valve valve = new Valve("valve", "valve", ValveType.OUTPUT, true, RaspiPin.GPIO_00);
+        Sensor sensor = new Sensor("sensor", minLevel, maxLevel, level, RaspiPin.GPIO_01);
+        Tank tank = new Tank("tank", 100, sensor, valve);
+        when(state.getTanks()).thenReturn(List.of(tank));
+
+        job.run();
+
+        verify(tanksCloseAction,never()).doAction(any());
+        verify(state, never()).setState(any());
         verify(valveOpenAction, never()).doAction(any());
     }
 

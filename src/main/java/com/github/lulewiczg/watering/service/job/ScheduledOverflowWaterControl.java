@@ -21,7 +21,7 @@ import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor
 @ConditionalOnProperty("com.github.lulewiczg.watering.schedule.fill.enabled")
-public class ScheduledOverflowWaterControl {
+public class ScheduledOverflowWaterControl extends ScheduledJob {
 
     private final TanksCloseAction tanksCloseAction;
 
@@ -30,23 +30,50 @@ public class ScheduledOverflowWaterControl {
     private final AppState state;
 
     @Scheduled(cron = "${com.github.lulewiczg.watering.schedule.fill.cron}")
-    public void run() {
-        log.info("Staring overflow control job...");
-        if (state.getState() == SystemStatus.DRAINING) {
-            log.info("Already draining");
-            return;
-        }
-        List<Tank> tanks = state.getTanks().stream()
-                .filter(i -> i.getSensor().getLevel() != null && i.getSensor().getLevel() > i.getSensor().getMaxLevel()).collect(Collectors.toList());
+    void schedule() {
+        run();
+    }
+
+    @Override
+    protected String getName() {
+        return "Water overflow control";
+    }
+
+    @Override
+    protected SystemStatus getJobStatus() {
+        return SystemStatus.DRAINING;
+    }
+
+    @Override
+    protected SystemStatus getState() {
+        return state.getState();
+    }
+
+    @Override
+    protected void doJob() {
+        List<Tank> tanks = findOverflowTanks();
         if (tanks.isEmpty()) {
-            log.info("Water levels are OK");
-            tanksCloseAction.doAction(null);
-            state.setState(SystemStatus.IDLE);
+            log.debug("Water levels are OK, no need to drain");
             return;
         }
         state.setState(SystemStatus.DRAINING);
-        log.info("Water level too high for {}", tanks);
+        log.info("Water level too high for {}", () -> tanks.stream().map(Tank::getId).collect(Collectors.toList()));
         tanks.forEach(i -> valveOpenAction.doAction(i.getValve()));
         log.info("Draining tanks started.");
+    }
+
+    @Override
+    protected void doJobRunning() {
+        List<Tank> tanks = findOverflowTanks();
+        if (tanks.isEmpty()) {
+            log.info("Water levels are OK, stopping");
+            tanksCloseAction.doAction(null);
+            state.setState(SystemStatus.IDLE);
+        }
+    }
+
+    private List<Tank> findOverflowTanks() {
+        return state.getTanks().stream()
+                .filter(i -> i.getSensor().getLevel() != null && i.getSensor().getLevel() > i.getSensor().getMaxLevel()).collect(Collectors.toList());
     }
 }
