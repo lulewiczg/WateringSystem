@@ -1,6 +1,6 @@
 GPIO 1,GPIO 2,GPIO 3,GPIO 4,
 GPIO 4,GPIO 3,GPIO 2,GPIO 1,
-GPIO 1,GPIO 2,GPIO 3,,sensors[test2].pinName must not be null
+GPIO 1,GPIO 2,GPIO 3,,sensors[1].pinName must not be null
 GPIO 1,GPIO 1,GPIO 3,GPIO 4,Pin already in use: GPIO 1
 GPIO 1,GPIO 2,GPIO 1,GPIO 4,Pin already in use: GPIO 1
 GPIO -1,GPIO 2,GPIO 3,GPIO 4,Could not find pin: GPIO -1

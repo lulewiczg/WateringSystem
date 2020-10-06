@@ -1,13 +1,15 @@
 package com.github.lulewiczg.watering.service.actions;
 
 import com.github.lulewiczg.watering.service.io.IOService;
-import com.github.lulewiczg.watering.state.Sensor;
+import com.github.lulewiczg.watering.state.dto.Sensor;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Component;
 
 /**
- * Action reading water level.
+ * Action for reading water level.
  */
+@Log4j2
 @Component
 @RequiredArgsConstructor
 public class WaterLevelReadAction implements Action<Sensor, Double> {
@@ -16,6 +18,7 @@ public class WaterLevelReadAction implements Action<Sensor, Double> {
 
     @Override
     public Double doAction(Sensor sensor) {
-        return service.analogRead(sensor.getConfig().getPin());
+        log.info("Reading water level for sensor {}", sensor);
+        return service.analogRead(sensor.getPin());
     }
 }

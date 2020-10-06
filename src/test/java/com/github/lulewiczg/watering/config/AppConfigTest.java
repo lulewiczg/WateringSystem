@@ -11,7 +11,7 @@ import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.validation.beanvalidation.LocalValidatorFactoryBean;
 
-import java.util.Map;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -26,10 +26,10 @@ class AppConfigTest {
 
     @Test
     void testPropsNoTank() {
-        Map<String, ValveConfig> valves = Map.of("test", new ValveConfig("abc", ValveType.INPUT, "GPIO 1", false));
-        Map<String, WaterLevelSensorConfig> sensors = Map.of("test", new WaterLevelSensorConfig(12, 21, "GPIO 2"));
+        List<ValveConfig> valves = List.of(new ValveConfig("valve1", "abc", ValveType.INPUT, "GPIO 1", false));
+        List<WaterLevelSensorConfig> sensors = List.of(new WaterLevelSensorConfig("sensor1", 12, 21, "GPIO 2"));
 
-        AppConfig config = new AppConfig(Map.of(), valves, sensors, validator);
+        AppConfig config = new AppConfig(List.of(), valves, sensors, validator);
 
         String message = assertThrows(IllegalStateException.class, config::validate).getMessage();
         assertEquals("No tanks found!", message);
@@ -37,10 +37,10 @@ class AppConfigTest {
 
     @Test
     void testPropsNoValve() {
-        Map<String, TankConfig> tanks = Map.of("tank", new TankConfig(123, "sensor1", "valve1", TankType.DEFAULT));
-        Map<String, WaterLevelSensorConfig> sensors = Map.of("test", new WaterLevelSensorConfig(12, 21, "GPIO 1"));
+        List<TankConfig> tanks = List.of(new TankConfig("tank", 123, "sensor1", "valve1", TankType.DEFAULT));
+        List<WaterLevelSensorConfig> sensors = List.of(new WaterLevelSensorConfig("test", 12, 21, "GPIO 1"));
 
-        AppConfig config = new AppConfig(tanks, Map.of(), sensors, validator);
+        AppConfig config = new AppConfig(tanks, List.of(), sensors, validator);
 
         String message = assertThrows(IllegalStateException.class, config::validate).getMessage();
         assertEquals("No valves found!", message);
@@ -48,10 +48,10 @@ class AppConfigTest {
 
     @Test
     void testPropsNoSensor() {
-        Map<String, ValveConfig> valves = Map.of("test", new ValveConfig("abc", ValveType.INPUT, "GPIO 1", false));
-        Map<String, TankConfig> tanks = Map.of("tank", new TankConfig(123, null, "test", TankType.DEFAULT));
+        List<ValveConfig> valves = List.of(new ValveConfig("test", "abc", ValveType.INPUT, "GPIO 1", false));
+        List<TankConfig> tanks = List.of(new TankConfig("tank", 123, null, "test", TankType.DEFAULT));
 
-        AppConfig config = new AppConfig(tanks, valves, Map.of(), validator);
+        AppConfig config = new AppConfig(tanks, valves, List.of(), validator);
 
         config.validate();
     }
@@ -59,12 +59,12 @@ class AppConfigTest {
     @ParameterizedTest
     @CsvFileSource(resources = "/testData/pins-test.csv")
     void testPins(String pin, String pin2, String pin3, String pin4, String error) {
-        Map<String, ValveConfig> valves = Map.of("test", new ValveConfig("abc", ValveType.INPUT, pin, false), "test2",
-                new ValveConfig("abc2", ValveType.INPUT, pin2, false));
-        Map<String, WaterLevelSensorConfig> sensors = Map.of("test", new WaterLevelSensorConfig(1, 2, pin3),
-                "test2", new WaterLevelSensorConfig(1, 2, pin4));
-        Map<String, TankConfig> tanks = Map.of("tank", new TankConfig(123, "test", "test", TankType.DEFAULT),
-                "tank2", new TankConfig(321, "test2", "test2", TankType.DEFAULT));
+        List<ValveConfig> valves = List.of(new ValveConfig("test", "abc", ValveType.INPUT, pin, false),
+                new ValveConfig("test2", "abc2", ValveType.INPUT, pin2, false));
+        List<WaterLevelSensorConfig> sensors = List.of(new WaterLevelSensorConfig("test", 1, 2, pin3)
+                , new WaterLevelSensorConfig("test2", 1, 2, pin4));
+        List<TankConfig> tanks = List.of(new TankConfig("tank", 123, "test", "test", TankType.DEFAULT),
+                new TankConfig("tank2", 321, "test2", "test2", TankType.DEFAULT));
 
         AppConfig config = new AppConfig(tanks, valves, sensors, validator);
 
@@ -78,10 +78,10 @@ class AppConfigTest {
 
     @ParameterizedTest
     @CsvFileSource(resources = "/testData/sensor-test.csv")
-    void testSensor(int min, int max, String error) {
-        Map<String, ValveConfig> valves = Map.of("test", new ValveConfig("abc", ValveType.INPUT, "GPIO 1", false));
-        Map<String, WaterLevelSensorConfig> sensors = Map.of("test", new WaterLevelSensorConfig(min, max, "GPIO 2"));
-        Map<String, TankConfig> tanks = Map.of("tank", new TankConfig(123, "test", "test", TankType.DEFAULT));
+    void testSensor(String id, int min, int max, String error) {
+        List<ValveConfig> valves = List.of(new ValveConfig("test", "abc", ValveType.INPUT, "GPIO 1", false));
+        List<WaterLevelSensorConfig> sensors = List.of(new WaterLevelSensorConfig(id, min, max, "GPIO 2"));
+        List<TankConfig> tanks = List.of(new TankConfig("tank", 123, "sensor", "test", TankType.DEFAULT));
 
         AppConfig config = new AppConfig(tanks, valves, sensors, validator);
 
@@ -95,10 +95,10 @@ class AppConfigTest {
 
     @ParameterizedTest
     @CsvFileSource(resources = "/testData/valve-test.csv")
-    void testValve(String name, ValveType type, boolean open, String error) {
-        Map<String, ValveConfig> valves = Map.of("test", new ValveConfig(name, type, "GPIO 1", open));
-        Map<String, WaterLevelSensorConfig> sensors = Map.of("test", new WaterLevelSensorConfig(1, 2, "GPIO 2"));
-        Map<String, TankConfig> tanks = Map.of("tank", new TankConfig(123, "test", "test", TankType.DEFAULT));
+    void testValve(String id, String name, ValveType type, boolean open, String error) {
+        List<ValveConfig> valves = List.of(new ValveConfig(id, name, type, "GPIO 1", open));
+        List<WaterLevelSensorConfig> sensors = List.of(new WaterLevelSensorConfig("test", 1, 2, "GPIO 2"));
+        List<TankConfig> tanks = List.of(new TankConfig("tank", 123, "test", "valve", TankType.DEFAULT));
 
         AppConfig config = new AppConfig(tanks, valves, sensors, validator);
 
@@ -112,10 +112,10 @@ class AppConfigTest {
 
     @ParameterizedTest
     @CsvFileSource(resources = "/testData/tank-test.csv")
-    void testTank(Integer volume, String sensorId, String valveId, TankType type, String error) {
-        Map<String, ValveConfig> valves = Map.of("testValve", new ValveConfig("test valve", ValveType.INPUT, "GPIO 1", true));
-        Map<String, WaterLevelSensorConfig> sensors = Map.of("testSensor", new WaterLevelSensorConfig(1, 2, "GPIO 2"));
-        Map<String, TankConfig> tanks = Map.of("tank", new TankConfig(volume, sensorId, valveId, type));
+    void testTank(String id, Integer volume, String sensorId, String valveId, TankType type, String error) {
+        List<ValveConfig> valves = List.of(new ValveConfig("testValve", "test valve", ValveType.INPUT, "GPIO 1", true));
+        List<WaterLevelSensorConfig> sensors = List.of(new WaterLevelSensorConfig("testSensor", 1, 2, "GPIO 2"));
+        List<TankConfig> tanks = List.of(new TankConfig(id, volume, sensorId, valveId, type));
 
         AppConfig config = new AppConfig(tanks, valves, sensors, validator);
 

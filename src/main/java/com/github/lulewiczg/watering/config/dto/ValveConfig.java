@@ -5,7 +5,7 @@ import com.pi4j.io.gpio.Pin;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-import lombok.RequiredArgsConstructor;
+import lombok.NoArgsConstructor;
 import org.springframework.validation.annotation.Validated;
 
 import javax.validation.Valid;
@@ -16,9 +16,12 @@ import javax.validation.constraints.NotNull;
  */
 @Data
 @Validated
+@NoArgsConstructor
 @AllArgsConstructor
-@RequiredArgsConstructor
 public class ValveConfig implements Steerable {
+
+    @NotNull
+    private String id;
 
     @Valid
     @NotNull
@@ -37,7 +40,8 @@ public class ValveConfig implements Steerable {
     @EqualsAndHashCode.Exclude
     private Pin pin;
 
-    public ValveConfig(@Valid @NotNull String name, @Valid @NotNull ValveType type, @NotNull String pinName, boolean open) {
+    public ValveConfig(String id, String name, ValveType type, String pinName, boolean open) {
+        this.id = id;
         this.name = name;
         this.type = type;
         this.pinName = pinName;

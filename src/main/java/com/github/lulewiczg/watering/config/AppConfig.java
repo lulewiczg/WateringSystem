@@ -35,15 +35,15 @@ public class AppConfig {
 
     @Valid
     @NotNull
-    private final Map<String, TankConfig> tanks;
+    private final List<TankConfig> tanks;
 
     @Valid
     @NotNull
-    private final Map<String, ValveConfig> valves;
+    private final List<ValveConfig> valves;
 
     @Valid
     @NotNull
-    private final Map<String, WaterLevelSensorConfig> sensors;
+    private final List<WaterLevelSensorConfig> sensors;
 
     @JsonIgnore
     private final Validator validator;
@@ -63,10 +63,10 @@ public class AppConfig {
     }
 
     void validate() {
-        if (tanks.size() == 0) {
+        if (tanks.isEmpty()) {
             throw new IllegalStateException("No tanks found!");
         }
-        if (valves.size() == 0) {
+        if (valves.isEmpty()) {
             throw new IllegalStateException("No valves found!");
         }
         validateFields();
@@ -74,18 +74,14 @@ public class AppConfig {
         validatePins();
     }
 
-    private void validate(String tankId, TankConfig tank) {
-        ValveConfig valve = valves.get(tank.getValveId());
-        if (valve == null) {
-            throw new IllegalStateException("Can not find valve for tank " + tankId);
-        }
+    private void validate(TankConfig tank) {
+        ValveConfig valve = valves.stream().filter(i -> i.getId().equals(tank.getValveId())).findFirst()
+                .orElseThrow(() -> new IllegalStateException("Can not find valve for tank: " + tank.getId()));
         tank.setValve(valve);
 
         if (tank.getSensorId() != null) {
-            WaterLevelSensorConfig waterLevelSensor = sensors.get(tank.getSensorId());
-            if (waterLevelSensor == null) {
-                throw new IllegalStateException("Can not find water level sensor for tank " + tankId);
-            }
+            WaterLevelSensorConfig waterLevelSensor = sensors.stream().filter(i -> i.getId().equals(tank.getSensorId())).findAny()
+                    .orElseThrow(() -> new IllegalStateException("Can not find water level sensor for tank: " + tank.getId()));
             waterLevelSensor.validate();
             tank.setSensor(waterLevelSensor);
         }
@@ -101,8 +97,8 @@ public class AppConfig {
 
     private void validatePins() {
         List<String> usedPins = new ArrayList<>();
-        valves.values().forEach(i -> validatePin(usedPins, i));
-        sensors.values().forEach(i -> validatePin(usedPins, i));
+        valves.forEach(i -> validatePin(usedPins, i));
+        sensors.forEach(i -> validatePin(usedPins, i));
     }
 
     private void validatePin(List<String> usedPins, Steerable i) {

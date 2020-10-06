@@ -10,13 +10,14 @@
     </parent>
     <groupId>com.github.lulewiczg</groupId>
     <artifactId>watering</artifactId>
-    <version>0.0.1-SNAPSHOT</version>
+    <version>0.1</version>
     <name>Watering App</name>
     <description>Watering system application</description>
 
     <properties>
         <java.version>11</java.version>
         <pi4j.version>1.2</pi4j.version>
+        <mapstruct.version>1.4.0.Final</mapstruct.version>
     </properties>
 
     <dependencies>
@@ -66,6 +67,12 @@
             <artifactId>pi4j-gpio-extension</artifactId>
             <version>${pi4j.version}</version>
         </dependency>
+
+        <dependency>
+            <groupId>org.mapstruct</groupId>
+            <artifactId>mapstruct</artifactId>
+            <version>${mapstruct.version}</version>
+        </dependency>
     </dependencies>
 
     <build>
@@ -104,6 +111,27 @@
                         </configuration>
                     </execution>
                 </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.8.1</version>
+                <configuration>
+                    <source>${java.version}</source>
+                    <target>${java.version}</target>
+                    <annotationProcessorPaths>
+                        <path>
+                            <groupId>org.mapstruct</groupId>
+                            <artifactId>mapstruct-processor</artifactId>
+                            <version>${mapstruct.version}</version>
+                        </path>
+                        <path>
+                            <groupId>org.projectlombok</groupId>
+                            <artifactId>lombok</artifactId>
+                            <version>${lombok.version}</version>
+                        </path>
+                    </annotationProcessorPaths>
+                </configuration>
             </plugin>
         </plugins>
     </build>

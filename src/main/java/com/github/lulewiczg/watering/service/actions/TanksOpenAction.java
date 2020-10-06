@@ -1,13 +1,14 @@
 package com.github.lulewiczg.watering.service.actions;
 
-import com.github.lulewiczg.watering.config.dto.TankType;
-import com.github.lulewiczg.watering.service.AppState;
+import com.github.lulewiczg.watering.state.AppState;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Component;
 
 /**
  * Action for opening tanks.
  */
+@Log4j2
 @Component
 @RequiredArgsConstructor
 public class TanksOpenAction implements Action<Void, Void> {
@@ -18,7 +19,8 @@ public class TanksOpenAction implements Action<Void, Void> {
 
     @Override
     public Void doAction(Void param) {
-        state.getTanks().stream().filter(i -> i.getConfig().getType() == TankType.DEFAULT).forEach(i -> openAction.doAction(i.getValve()));
+        log.info("Opening tanks...");
+        state.getTanks().forEach(i -> openAction.doAction(i.getValve()));
         return null;
     }
 }

@@ -1,11 +1,10 @@
 package com.github.lulewiczg.watering.config.dto;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.pi4j.io.gpio.Pin;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-import lombok.RequiredArgsConstructor;
+import lombok.NoArgsConstructor;
 import org.springframework.validation.annotation.Validated;
 
 import javax.validation.Valid;
@@ -18,9 +17,12 @@ import javax.validation.constraints.NotNull;
  */
 @Data
 @Validated
-@RequiredArgsConstructor
+@NoArgsConstructor
 @AllArgsConstructor
 public class WaterLevelSensorConfig implements Steerable {
+
+    @NotNull
+    private String id;
 
     @Valid
     @Min(0)
@@ -35,7 +37,6 @@ public class WaterLevelSensorConfig implements Steerable {
     @NotNull
     private String pinName;
 
-    @JsonIgnore
     @EqualsAndHashCode.Exclude
     private Pin pin;
 
@@ -45,7 +46,8 @@ public class WaterLevelSensorConfig implements Steerable {
         }
     }
 
-    public WaterLevelSensorConfig(@Valid @Min(0) @Max(100) Integer minLevel, @Valid @Min(0) @Max(100) Integer maxLevel, @NotNull String pinName) {
+    public WaterLevelSensorConfig(String id, Integer minLevel, Integer maxLevel, String pinName) {
+        this.id = id;
         this.minLevel = minLevel;
         this.maxLevel = maxLevel;
         this.pinName = pinName;
