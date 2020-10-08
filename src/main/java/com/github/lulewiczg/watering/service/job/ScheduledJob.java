@@ -14,7 +14,7 @@ public abstract class ScheduledJob {
      *
      * @return name
      */
-    protected abstract String getName();
+    public abstract String getName();
 
     /**
      * Status that action uses.

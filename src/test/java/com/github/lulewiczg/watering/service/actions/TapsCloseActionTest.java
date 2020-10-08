@@ -16,6 +16,8 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.util.List;
 
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.*;
 
 @ActiveProfiles("test")
@@ -51,6 +53,18 @@ class TapsCloseActionTest {
         verify(closeAction, never()).doAction(valve);
         verify(closeAction, never()).doAction(valve2);
         verify(closeAction, never()).doAction(valve3);
+    }
+
+    @Test
+    void testActionEnabled(){
+        when(state.getTaps()).thenReturn(List.of(new WaterSource()));
+
+        assertTrue(action.isEnabled());
+    }
+
+    @Test
+    void testActionDisabled(){
+        assertFalse(action.isEnabled());
     }
 
 }

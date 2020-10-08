@@ -23,4 +23,9 @@ public class TapsCloseAction implements Action<Void, Void> {
         state.getTaps().forEach(i -> closeAction.doAction(i.getValve()));
         return null;
     }
+
+    @Override
+    public boolean isEnabled() {
+        return !state.getTaps().isEmpty();
+    }
 }

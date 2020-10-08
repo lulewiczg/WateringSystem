@@ -16,4 +16,13 @@ public interface Action<T, R> {
      */
     R doAction(T param);
 
+    /**
+     * Checks if action is enabled.
+     *
+     * @return true, if enabled
+     */
+    default boolean isEnabled() {
+        return true;
+    }
+
 }
