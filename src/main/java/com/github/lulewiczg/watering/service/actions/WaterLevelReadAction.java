@@ -20,6 +20,16 @@ public class WaterLevelReadAction implements Action<Sensor, Double> {
     private final AppState state;
 
     @Override
+    public String getParamDescription() {
+        return "Sensor ID";
+    }
+
+    @Override
+    public String getParamType() {
+        return String.class.getSimpleName();
+    }
+
+    @Override
     public Double doAction(Sensor sensor) {
         log.info("Reading water level for sensor {}", sensor);
         return service.analogRead(sensor.getPin());

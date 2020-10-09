@@ -31,7 +31,7 @@ class RestExceptionHandlerTest {
         ApiError error = response.getBody();
         assertNotNull(error);
         assertNotNull(error.getTimestamp());
-        assertTrue(date.before(error.getTimestamp()));
+        assertTrue(date.equals(error.getTimestamp()) || date.before(error.getTimestamp()));
         error.setTimestamp(expected.getTimestamp());
         assertEquals(expected, error);
     }

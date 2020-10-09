@@ -1,0 +1,62 @@
+[
+  {
+    "actionName": "emergencyStopAction",
+    "parameterType": "Void",
+    "parameterDescription": "",
+    "returnType": "Void"
+  },
+  {
+    "actionName": "outputsCloseAction",
+    "parameterType": "Void",
+    "parameterDescription": "",
+    "returnType": "Void"
+  },
+  {
+    "actionName": "outputsOpenAction",
+    "parameterType": "Void",
+    "parameterDescription": "",
+    "returnType": "Void"
+  },
+  {
+    "actionName": "tanksCloseAction",
+    "parameterType": "Void",
+    "parameterDescription": "",
+    "returnType": "Void"
+  },
+  {
+    "actionName": "tanksOpenAction",
+    "parameterType": "Void",
+    "parameterDescription": "",
+    "returnType": "Void"
+  },
+  {
+    "actionName": "tapsCloseAction",
+    "parameterType": "Void",
+    "parameterDescription": "",
+    "returnType": "Void"
+  },
+  {
+    "actionName": "tapsOpenAction",
+    "parameterType": "Void",
+    "parameterDescription": "",
+    "returnType": "Void"
+  },
+  {
+    "actionName": "valveCloseAction",
+    "parameterType": "String",
+    "parameterDescription": "Valve ID",
+    "returnType": "Void"
+  },
+  {
+    "actionName": "valveOpenAction",
+    "parameterType": "String",
+    "parameterDescription": "Valve ID",
+    "returnType": "Void"
+  },
+  {
+    "actionName": "waterLevelReadAction",
+    "parameterType": "String",
+    "parameterDescription": "Sensor ID",
+    "returnType": "Double"
+  }
+]

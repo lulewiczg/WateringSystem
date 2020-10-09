@@ -1,7 +1,9 @@
 package com.github.lulewiczg.watering.controller;
 
 import com.github.lulewiczg.watering.service.ActionService;
+import com.github.lulewiczg.watering.service.dto.ActionDefinitionDto;
 import com.github.lulewiczg.watering.service.dto.ActionDto;
+import com.github.lulewiczg.watering.service.dto.JobDefinitionDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
@@ -19,7 +21,7 @@ public class ActionController {
     private final ActionService actionService;
 
     @GetMapping("/actions")
-    public List<String> getActions() {
+    public List<ActionDefinitionDto> getActions() {
         return actionService.getActions();
     }
 
@@ -29,7 +31,7 @@ public class ActionController {
     }
 
     @GetMapping("/jobs")
-    public List<String> getJobs() {
+    public List<JobDefinitionDto> getJobs() {
         return actionService.getJobs();
     }
 

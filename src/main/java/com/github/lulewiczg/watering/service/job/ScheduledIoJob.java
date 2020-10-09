@@ -6,7 +6,7 @@ package com.github.lulewiczg.watering.service.job;
 public abstract class ScheduledIoJob extends ScheduledJob{
 
     @Override
-    protected boolean canBeStarted() {
+    public boolean canBeStarted() {
         return true;
     }
 

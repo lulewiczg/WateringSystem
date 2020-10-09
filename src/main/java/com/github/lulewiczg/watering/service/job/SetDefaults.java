@@ -42,7 +42,7 @@ public class SetDefaults extends ScheduledJob {
     }
 
     @Override
-    protected boolean canBeStarted() {
+    public boolean canBeStarted() {
         return true;
     }
 

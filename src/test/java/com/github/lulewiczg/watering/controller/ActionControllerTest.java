@@ -1,10 +1,13 @@
 package com.github.lulewiczg.watering.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.github.lulewiczg.watering.TestUtils;
 import com.github.lulewiczg.watering.exception.ApiError;
 import com.github.lulewiczg.watering.exception.InvalidParamException;
 import com.github.lulewiczg.watering.service.ActionService;
+import com.github.lulewiczg.watering.service.dto.ActionDefinitionDto;
 import com.github.lulewiczg.watering.service.dto.ActionDto;
+import com.github.lulewiczg.watering.service.dto.JobDefinitionDto;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,8 +19,8 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 
+import java.util.Arrays;
 import java.util.Date;
-import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
@@ -43,20 +46,22 @@ class ActionControllerTest {
 
     @Test
     void testGetActions() throws Exception {
-        when(service.getActions()).thenReturn(List.of("1", "2", "5"));
+        ActionDefinitionDto[] jobDefinitionDto = TestUtils.readJson("actions.json", ActionDefinitionDto[].class, mapper);
+        when(service.getActions()).thenReturn(Arrays.asList(jobDefinitionDto));
 
         mvc.perform(get("/actions/actions"))
                 .andExpect(status().isOk())
-                .andExpect(content().string("[\"1\",\"2\",\"5\"]"));
+                .andExpect(content().json(mapper.writeValueAsString(jobDefinitionDto)));
     }
 
     @Test
     void testGetJobs() throws Exception {
-        when(service.getJobs()).thenReturn(List.of("1", "2", "5"));
+        JobDefinitionDto[] jobDefinitionDto = TestUtils.readJson("jobs.json", JobDefinitionDto[].class, mapper);
+        when(service.getJobs()).thenReturn(Arrays.asList(jobDefinitionDto));
 
         mvc.perform(get("/actions/jobs"))
                 .andExpect(status().isOk())
-                .andExpect(content().string("[\"1\",\"2\",\"5\"]"));
+                .andExpect(content().json(mapper.writeValueAsString(jobDefinitionDto)));
     }
 
     @Test

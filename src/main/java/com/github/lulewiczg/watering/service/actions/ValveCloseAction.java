@@ -17,6 +17,16 @@ public class ValveCloseAction implements Action<Valve, Void> {
     private final IOService service;
 
     @Override
+    public String getParamDescription() {
+        return "Valve ID";
+    }
+
+    @Override
+    public String getParamType() {
+        return String.class.getSimpleName();
+    }
+
+    @Override
     public Void doAction(Valve valve) {
         log.info("Closing valve: {}", valve.getName());
         service.toggleOff(valve.getPin());

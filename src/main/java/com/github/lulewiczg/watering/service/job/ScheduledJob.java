@@ -50,7 +50,7 @@ public abstract class ScheduledJob {
      *
      * @return true if can
      */
-    protected boolean canBeStarted() {
+    public boolean canBeStarted() {
         SystemStatus state = getState();
         if (!state.canBeInterrupted(getJobStatus())) {
             log.debug("{} can not start, state {}", getName(), state);

@@ -1,18 +1,23 @@
 package com.github.lulewiczg.watering.service;
 
-import com.github.lulewiczg.watering.service.actions.*;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.github.lulewiczg.watering.TestUtils;
+import com.github.lulewiczg.watering.service.actions.WaterLevelReadAction;
+import com.github.lulewiczg.watering.service.dto.ActionDefinitionDto;
 import com.github.lulewiczg.watering.service.dto.ActionDto;
+import com.github.lulewiczg.watering.service.dto.JobDefinitionDto;
 import com.github.lulewiczg.watering.service.io.IOService;
 import com.github.lulewiczg.watering.service.job.ScheduledSensorRead;
 import com.github.lulewiczg.watering.service.job.ScheduledWatering;
 import com.github.lulewiczg.watering.service.job.SetDefaults;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.NoSuchBeanDefinitionException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.ActiveProfiles;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -29,19 +34,24 @@ class ActionServiceDisabledTest {
     @MockBean
     private IOService ioService;
 
+    @Autowired
+    private ObjectMapper mapper;
+
     @Test
     void testGetActions() {
-        List<String> actions = service.getActions();
-        List<Class<?>> classes = List.of(EmergencyStopAction.class, OutputsCloseAction.class, OutputsOpenAction.class, TanksCloseAction.class,
-                TanksOpenAction.class, ValveCloseAction.class, ValveOpenAction.class);
-        assertEquals(classes.stream().map(Class::getSimpleName).map(this::deCapitalize).collect(Collectors.toList()), actions);
+        ActionDefinitionDto[] expected = TestUtils.readJson("actions-small.json", ActionDefinitionDto[].class, mapper);
+
+        List<ActionDefinitionDto> actions = service.getActions();
+
+        assertEquals(Arrays.asList(expected), actions);
     }
 
     @Test
     void testGetJobs() {
-        List<String> jobs = service.getJobs();
-        List<Class<?>> classes = List.of(ScheduledWatering.class, SetDefaults.class);
-        assertEquals(classes.stream().map(Class::getSimpleName).map(this::deCapitalize).collect(Collectors.toList()), jobs);
+        List<JobDefinitionDto> jobs = service.getJobs();
+        List<JobDefinitionDto> expected = List.of(ScheduledWatering.class, SetDefaults.class)
+                .stream().map(i -> new JobDefinitionDto(deCapitalize(i.getSimpleName()), true)).collect(Collectors.toList());
+        assertEquals(expected, jobs);
     }
 
     @Test

@@ -1,9 +1,13 @@
 package com.github.lulewiczg.watering.service;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.github.lulewiczg.watering.TestUtils;
 import com.github.lulewiczg.watering.exception.InvalidParamException;
 import com.github.lulewiczg.watering.exception.SensorNotFoundException;
 import com.github.lulewiczg.watering.service.actions.*;
+import com.github.lulewiczg.watering.service.dto.ActionDefinitionDto;
 import com.github.lulewiczg.watering.service.dto.ActionDto;
+import com.github.lulewiczg.watering.service.dto.JobDefinitionDto;
 import com.github.lulewiczg.watering.service.io.IOService;
 import com.github.lulewiczg.watering.service.job.*;
 import com.pi4j.io.gpio.RaspiPin;
@@ -13,6 +17,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.ActiveProfiles;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -31,21 +36,25 @@ class ActionServiceTest {
     @MockBean
     private IOService ioService;
 
+    @Autowired
+    private ObjectMapper mapper;
+
     @Test
     void testGetActions() {
-        List<String> actions = service.getActions();
-        List<Class<?>> classes = List.of(EmergencyStopAction.class, OutputsCloseAction.class, OutputsOpenAction.class, TanksCloseAction.class,
-                TanksOpenAction.class, TapsCloseAction.class, TapsOpenAction.class, ValveCloseAction.class, ValveOpenAction.class,
-                WaterLevelReadAction.class);
-        assertEquals(classes.stream().map(Class::getSimpleName).map(this::deCapitalize).collect(Collectors.toList()), actions);
+        ActionDefinitionDto[] expected = TestUtils.readJson("actions.json", ActionDefinitionDto[].class, mapper);
+
+        List<ActionDefinitionDto> actions = service.getActions();
+
+        assertEquals(Arrays.asList(expected), actions);
     }
 
     @Test
     void testGetJobs() {
-        List<String> jobs = service.getJobs();
-        List<Class<?>> classes = List.of(ScheduledOverflowWaterControl.class, ScheduledSensorRead.class, ScheduledValveRead.class,
-                ScheduledWaterEscapeControl.class, ScheduledWaterFillControl.class, ScheduledWatering.class, SetDefaults.class);
-        assertEquals(classes.stream().map(Class::getSimpleName).map(this::deCapitalize).collect(Collectors.toList()), jobs);
+        List<JobDefinitionDto> jobs = service.getJobs();
+        List<JobDefinitionDto> expected = List.of(ScheduledOverflowWaterControl.class, ScheduledSensorRead.class, ScheduledValveRead.class,
+                ScheduledWaterEscapeControl.class, ScheduledWaterFillControl.class, ScheduledWatering.class, SetDefaults.class)
+                .stream().map(i -> new JobDefinitionDto(deCapitalize(i.getSimpleName()), true)).collect(Collectors.toList());
+        assertEquals(expected, jobs);
     }
 
     @Test
@@ -58,7 +67,6 @@ class ActionServiceTest {
     @Test
     void testRunActionMissingParam() {
         assertThrows(SensorNotFoundException.class, () -> service.runAction(new ActionDto(deCapitalize(WaterLevelReadAction.class.getSimpleName()), "Sensor", null)));
-        ;
     }
 
     @Test
