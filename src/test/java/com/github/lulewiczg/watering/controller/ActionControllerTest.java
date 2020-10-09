@@ -1,6 +1,8 @@
 package com.github.lulewiczg.watering.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.github.lulewiczg.watering.exception.ApiError;
+import com.github.lulewiczg.watering.exception.InvalidParamException;
 import com.github.lulewiczg.watering.service.ActionService;
 import com.github.lulewiczg.watering.service.dto.ActionDto;
 import org.junit.jupiter.api.Test;
@@ -14,10 +16,11 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 
+import java.util.Date;
 import java.util.List;
 
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
@@ -35,7 +38,8 @@ class ActionControllerTest {
     @Autowired
     private MockMvc mvc;
 
-    private final ObjectMapper mapper = new ObjectMapper();
+    @Autowired
+    private ObjectMapper mapper;
 
     @Test
     void testGetActions() throws Exception {
@@ -74,5 +78,44 @@ class ActionControllerTest {
                 .andExpect(content().string(""));
 
         verify(service).runJob("test123");
+    }
+
+    @Test
+    void testRunActionError() throws Exception {
+        ActionDto actionDto = new ActionDto("test", "test2", "test3");
+        InvalidParamException ex = new InvalidParamException(Object.class, String.class);
+        when(service.runAction(actionDto)).thenThrow(ex);
+        ApiError expected = new ApiError(400, "Bad Request", ex.getMessage());
+        Date date = new Date();
+
+        String json = mvc.perform(post("/actions/actions")
+                .content(mapper.writeValueAsString(actionDto))
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest())
+                .andReturn().getResponse().getContentAsString();
+
+        ApiError error = mapper.readValue(json, ApiError.class);
+        assertNotNull(error.getTimestamp());
+        assertTrue(date.before(error.getTimestamp()));
+        error.setTimestamp(expected.getTimestamp());
+        assertEquals(expected, error);
+    }
+
+    @Test
+    void testRunJobError() throws Exception {
+        InvalidParamException ex = new InvalidParamException(Object.class, String.class);
+        doThrow(ex).when(service).runJob("test123");
+        ApiError expected = new ApiError(400, "Bad Request", ex.getMessage());
+        Date date = new Date();
+
+        String json = mvc.perform(post("/actions/jobs/test123"))
+                .andExpect(status().isBadRequest())
+                .andReturn().getResponse().getContentAsString();
+
+        ApiError error = mapper.readValue(json, ApiError.class);
+        assertNotNull(error.getTimestamp());
+        assertTrue(date.before(error.getTimestamp()));
+        error.setTimestamp(expected.getTimestamp());
+        assertEquals(expected, error);
     }
 }
