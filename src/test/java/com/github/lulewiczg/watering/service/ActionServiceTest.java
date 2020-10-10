@@ -4,7 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.lulewiczg.watering.TestUtils;
 import com.github.lulewiczg.watering.exception.InvalidParamException;
 import com.github.lulewiczg.watering.exception.SensorNotFoundException;
-import com.github.lulewiczg.watering.service.actions.*;
+import com.github.lulewiczg.watering.service.actions.WaterLevelReadAction;
 import com.github.lulewiczg.watering.service.dto.ActionDefinitionDto;
 import com.github.lulewiczg.watering.service.dto.ActionDto;
 import com.github.lulewiczg.watering.service.dto.JobDefinitionDto;
@@ -66,17 +66,20 @@ class ActionServiceTest {
 
     @Test
     void testRunActionMissingParam() {
-        assertThrows(SensorNotFoundException.class, () -> service.runAction(new ActionDto(deCapitalize(WaterLevelReadAction.class.getSimpleName()), "Sensor", null)));
+        ActionDto sensor = new ActionDto(deCapitalize(WaterLevelReadAction.class.getSimpleName()), "Sensor", null);
+        assertThrows(SensorNotFoundException.class, () -> service.runAction(sensor));
     }
 
     @Test
     void testRunActionInvalidParam() {
-        assertThrows(SensorNotFoundException.class, () -> service.runAction(new ActionDto(deCapitalize(WaterLevelReadAction.class.getSimpleName()), "Sensor", "abc")));
+        ActionDto sensor = new ActionDto(deCapitalize(WaterLevelReadAction.class.getSimpleName()), "Sensor", "abc");
+        assertThrows(SensorNotFoundException.class, () -> service.runAction(sensor));
     }
 
     @Test
     void testRunActionInvalidType() {
-        assertThrows(InvalidParamException.class, () -> service.runAction(new ActionDto(deCapitalize(WaterLevelReadAction.class.getSimpleName()), "String", "sensor2")));
+        ActionDto sensor = new ActionDto(deCapitalize(WaterLevelReadAction.class.getSimpleName()), "String", "Sensor2");
+        assertThrows(InvalidParamException.class, () -> service.runAction(sensor));
     }
 
     @Test

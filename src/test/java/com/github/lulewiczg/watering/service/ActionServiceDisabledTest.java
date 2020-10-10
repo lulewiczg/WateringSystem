@@ -16,7 +16,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.ActiveProfiles;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -56,13 +55,14 @@ class ActionServiceDisabledTest {
 
     @Test
     void testRunAction() {
-        assertThrows(IllegalArgumentException.class, () ->
-                service.runAction(new ActionDto(deCapitalize(WaterLevelReadAction.class.getSimpleName()), "Sensor", "sensor2")));
+        ActionDto actionDto = new ActionDto(deCapitalize(WaterLevelReadAction.class.getSimpleName()), "Sensor", "sensor2");
+        assertThrows(IllegalArgumentException.class, () -> service.runAction(actionDto));
     }
 
     @Test
     void testRunJob() {
-        assertThrows(IllegalArgumentException.class, () -> service.runJob(deCapitalize(ScheduledSensorRead.class.getSimpleName())));
+        String jobName = deCapitalize(ScheduledSensorRead.class.getSimpleName());
+        assertThrows(IllegalArgumentException.class, () -> service.runJob(jobName));
     }
 
     private String deCapitalize(String str) {
