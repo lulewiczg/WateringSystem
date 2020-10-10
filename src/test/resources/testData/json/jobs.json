@@ -1,0 +1,18 @@
+[
+  {
+    "jobName": "scheduledOverflowWaterControl",
+    "canBeRun": true
+  },
+  {
+    "jobName": "scheduledWaterEscapeControl",
+    "canBeRun": true
+  },
+  {
+    "jobName": "scheduledWaterFillControl",
+    "canBeRun": true
+  },
+  {
+    "jobName": "setDefaults",
+    "canBeRun": true
+  }
+]

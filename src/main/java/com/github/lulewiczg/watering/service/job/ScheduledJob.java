@@ -14,7 +14,7 @@ public abstract class ScheduledJob {
      *
      * @return name
      */
-    protected abstract String getName();
+    public abstract String getName();
 
     /**
      * Status that action uses.
@@ -50,7 +50,7 @@ public abstract class ScheduledJob {
      *
      * @return true if can
      */
-    protected boolean canBeStarted() {
+    public boolean canBeStarted() {
         SystemStatus state = getState();
         if (!state.canBeInterrupted(getJobStatus())) {
             log.debug("{} can not start, state {}", getName(), state);

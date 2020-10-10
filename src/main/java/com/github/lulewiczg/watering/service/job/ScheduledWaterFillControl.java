@@ -41,7 +41,7 @@ public class ScheduledWaterFillControl extends ScheduledJob {
     }
 
     @Override
-    protected String getName() {
+    public String getName() {
         return "Water fill";
     }
 

@@ -1,7 +1,9 @@
 package com.github.lulewiczg.watering.service.actions;
 
 import com.github.lulewiczg.watering.service.io.IOService;
+import com.github.lulewiczg.watering.state.AppState;
 import com.github.lulewiczg.watering.state.dto.Sensor;
+import com.github.lulewiczg.watering.state.dto.Tank;
 import com.pi4j.io.gpio.RaspiPin;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -11,7 +13,9 @@ import org.springframework.context.annotation.Import;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import java.util.List;
+
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.when;
 
 @ActiveProfiles("test")
@@ -21,6 +25,9 @@ class WaterLevelReadActionTest {
 
     @MockBean
     private IOService service;
+
+    @MockBean
+    private AppState state;
 
     @Autowired
     private WaterLevelReadAction action;
@@ -32,5 +39,19 @@ class WaterLevelReadActionTest {
 
         Double result = action.doAction(sensor);
         assertEquals(12.34, result);
+    }
+
+    @Test
+    void testActionEnabled() {
+        when(state.getTanks()).thenReturn(List.of(new Tank(), new Tank(null, null, new Sensor(), null)));
+
+        assertTrue(action.isEnabled());
+    }
+
+    @Test
+    void testActionDisabled() {
+        when(state.getTanks()).thenReturn(List.of(new Tank()));
+
+        assertFalse(action.isEnabled());
     }
 }

@@ -27,7 +27,7 @@ public class ScheduledSensorRead extends ScheduledIoJob {
     }
 
     @Override
-    protected String getName() {
+    public String getName() {
         return "Sensors read";
     }
 

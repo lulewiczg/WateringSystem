@@ -10,7 +10,7 @@ import org.springframework.stereotype.Service;
  */
 @Log4j2
 @Service
-@ConditionalOnExpression("${com.github.lulewiczg.watering.mockedIO:true}")
+@ConditionalOnExpression("!${com.github.lulewiczg.watering.mockedIO:false}")
 public class IOServiceImpl implements IOService {
 
     private static final String ERR = "Not yet implemented!";

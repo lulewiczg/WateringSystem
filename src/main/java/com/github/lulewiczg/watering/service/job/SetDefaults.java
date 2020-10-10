@@ -37,12 +37,12 @@ public class SetDefaults extends ScheduledJob {
     }
 
     @Override
-    protected String getName() {
+    public String getName() {
         return "Defaults setting";
     }
 
     @Override
-    protected boolean canBeStarted() {
+    public boolean canBeStarted() {
         return true;
     }
 

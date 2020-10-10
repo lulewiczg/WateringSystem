@@ -30,7 +30,7 @@ public class ScheduledValveRead extends ScheduledIoJob {
     }
 
     @Override
-    protected String getName() {
+    public String getName() {
         return "Valves state read";
     }
 

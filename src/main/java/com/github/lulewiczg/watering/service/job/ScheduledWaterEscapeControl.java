@@ -36,7 +36,7 @@ public class ScheduledWaterEscapeControl extends ScheduledJob {
     }
 
     @Override
-    protected String getName() {
+    public String getName() {
         return "Water leak control";
     }
 
