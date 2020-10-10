@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.RestController;
  * Controller for obtaining current state.
  */
 @RestController
-@RequestMapping("/state")
+@RequestMapping("/rest/state")
 @RequiredArgsConstructor
 public class StateController {
 

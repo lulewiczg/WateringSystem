@@ -25,7 +25,7 @@ class StateControllerTest {
     @Test
     void testGetState() throws Exception {
         String json = Files.readString(Paths.get("src/test/resources/testData/json/state.json"));
-        mvc.perform(get("/state"))
+        mvc.perform(get("/rest/state"))
                 .andExpect(status().isOk())
                 .andExpect(content().json(json));
     }
