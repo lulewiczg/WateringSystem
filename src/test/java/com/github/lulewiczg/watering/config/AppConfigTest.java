@@ -7,18 +7,19 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvFileSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Import;
-import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.validation.beanvalidation.LocalValidatorFactoryBean;
 
+import javax.validation.ConstraintViolation;
+import java.util.Comparator;
 import java.util.List;
+import java.util.Optional;
+import java.util.Set;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.*;
 
 @ExtendWith(SpringExtension.class)
 @Import(LocalValidatorFactoryBean.class)
-@TestPropertySource(locations = "classpath:application-appConfigTest.properties")
 class AppConfigTest {
 
     @Autowired
@@ -29,10 +30,9 @@ class AppConfigTest {
         List<ValveConfig> valves = List.of(new ValveConfig("valve1", "abc", ValveType.INPUT, "GPIO 1", false));
         List<WaterLevelSensorConfig> sensors = List.of(new WaterLevelSensorConfig("sensor1", 12, 21, "GPIO 2"));
 
-        AppConfig config = new AppConfig(List.of(), valves, sensors, validator);
+        AppConfig config = new AppConfig(List.of(), valves, sensors);
 
-        String message = assertThrows(IllegalStateException.class, config::validate).getMessage();
-        assertEquals("No tanks found!", message);
+        testValidate(config, "tanks must not be empty");
     }
 
     @Test
@@ -40,10 +40,9 @@ class AppConfigTest {
         List<TankConfig> tanks = List.of(new TankConfig("tank", 123, "sensor1", "valve1", TankType.DEFAULT));
         List<WaterLevelSensorConfig> sensors = List.of(new WaterLevelSensorConfig("test", 12, 21, "GPIO 1"));
 
-        AppConfig config = new AppConfig(tanks, List.of(), sensors, validator);
+        AppConfig config = new AppConfig(tanks, List.of(), sensors);
 
-        String message = assertThrows(IllegalStateException.class, config::validate).getMessage();
-        assertEquals("No valves found!", message);
+        testValidate(config, "valves must not be empty");
     }
 
     @Test
@@ -51,9 +50,9 @@ class AppConfigTest {
         List<ValveConfig> valves = List.of(new ValveConfig("test", "abc", ValveType.INPUT, "GPIO 1", false));
         List<TankConfig> tanks = List.of(new TankConfig("tank", 123, null, "test", TankType.DEFAULT));
 
-        AppConfig config = new AppConfig(tanks, valves, List.of(), validator);
+        AppConfig config = new AppConfig(tanks, valves, List.of());
 
-        config.validate();
+        testValidate(config, null);
     }
 
     @ParameterizedTest
@@ -66,14 +65,9 @@ class AppConfigTest {
         List<TankConfig> tanks = List.of(new TankConfig("tank", 123, "test", "test", TankType.DEFAULT),
                 new TankConfig("tank2", 321, "test2", "test2", TankType.DEFAULT));
 
-        AppConfig config = new AppConfig(tanks, valves, sensors, validator);
+        AppConfig config = new AppConfig(tanks, valves, sensors);
 
-        if (error != null) {
-            String message = assertThrows(IllegalStateException.class, config::validate).getMessage();
-            assertEquals(error, message);
-        } else {
-            config.validate();
-        }
+        testValidate(config, error);
     }
 
     @ParameterizedTest
@@ -83,14 +77,9 @@ class AppConfigTest {
         List<WaterLevelSensorConfig> sensors = List.of(new WaterLevelSensorConfig(id, min, max, "GPIO 2"));
         List<TankConfig> tanks = List.of(new TankConfig("tank", 123, "sensor", "test", TankType.DEFAULT));
 
-        AppConfig config = new AppConfig(tanks, valves, sensors, validator);
+        AppConfig config = new AppConfig(tanks, valves, sensors);
 
-        if (error != null) {
-            String message = assertThrows(IllegalStateException.class, config::validate).getMessage();
-            assertEquals(error, message);
-        } else {
-            config.validate();
-        }
+        testValidate(config, error);
     }
 
     @ParameterizedTest
@@ -100,14 +89,9 @@ class AppConfigTest {
         List<WaterLevelSensorConfig> sensors = List.of(new WaterLevelSensorConfig("test", 1, 2, "GPIO 2"));
         List<TankConfig> tanks = List.of(new TankConfig("tank", 123, "test", "valve", TankType.DEFAULT));
 
-        AppConfig config = new AppConfig(tanks, valves, sensors, validator);
+        AppConfig config = new AppConfig(tanks, valves, sensors);
 
-        if (error != null) {
-            String message = assertThrows(IllegalStateException.class, config::validate).getMessage();
-            assertEquals(error, message);
-        } else {
-            config.validate();
-        }
+        testValidate(config, error);
     }
 
     @ParameterizedTest
@@ -117,15 +101,29 @@ class AppConfigTest {
         List<WaterLevelSensorConfig> sensors = List.of(new WaterLevelSensorConfig("testSensor", 1, 2, "GPIO 2"));
         List<TankConfig> tanks = List.of(new TankConfig(id, volume, sensorId, valveId, type));
 
-        AppConfig config = new AppConfig(tanks, valves, sensors, validator);
+        AppConfig config = new AppConfig(tanks, valves, sensors);
 
+        testValidate(config, error);
+    }
+
+    private void testValidate(AppConfig config, String message) {
+        ConstraintViolation<AppConfig> error = validateFields(config);
         if (error != null) {
-            String message = assertThrows(IllegalStateException.class, config::validate).getMessage();
-            assertEquals(error, message);
+            assertEquals(error.getPropertyPath() + " " + error.getMessage(), message);
         } else {
-            config.validate();
+            if (message != null) {
+                String msg = assertThrows(IllegalStateException.class, config::validate).getMessage();
+                assertEquals(msg, message);
+            } else {
+                assertDoesNotThrow(config::validate);
+            }
         }
     }
 
+    private ConstraintViolation<AppConfig> validateFields(AppConfig config) {
+        Set<ConstraintViolation<AppConfig>> errors = validator.validate(config);
+        Optional<ConstraintViolation<AppConfig>> error = errors.stream().min(Comparator.comparing(i -> i.getPropertyPath().toString()));
+        return error.orElse(null);
+    }
 
 }

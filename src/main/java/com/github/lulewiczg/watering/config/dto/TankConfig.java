@@ -8,6 +8,7 @@ import org.springframework.validation.annotation.Validated;
 
 import javax.validation.Valid;
 import javax.validation.constraints.Min;
+import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 
 /**
@@ -19,21 +20,18 @@ import javax.validation.constraints.NotNull;
 @AllArgsConstructor
 public class TankConfig {
 
-    @NotNull
+    @NotEmpty
     private String id;
 
-    @Valid
     @Min(0)
     private Integer volume;
 
     @Valid
     private String sensorId;
 
-    @Valid
-    @NotNull
+    @NotEmpty
     private String valveId;
 
-    @Valid
     @NotNull
     private TankType type;
 

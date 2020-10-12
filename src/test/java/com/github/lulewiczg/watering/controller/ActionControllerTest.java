@@ -5,6 +5,7 @@ import com.github.lulewiczg.watering.TestUtils;
 import com.github.lulewiczg.watering.exception.ApiError;
 import com.github.lulewiczg.watering.exception.InvalidParamException;
 import com.github.lulewiczg.watering.security.AuthEntryPoint;
+import com.github.lulewiczg.watering.security.AuthProvider;
 import com.github.lulewiczg.watering.service.ActionService;
 import com.github.lulewiczg.watering.service.dto.ActionDefinitionDto;
 import com.github.lulewiczg.watering.service.dto.ActionDto;
@@ -31,9 +32,9 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @AutoConfigureMockMvc
 @ActiveProfiles("test")
-@Import(AuthEntryPoint.class)
-@WebMvcTest(ActionController.class)
 @ExtendWith(SpringExtension.class)
+@WebMvcTest(ActionController.class)
+@Import({AuthEntryPoint.class, AuthProvider.class})
 class ActionControllerTest {
 
     @MockBean

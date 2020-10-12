@@ -12,4 +12,4 @@ sensor,16,2,Min water level can not be higher than max!
 sensor,99,98,Min water level can not be higher than max!
 sensor,2,1,Min water level can not be higher than max!
 sensor,0,101,sensors[0].maxLevel must be less than or equal to 100
-,1,2,sensors[0].id must not be null
+,1,2,sensors[0].id must not be empty

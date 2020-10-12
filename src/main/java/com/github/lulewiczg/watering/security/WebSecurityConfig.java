@@ -1,8 +1,6 @@
 package com.github.lulewiczg.watering.security;
 
-import com.github.lulewiczg.watering.exception.RestExceptionHandler;
 import lombok.RequiredArgsConstructor;
-import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
@@ -10,8 +8,6 @@ import org.springframework.security.config.annotation.method.configuration.Enabl
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.crypto.password.PasswordEncoder;
 
 /**
  * Security configuration.
@@ -20,28 +16,15 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 @EnableWebSecurity
 @RequiredArgsConstructor
 @EnableGlobalMethodSecurity(jsr250Enabled = true, prePostEnabled = true, securedEnabled = true)
-public class CustomWebSecurityConfigurerAdapter extends WebSecurityConfigurerAdapter {
+public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
     private final AuthEntryPoint entryPoint;
 
-    private final RestExceptionHandler handler;
-
-    @Bean
-    public PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder();
-    }
+    private final AuthProvider authProvider;
 
     @Override
-    public void configure(AuthenticationManagerBuilder auth) throws Exception {
-        auth.inMemoryAuthentication()
-                .withUser("user").password(passwordEncoder().encode("qwerty"))
-                .authorities("ROLE_GUEST")
-                .and()
-                .withUser("user2").password(passwordEncoder().encode("qwerty"))
-                .authorities("ROLE_USER")
-                .and()
-                .withUser("admin").password(passwordEncoder().encode("qwerty"))
-                .authorities("ROLE_ADMIN");
+    public void configure(AuthenticationManagerBuilder auth) {
+        auth.authenticationProvider(authProvider);
     }
 
     @Override

@@ -10,6 +10,7 @@ import org.springframework.validation.annotation.Validated;
 import javax.validation.Valid;
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
+import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 
 /**
@@ -21,7 +22,7 @@ import javax.validation.constraints.NotNull;
 @AllArgsConstructor
 public class WaterLevelSensorConfig implements Steerable {
 
-    @NotNull
+    @NotEmpty
     private String id;
 
     @Valid
@@ -34,7 +35,7 @@ public class WaterLevelSensorConfig implements Steerable {
     @Max(100)
     private Integer maxLevel;
 
-    @NotNull
+    @NotEmpty
     private String pinName;
 
     @EqualsAndHashCode.Exclude
