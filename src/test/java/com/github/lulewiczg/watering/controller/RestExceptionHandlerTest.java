@@ -1,6 +1,7 @@
 package com.github.lulewiczg.watering.controller;
 
 import com.github.lulewiczg.watering.exception.ApiError;
+import com.github.lulewiczg.watering.exception.RestExceptionHandler;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
