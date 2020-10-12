@@ -35,9 +35,9 @@ class AuthProviderTest {
     @Test
     void testLoginNotFound() {
         when(securityConfig.getUsers()).thenReturn(List.of(new User("test", "test", List.of(Role.ADMIN))));
+        UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken("test2", "test");
 
-        String message = assertThrows(BadCredentialsException.class,
-                () -> authProvider.authenticate(new UsernamePasswordAuthenticationToken("test2", "test"))).getMessage();
+        String message = assertThrows(BadCredentialsException.class, () -> authProvider.authenticate(authentication)).getMessage();
 
         assertEquals("Invalid credentials", message);
     }
@@ -45,9 +45,9 @@ class AuthProviderTest {
     @Test
     void testLoginInvalidPassword() {
         when(securityConfig.getUsers()).thenReturn(List.of(new User("test", "test", List.of(Role.ADMIN))));
+        UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken("test2", "abc");
 
-        String message = assertThrows(BadCredentialsException.class,
-                () -> authProvider.authenticate(new UsernamePasswordAuthenticationToken("test", "abc"))).getMessage();
+        String message = assertThrows(BadCredentialsException.class, () -> authProvider.authenticate(authentication)).getMessage();
 
         assertEquals("Invalid credentials", message);
     }

@@ -10,7 +10,6 @@ import org.springframework.test.context.TestPropertySource;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNull;
 
 @SpringBootTest
 @TestPropertySource(locations = "classpath:application-test.properties")
