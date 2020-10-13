@@ -70,4 +70,18 @@ public final class TestUtils {
         assertEquals(expected, error);
     }
 
+    /**
+     * Tests REST error response.
+     *
+     * @param error   actual error
+     * @param expected expected error
+     */
+    public static void testError(ApiError error, ApiError expected) {
+        Date expectedDate = expected.getTimestamp();
+        assertNotNull(error.getTimestamp());
+        assertTrue(expectedDate.getTime() <= error.getTimestamp().getTime(), "Time should be after expected!");
+        error.setTimestamp(expectedDate);
+        assertEquals(expected, error);
+    }
+
 }

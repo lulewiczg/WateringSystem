@@ -8,6 +8,7 @@ import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.InsufficientAuthenticationException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
 /**
@@ -18,27 +19,28 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExcep
 public class RestExceptionHandler extends ResponseEntityExceptionHandler {
 
     @ExceptionHandler(Exception.class)
-    public ResponseEntity<ApiError> handle(Exception e) {
-        return getGenericError(e, HttpStatus.BAD_REQUEST);
+    public ResponseEntity<ApiError> handle(Exception e, WebRequest request) {
+        return getGenericError(e, HttpStatus.BAD_REQUEST, request);
     }
 
     @ExceptionHandler(AccessDeniedException.class)
-    public ResponseEntity<ApiError> handle(AccessDeniedException e) {
-        return getGenericError(e, HttpStatus.FORBIDDEN);
+    public ResponseEntity<ApiError> handle(AccessDeniedException e, WebRequest request) {
+        return getGenericError(e, HttpStatus.FORBIDDEN, request);
     }
 
     @ExceptionHandler(InsufficientAuthenticationException.class)
-    public ResponseEntity<ApiError> handle(InsufficientAuthenticationException e) {
-        return getGenericError(e, HttpStatus.UNAUTHORIZED);
+    public ResponseEntity<ApiError> handle(InsufficientAuthenticationException e, WebRequest request) {
+        return getGenericError(e, HttpStatus.UNAUTHORIZED, request);
     }
 
     @ExceptionHandler(BadCredentialsException.class)
-    public ResponseEntity<ApiError> handle(BadCredentialsException e) {
-        return getGenericError(e, HttpStatus.FORBIDDEN);
+    public ResponseEntity<ApiError> handle(BadCredentialsException e, WebRequest request) {
+        return getGenericError(e, HttpStatus.FORBIDDEN, request);
     }
 
-    private ResponseEntity<ApiError> getGenericError(Exception e, HttpStatus status) {
+    private ResponseEntity<ApiError> getGenericError(Exception e, HttpStatus status, WebRequest request) {
         log.error(e);
+        log.error("Request info: {}", request.getDescription(true));
         ApiError error = new ApiError(status.value(), status.getReasonPhrase(), e.getMessage());
         return new ResponseEntity<>(error, status);
     }
