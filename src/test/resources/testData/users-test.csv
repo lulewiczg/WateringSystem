@@ -1,0 +1,6 @@
+test,test,ADMIN,
+test,test,ADMIN|USER,
+test,test,,users[1].roles must not be empty
+test,,,users[1].password must not be empty
+,test,,users[1].name must not be empty
+user,test,ADMIN,Duplicated users found!

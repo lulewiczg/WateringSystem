@@ -1,6 +1,6 @@
 valve,Andrzej,INPUT,true,
 valve,Zbigniew,OUTPUT,false,
 valve,Stasiek,OUTPUT,false,
-valve,,INPUT,true,valves[0].name must not be null
+valve,,INPUT,true,valves[0].name must not be empty
 valve,Alojzy,,false,valves[0].type must not be null
-,Andrzej,INPUT,true,valves[0].id must not be null
+,Andrzej,INPUT,true,valves[0].id must not be empty
