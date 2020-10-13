@@ -8,7 +8,7 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import org.springframework.validation.annotation.Validated;
 
-import javax.validation.Valid;
+import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 
 /**
@@ -20,18 +20,16 @@ import javax.validation.constraints.NotNull;
 @AllArgsConstructor
 public class ValveConfig implements Steerable {
 
-    @NotNull
+    @NotEmpty
     private String id;
 
-    @Valid
-    @NotNull
+    @NotEmpty
     private String name;
 
-    @Valid
     @NotNull
     private ValveType type;
 
-    @NotNull
+    @NotEmpty
     private String pinName;
 
     private boolean open;

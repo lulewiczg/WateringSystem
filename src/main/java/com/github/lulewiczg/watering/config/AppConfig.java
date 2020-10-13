@@ -16,11 +16,11 @@ import org.springframework.boot.context.properties.ConfigurationPropertiesScan;
 import org.springframework.validation.annotation.Validated;
 
 import javax.annotation.PostConstruct;
-import javax.validation.ConstraintViolation;
 import javax.validation.Valid;
-import javax.validation.Validator;
+import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Bean for holding system configuration.
@@ -30,23 +30,20 @@ import java.util.*;
 @Validated
 @RequiredArgsConstructor
 @ConfigurationPropertiesScan
-@ConfigurationProperties(prefix = "config")
+@ConfigurationProperties(prefix = "config.system")
 public class AppConfig {
 
     @Valid
-    @NotNull
+    @NotEmpty
     private final List<TankConfig> tanks;
 
     @Valid
-    @NotNull
+    @NotEmpty
     private final List<ValveConfig> valves;
 
     @Valid
     @NotNull
     private final List<WaterLevelSensorConfig> sensors;
-
-    @JsonIgnore
-    private final Validator validator;
 
     @JsonIgnore
     @Value("${app.config.appConfig.runPostConstruct:true}")
@@ -63,13 +60,6 @@ public class AppConfig {
     }
 
     void validate() {
-        if (tanks.isEmpty()) {
-            throw new IllegalStateException("No tanks found!");
-        }
-        if (valves.isEmpty()) {
-            throw new IllegalStateException("No valves found!");
-        }
-        validateFields();
         tanks.forEach(this::validate);
         validatePins();
     }
@@ -85,14 +75,6 @@ public class AppConfig {
             waterLevelSensor.validate();
             tank.setSensor(waterLevelSensor);
         }
-    }
-
-    private void validateFields() {
-        Set<ConstraintViolation<AppConfig>> errors = validator.validate(this);
-        Optional<ConstraintViolation<AppConfig>> error = errors.stream().min(Comparator.comparing(i -> i.getPropertyPath().toString()));
-        error.ifPresent(i -> {
-            throw new IllegalStateException(i.getPropertyPath() + " " + i.getMessage());
-        });
     }
 
     private void validatePins() {
