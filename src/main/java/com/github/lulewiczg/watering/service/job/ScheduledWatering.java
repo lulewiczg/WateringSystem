@@ -9,6 +9,7 @@ import com.github.lulewiczg.watering.state.SystemStatus;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
@@ -24,6 +25,7 @@ import java.util.concurrent.TimeUnit;
 @Service
 @RequiredArgsConstructor
 @ConditionalOnProperty("com.github.lulewiczg.watering.schedule.watering.enabled")
+@ConditionalOnExpression("'${com.github.lulewiczg.watering.role}' != 'master'")
 public class ScheduledWatering extends ScheduledJob {
 
     @Value("${com.github.lulewiczg.watering.schedule.watering.duration}")

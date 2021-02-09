@@ -9,6 +9,7 @@ import com.github.lulewiczg.watering.state.SystemStatus;
 import com.github.lulewiczg.watering.state.dto.Tank;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
@@ -23,6 +24,7 @@ import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor
 @ConditionalOnProperty("com.github.lulewiczg.watering.schedule.overflow.enabled")
+@ConditionalOnExpression("'${com.github.lulewiczg.watering.role}' != 'master'")
 public class ScheduledWaterFillControl extends ScheduledJob {
 
     private final TanksCloseAction tanksCloseAction;

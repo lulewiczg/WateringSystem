@@ -19,7 +19,7 @@ public enum SystemStatus {
     ERROR;
 
     static {
-        IDLE.setIncorruptibleBy(EnumSet.of(WATERING, DRAINING, FILLING, ERROR));
+        IDLE.setIncorruptibleBy(EnumSet.of(WATERING, DRAINING, FILLING, ERROR, IDLE));
         WATERING.setIncorruptibleBy(EnumSet.of(IDLE));
         DRAINING.setIncorruptibleBy(EnumSet.of(WATERING, IDLE));
         FILLING.setIncorruptibleBy(EnumSet.of(ERROR, DRAINING));

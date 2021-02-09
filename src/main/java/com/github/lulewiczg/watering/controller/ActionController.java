@@ -21,13 +21,13 @@ public class ActionController {
     private final ActionService actionService;
 
     @GetMapping
-    @Secured({"ROLE_USER","ROLE_ADMIN"})
+    @Secured({"ROLE_USER", "ROLE_ADMIN"})
     public List<ActionDefinitionDto> getActions() {
         return actionService.getActions();
     }
 
     @PostMapping
-    @Secured({"ROLE_USER","ROLE_ADMIN"})
+    @Secured({"ROLE_USER", "ROLE_ADMIN"})
     public Object runAction(@Valid @RequestBody ActionDto actionDto) {
         return actionService.runAction(actionDto);
     }

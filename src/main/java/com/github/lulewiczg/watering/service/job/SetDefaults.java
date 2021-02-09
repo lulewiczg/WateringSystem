@@ -8,6 +8,7 @@ import com.github.lulewiczg.watering.state.dto.Valve;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
@@ -18,6 +19,7 @@ import javax.annotation.PostConstruct;
 @Log4j2
 @Service
 @RequiredArgsConstructor
+@ConditionalOnExpression("'${com.github.lulewiczg.watering.role}' != 'master'")
 public class SetDefaults extends ScheduledJob {
 
     private final AppState state;
