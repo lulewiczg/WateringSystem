@@ -1,4 +1,4 @@
-package com.github.lulewiczg.watering;
+package com.github.lulewiczg.watering.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

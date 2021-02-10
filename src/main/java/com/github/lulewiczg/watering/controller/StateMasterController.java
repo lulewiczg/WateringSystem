@@ -1,9 +1,10 @@
 package com.github.lulewiczg.watering.controller;
 
+import com.github.lulewiczg.watering.config.MasterConfig;
 import com.github.lulewiczg.watering.state.AppState;
 import com.github.lulewiczg.watering.state.MasterState;
 import lombok.RequiredArgsConstructor;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -16,7 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/rest/state")
-@ConditionalOnProperty(name = "com.github.lulewiczg.watering.role", havingValue = "master")
+@ConditionalOnBean(MasterConfig.class)
 public class StateMasterController {
 
     private final AppState state;

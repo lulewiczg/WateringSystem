@@ -1,5 +1,6 @@
 package com.github.lulewiczg.watering.service.job;
 
+import com.github.lulewiczg.watering.config.MasterConfig;
 import com.github.lulewiczg.watering.service.actions.OutputsCloseAction;
 import com.github.lulewiczg.watering.service.actions.OutputsOpenAction;
 import com.github.lulewiczg.watering.service.actions.TanksCloseAction;
@@ -10,6 +11,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
@@ -24,8 +26,8 @@ import java.util.concurrent.TimeUnit;
 @Log4j2
 @Service
 @RequiredArgsConstructor
+@ConditionalOnMissingBean(MasterConfig.class)
 @ConditionalOnProperty("com.github.lulewiczg.watering.schedule.watering.enabled")
-@ConditionalOnExpression("'${com.github.lulewiczg.watering.role}' != 'master'")
 public class ScheduledWatering extends ScheduledJob {
 
     @Value("${com.github.lulewiczg.watering.schedule.watering.duration}")

@@ -1,5 +1,6 @@
 package com.github.lulewiczg.watering.service;
 
+import com.github.lulewiczg.watering.config.MasterConfig;
 import com.github.lulewiczg.watering.exception.InvalidParamException;
 import com.github.lulewiczg.watering.service.actions.Action;
 import com.github.lulewiczg.watering.service.dto.ActionDefinitionDto;
@@ -13,6 +14,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.NoSuchBeanDefinitionException;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Service;
 
@@ -28,6 +30,7 @@ import java.util.stream.Collectors;
 @Log4j2
 @Service
 @RequiredArgsConstructor
+@ConditionalOnMissingBean(MasterConfig.class)
 public class ActionService {
 
     private final ApplicationContext applicationContext;

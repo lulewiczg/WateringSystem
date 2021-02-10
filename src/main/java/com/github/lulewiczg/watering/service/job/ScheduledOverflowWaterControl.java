@@ -1,5 +1,6 @@
 package com.github.lulewiczg.watering.service.job;
 
+import com.github.lulewiczg.watering.config.MasterConfig;
 import com.github.lulewiczg.watering.service.actions.TanksCloseAction;
 import com.github.lulewiczg.watering.service.actions.ValveOpenAction;
 import com.github.lulewiczg.watering.state.AppState;
@@ -8,6 +9,7 @@ import com.github.lulewiczg.watering.state.dto.Tank;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
@@ -21,8 +23,8 @@ import java.util.stream.Collectors;
 @Log4j2
 @Service
 @RequiredArgsConstructor
+@ConditionalOnMissingBean(MasterConfig.class)
 @ConditionalOnProperty("com.github.lulewiczg.watering.schedule.fill.enabled")
-@ConditionalOnExpression("'${com.github.lulewiczg.watering.role}' != 'master'")
 public class ScheduledOverflowWaterControl extends ScheduledJob {
 
     private final TanksCloseAction tanksCloseAction;

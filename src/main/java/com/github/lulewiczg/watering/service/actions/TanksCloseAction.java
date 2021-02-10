@@ -1,8 +1,10 @@
 package com.github.lulewiczg.watering.service.actions;
 
+import com.github.lulewiczg.watering.config.MasterConfig;
 import com.github.lulewiczg.watering.state.AppState;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.stereotype.Component;
 
 /**
@@ -11,6 +13,7 @@ import org.springframework.stereotype.Component;
 @Log4j2
 @Component
 @RequiredArgsConstructor
+@ConditionalOnMissingBean(MasterConfig.class)
 public class TanksCloseAction implements Action<Void, Void> {
 
     private final AppState state;

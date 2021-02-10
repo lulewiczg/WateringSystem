@@ -1,10 +1,12 @@
 package com.github.lulewiczg.watering.service.job;
 
+import com.github.lulewiczg.watering.config.MasterConfig;
 import com.github.lulewiczg.watering.service.actions.WaterLevelReadAction;
 import com.github.lulewiczg.watering.state.AppState;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
@@ -15,8 +17,8 @@ import org.springframework.stereotype.Service;
 @Log4j2
 @Service
 @RequiredArgsConstructor
+@ConditionalOnMissingBean(MasterConfig.class)
 @ConditionalOnProperty("com.github.lulewiczg.watering.schedule.sensorsRead.enabled")
-@ConditionalOnExpression("'${com.github.lulewiczg.watering.role}' != 'master'")
 public class ScheduledSensorRead extends ScheduledIoJob {
 
     private final AppState state;

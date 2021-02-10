@@ -1,10 +1,13 @@
 package com.github.lulewiczg.watering.controller;
 
+import com.github.lulewiczg.watering.config.MasterConfig;
 import com.github.lulewiczg.watering.service.ActionService;
 import com.github.lulewiczg.watering.service.dto.ActionDefinitionDto;
 import com.github.lulewiczg.watering.service.dto.ActionDto;
+import com.github.lulewiczg.watering.state.MasterState;
 import lombok.RequiredArgsConstructor;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.*;
 
@@ -12,13 +15,15 @@ import javax.validation.Valid;
 import java.util.List;
 
 /**
- * Controller for actions.
+ * Controller for saving actions in master server to pass them back to slave server.
  */
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/rest/actions")
-@ConditionalOnMissingBean(ActionMasterController.class)
-public class ActionController {
+@ConditionalOnBean(MasterConfig.class)
+public class ActionMasterController {
+
+    private final MasterState masterState;
 
     private final ActionService actionService;
 
@@ -30,8 +35,8 @@ public class ActionController {
 
     @PostMapping
     @Secured({"ROLE_USER", "ROLE_ADMIN"})
-    public Object runAction(@Valid @RequestBody ActionDto actionDto) {
-        return actionService.runAction(actionDto);
+    public void runAction(@Valid @RequestBody ActionDto actionDto) {
+        masterState.getActions().add(actionDto);
     }
 
 }

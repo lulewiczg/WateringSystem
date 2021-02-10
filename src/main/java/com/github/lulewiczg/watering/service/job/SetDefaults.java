@@ -1,5 +1,6 @@
 package com.github.lulewiczg.watering.service.job;
 
+import com.github.lulewiczg.watering.config.MasterConfig;
 import com.github.lulewiczg.watering.service.actions.ValveCloseAction;
 import com.github.lulewiczg.watering.service.actions.ValveOpenAction;
 import com.github.lulewiczg.watering.state.AppState;
@@ -9,6 +10,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
@@ -19,7 +21,7 @@ import javax.annotation.PostConstruct;
 @Log4j2
 @Service
 @RequiredArgsConstructor
-@ConditionalOnExpression("'${com.github.lulewiczg.watering.role}' != 'master'")
+@ConditionalOnMissingBean(MasterConfig.class)
 public class SetDefaults extends ScheduledJob {
 
     private final AppState state;
