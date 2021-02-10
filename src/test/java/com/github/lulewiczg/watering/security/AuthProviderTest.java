@@ -58,8 +58,9 @@ class AuthProviderTest {
 
         Authentication auth = authProvider.authenticate(new UsernamePasswordAuthenticationToken("name", "password"));
 
-        assertEquals("name", auth.getName());
+        assertEquals("name", ((User) auth.getPrincipal()).getName());
         assertEquals("password", auth.getCredentials());
+
         assertEquals(List.of(new SimpleGrantedAuthority("ROLE_ADMIN")), auth.getAuthorities());
     }
 

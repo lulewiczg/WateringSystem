@@ -33,7 +33,7 @@ public class AuthProvider implements AuthenticationProvider {
                 .orElseThrow(() -> new BadCredentialsException("Invalid credentials"));
 
         checkPassword(password, user);
-        return new UsernamePasswordAuthenticationToken(name, password,
+        return new UsernamePasswordAuthenticationToken(user, password,
                 user.getRoles().stream().map(i -> new SimpleGrantedAuthority("ROLE_" + i.getName())).collect(Collectors.toList()));
     }
 

@@ -9,6 +9,7 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.constraints.NotNull;
 import java.util.List;
 
 /**
@@ -38,7 +39,7 @@ public class JobMasterController {
 
     @PostMapping("/{job}")
     @Secured({"ROLE_USER", "ROLE_ADMIN"})
-    public void runJob(@PathVariable("job") String name) {
+    public void runJob(@PathVariable("job") @NotNull String name) {
         actionService.runJob(name);
     }
 

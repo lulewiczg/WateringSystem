@@ -27,4 +27,8 @@ public class User {
 
     @NotEmpty
     private List<Role> roles;
+
+    public String getUsername() {
+        return name;
+    }
 }

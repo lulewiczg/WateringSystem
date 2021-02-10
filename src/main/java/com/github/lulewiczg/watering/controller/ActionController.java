@@ -1,5 +1,6 @@
 package com.github.lulewiczg.watering.controller;
 
+import com.github.lulewiczg.watering.config.MasterConfig;
 import com.github.lulewiczg.watering.service.ActionService;
 import com.github.lulewiczg.watering.service.dto.ActionDefinitionDto;
 import com.github.lulewiczg.watering.service.dto.ActionDto;
@@ -17,7 +18,7 @@ import java.util.List;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/rest/actions")
-@ConditionalOnMissingBean(ActionMasterController.class)
+@ConditionalOnMissingBean(MasterConfig.class)
 public class ActionController {
 
     private final ActionService actionService;

@@ -34,15 +34,14 @@ public class ActionServiceMasterImpl implements ActionService {
 
     @Override
     public void runJob(String jobName) {
-        if (!state.getJobs().contains(jobName)) {
-            throw new IllegalArgumentException("Job not found: " + jobName);
-        }
+        state.getJobDefinitions().stream().filter(i -> i.getJobName().equals(jobName)).findFirst()
+                .orElseThrow(() -> new IllegalArgumentException("Job not found: " + jobName));
         state.getJobs().add(jobName);
     }
 
     @Override
     public Object runAction(ActionDto actionDto) {
-        state.getActionDefinitions().stream().filter(i -> i.getActionName().equals(actionDto.getName()) && i.getParameterType().equals(actionDto.getParamType()))
+        state.getActionDefinitions().stream().filter(i -> i.getActionName().equals(actionDto.getName()))
                 .findFirst().orElseThrow(() -> new IllegalArgumentException("Job not found: " + actionDto));
         state.getActions().add(actionDto);
         return null;
