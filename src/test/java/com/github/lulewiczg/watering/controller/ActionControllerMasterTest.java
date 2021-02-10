@@ -2,6 +2,7 @@ package com.github.lulewiczg.watering.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.lulewiczg.watering.TestUtils;
+import com.github.lulewiczg.watering.config.MasterConfig;
 import com.github.lulewiczg.watering.exception.ApiError;
 import com.github.lulewiczg.watering.exception.InvalidParamException;
 import com.github.lulewiczg.watering.security.AuthEntryPoint;
@@ -9,6 +10,7 @@ import com.github.lulewiczg.watering.security.AuthProvider;
 import com.github.lulewiczg.watering.service.ActionService;
 import com.github.lulewiczg.watering.service.dto.ActionDefinitionDto;
 import com.github.lulewiczg.watering.service.dto.ActionDto;
+import com.github.lulewiczg.watering.state.MasterState;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,6 +25,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.Arrays;
+import java.util.List;
 
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -31,14 +34,17 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @AutoConfigureMockMvc
-@ActiveProfiles("test")
+@ActiveProfiles({"test", "testMaster"})
 @ExtendWith(SpringExtension.class)
+@Import({AuthEntryPoint.class, AuthProvider.class, MasterConfig.class, ActionMasterController.class})
 @WebMvcTest(ActionController.class)
-@Import({AuthEntryPoint.class, AuthProvider.class})
-class ActionControllerTest {
+class ActionControllerMasterTest {
 
     @MockBean
     private ActionService service;
+
+    @MockBean
+    private MasterState masterState;
 
     @Autowired
     private MockMvc mvc;
@@ -98,6 +104,30 @@ class ActionControllerTest {
 
     @Test
     @WithMockUser(roles = "USER")
+    void testGetPending() throws Exception {
+        testPending();
+    }
+
+    @Test
+    @WithMockUser(roles = "ADMIN")
+    void testGetPendingAdmin() throws Exception {
+        testPending();
+    }
+
+    @Test
+    @WithMockUser(roles = "GUEST")
+    void testGetPendingGuest() {
+        TestUtils.testForbiddenGet(mvc, mapper, "/rest/actions/pending");
+    }
+
+    @Test
+    void testGetPendingAnon() {
+        TestUtils.testUnauthorizedGet(mvc, mapper, "/rest/actions/pending");
+
+    }
+
+    @Test
+    @WithMockUser(roles = "USER")
     void testRunActionError() throws Exception {
         ActionDto actionDto = new ActionDto("test", "test2", "test3");
         InvalidParamException ex = new InvalidParamException(Object.class, String.class);
@@ -129,7 +159,16 @@ class ActionControllerTest {
                 .content(mapper.writeValueAsString(actionDto))
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(content().string("testResult"));
+                .andExpect(content().string(""));
     }
 
+    private void testPending() throws Exception {
+        ActionDto actionDto = new ActionDto("test", "test2", "test3");
+        ActionDto actionDto2 = new ActionDto("test4", "test5", "test6");
+
+        when(masterState.getActions()).thenReturn(List.of(actionDto, actionDto2));
+        mvc.perform(get("/rest/actions/pending"))
+                .andExpect(status().isOk())
+                .andExpect(content().json(mapper.writeValueAsString(List.of(actionDto, actionDto2))));
+    }
 }

@@ -31,7 +31,7 @@ import static org.mockito.Mockito.verify;
 class ActionServiceTest {
 
     @Autowired
-    private ActionService service;
+    private ActionServiceImpl service;
 
     @MockBean
     private IOService ioService;

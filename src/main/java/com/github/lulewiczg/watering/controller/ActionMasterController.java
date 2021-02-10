@@ -7,7 +7,6 @@ import com.github.lulewiczg.watering.service.dto.ActionDto;
 import com.github.lulewiczg.watering.state.MasterState;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.*;
 
@@ -33,10 +32,16 @@ public class ActionMasterController {
         return actionService.getActions();
     }
 
+    @GetMapping("/pending")
+    @Secured({"ROLE_USER", "ROLE_ADMIN"})
+    public List<ActionDto> getPendingActions() {
+        return masterState.getActions();
+    }
+
     @PostMapping
     @Secured({"ROLE_USER", "ROLE_ADMIN"})
     public void runAction(@Valid @RequestBody ActionDto actionDto) {
-        masterState.getActions().add(actionDto);
+        actionService.runAction(actionDto);
     }
 
 }

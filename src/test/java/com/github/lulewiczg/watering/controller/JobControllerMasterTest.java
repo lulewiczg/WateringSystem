@@ -2,12 +2,14 @@ package com.github.lulewiczg.watering.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.lulewiczg.watering.TestUtils;
+import com.github.lulewiczg.watering.config.MasterConfig;
 import com.github.lulewiczg.watering.exception.ApiError;
 import com.github.lulewiczg.watering.exception.InvalidParamException;
 import com.github.lulewiczg.watering.security.AuthEntryPoint;
 import com.github.lulewiczg.watering.security.AuthProvider;
 import com.github.lulewiczg.watering.service.ActionService;
 import com.github.lulewiczg.watering.service.dto.JobDefinitionDto;
+import com.github.lulewiczg.watering.state.MasterState;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,6 +24,7 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.Arrays;
 import java.util.Date;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
@@ -31,14 +34,17 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @AutoConfigureMockMvc
-@ActiveProfiles("test")
+@ActiveProfiles({"test", "testMaster"})
 @WebMvcTest(JobController.class)
 @ExtendWith(SpringExtension.class)
-@Import({AuthEntryPoint.class, AuthProvider.class})
-class JobControllerTest {
+@Import({AuthEntryPoint.class, AuthProvider.class, MasterConfig.class, JobMasterController.class})
+class JobControllerMasterTest {
 
     @MockBean
     private ActionService service;
+
+    @MockBean
+    private MasterState masterState;
 
     @Autowired
     private MockMvc mvc;
@@ -60,9 +66,8 @@ class JobControllerTest {
 
     @Test
     @WithMockUser(roles = "GUEST")
-    void testGetJobsGuest() {
+    void testGetJobsGuest() throws Exception {
         TestUtils.testForbiddenGet(mvc, mapper, "/rest/jobs");
-
     }
 
     @Test
@@ -86,12 +91,47 @@ class JobControllerTest {
     @WithMockUser(roles = "GUEST")
     void testRunJobsGuest() {
         TestUtils.testForbiddenPost(mvc, mapper, "/rest/jobs/test123", null);
-
     }
 
     @Test
     void testRunJobsAnon() {
         TestUtils.testUnauthorizedPost(mvc, mapper, "/rest/jobs/test123", null);
+
+    }
+
+    @Test
+    @WithMockUser(roles = "USER")
+    void testGetPending() throws Exception {
+        testPending();
+    }
+
+    @Test
+    @WithMockUser(roles = "ADMIN")
+    void testGetPendingAdmin() throws Exception {
+        testPending();
+    }
+
+    @Test
+    @WithMockUser(roles = "GUEST")
+    void testGetPendingGuest() throws Exception {
+        ApiError expected = new ApiError(403, TestUtils.FORBIDDEN, TestUtils.FORBIDDEN_MSG);
+
+        String json = mvc.perform(get("/rest/jobs/pending"))
+                .andExpect(status().isForbidden())
+                .andReturn().getResponse().getContentAsString();
+
+        TestUtils.testError(json, expected, mapper);
+    }
+
+    @Test
+    void testGetPendingAnon() throws Exception {
+        ApiError expected = new ApiError(401, TestUtils.UNAUTHORIZED, TestUtils.UNAUTHORIZED_MSG);
+
+        String json = mvc.perform(get("/rest/jobs/pending"))
+                .andExpect(status().isUnauthorized())
+                .andReturn().getResponse().getContentAsString();
+
+        TestUtils.testError(json, expected, mapper);
     }
 
     @Test
@@ -128,6 +168,14 @@ class JobControllerTest {
                 .andExpect(content().string(""));
 
         verify(service).runJob("test123");
+    }
+
+    private void testPending() throws Exception {
+        List<String> list = List.of("test", "test");
+        when(masterState.getJobs()).thenReturn(list);
+        mvc.perform(get("/rest/jobs/pending"))
+                .andExpect(status().isOk())
+                .andExpect(content().json(mapper.writeValueAsString(list)));
     }
 
 }

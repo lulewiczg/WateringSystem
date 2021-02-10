@@ -7,8 +7,7 @@ import com.github.lulewiczg.watering.exception.InvalidParamException;
 import com.github.lulewiczg.watering.security.AuthEntryPoint;
 import com.github.lulewiczg.watering.security.AuthProvider;
 import com.github.lulewiczg.watering.service.ActionService;
-import com.github.lulewiczg.watering.service.dto.ActionDefinitionDto;
-import com.github.lulewiczg.watering.service.dto.ActionDto;
+import com.github.lulewiczg.watering.service.dto.JobDefinitionDto;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,26 +15,27 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
-import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.Arrays;
+import java.util.Date;
 
-import static org.mockito.Mockito.when;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @AutoConfigureMockMvc
-@ActiveProfiles("test")
+@ActiveProfiles({"test", "testSlave"})
+@WebMvcTest(JobController.class)
 @ExtendWith(SpringExtension.class)
-@WebMvcTest(ActionController.class)
 @Import({AuthEntryPoint.class, AuthProvider.class})
-class ActionControllerTest {
+class JobControllerSlaveTest {
 
     @MockBean
     private ActionService service;
@@ -48,88 +48,86 @@ class ActionControllerTest {
 
     @Test
     @WithMockUser(roles = "USER")
-    void testGetActions() throws Exception {
-        testGetAction();
+    void testGetJobs() throws Exception {
+        testGet();
     }
 
     @Test
     @WithMockUser(roles = "ADMIN")
-    void testGetActionsAdmin() throws Exception {
-        testGetAction();
+    void testGetJobsAdmin() throws Exception {
+        testGet();
     }
 
     @Test
     @WithMockUser(roles = "GUEST")
-    void testGetActionsGuest() {
-        TestUtils.testForbiddenGet(mvc, mapper, "/rest/actions");
+    void testGetJobsGuest() {
+        TestUtils.testForbiddenGet(mvc, mapper, "/rest/jobs");
+
     }
 
     @Test
-    void testGetActionsAnon() {
-        TestUtils.testUnauthorizedGet(mvc, mapper, "/rest/actions");
+    void testGetJobsAnon() throws Exception {
+        TestUtils.testUnauthorizedGet(mvc, mapper, "/rest/jobs");
     }
 
     @Test
     @WithMockUser(roles = "USER")
-    void testRunAction() throws Exception {
+    void testRunJob() throws Exception {
         testRun();
     }
 
     @Test
     @WithMockUser(roles = "ADMIN")
-    void testRunActionAdmin() throws Exception {
+    void testRunJobAdmin() throws Exception {
         testRun();
     }
 
     @Test
     @WithMockUser(roles = "GUEST")
-    void testRunActionGuest() {
-        ActionDto actionDto = new ActionDto("test", "test2", "test3");
+    void testRunJobsGuest() {
+        TestUtils.testForbiddenPost(mvc, mapper, "/rest/jobs/test123", null);
 
-        TestUtils.testForbiddenPost(mvc, mapper, "/rest/actions", actionDto);
     }
 
     @Test
-    void testRunActionGuestAnon() {
-        ActionDto actionDto = new ActionDto("test", "test2", "test3");
-
-        TestUtils.testUnauthorizedPost(mvc, mapper, "/rest/actions", actionDto);
+    void testRunJobsAnon() {
+        TestUtils.testUnauthorizedPost(mvc, mapper, "/rest/jobs/test123", null);
     }
 
     @Test
     @WithMockUser(roles = "USER")
-    void testRunActionError() throws Exception {
-        ActionDto actionDto = new ActionDto("test", "test2", "test3");
+    void testRunJobError() throws Exception {
         InvalidParamException ex = new InvalidParamException(Object.class, String.class);
-        when(service.runAction(actionDto)).thenThrow(ex);
+        doThrow(ex).when(service).runJob("test123");
         ApiError expected = new ApiError(400, "Bad Request", ex.getMessage());
+        Date date = new Date();
 
-        String json = mvc.perform(post("/rest/actions")
-                .content(mapper.writeValueAsString(actionDto))
-                .contentType(MediaType.APPLICATION_JSON))
+        String json = mvc.perform(post("/rest/jobs/test123"))
                 .andExpect(status().isBadRequest())
                 .andReturn().getResponse().getContentAsString();
 
-        TestUtils.testError(json, expected, mapper);
+        ApiError error = mapper.readValue(json, ApiError.class);
+        assertNotNull(error.getTimestamp());
+        assertTrue(date.before(error.getTimestamp()));
+        error.setTimestamp(expected.getTimestamp());
+        assertEquals(expected, error);
     }
 
-    private void testGetAction() throws Exception {
-        ActionDefinitionDto[] jobDefinitionDto = TestUtils.readJson("actions.json", ActionDefinitionDto[].class, mapper);
-        when(service.getActions()).thenReturn(Arrays.asList(jobDefinitionDto));
+    private void testGet() throws Exception {
+        JobDefinitionDto[] jobDefinitionDto = TestUtils.readJson("jobs.json", JobDefinitionDto[].class, mapper);
+        when(service.getJobs()).thenReturn(Arrays.asList(jobDefinitionDto));
 
-        mvc.perform(get("/rest/actions"))
+        mvc.perform(get("/rest/jobs"))
                 .andExpect(status().isOk())
                 .andExpect(content().json(mapper.writeValueAsString(jobDefinitionDto)));
     }
 
     private void testRun() throws Exception {
-        ActionDto actionDto = new ActionDto("test", "test2", "test3");
-        when(service.runAction(actionDto)).thenReturn("testResult");
-        mvc.perform(post("/rest/actions")
-                .content(mapper.writeValueAsString(actionDto))
-                .contentType(MediaType.APPLICATION_JSON))
+        mvc.perform(post("/rest/jobs/test123"))
                 .andExpect(status().isOk())
-                .andExpect(content().string("testResult"));
+                .andExpect(content().string(""));
+
+        verify(service).runJob("test123");
     }
 
 }

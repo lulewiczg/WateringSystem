@@ -1,8 +1,9 @@
 package com.github.lulewiczg.watering.controller;
 
 import com.github.lulewiczg.watering.config.MasterConfig;
-import com.github.lulewiczg.watering.state.AppState;
-import com.github.lulewiczg.watering.state.MasterState;
+import com.github.lulewiczg.watering.service.MasterService;
+import com.github.lulewiczg.watering.service.dto.SlaveStateDto;
+import com.github.lulewiczg.watering.state.dto.MasterResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -20,17 +21,13 @@ import org.springframework.web.bind.annotation.RestController;
 @ConditionalOnBean(MasterConfig.class)
 public class StateMasterController {
 
-    private final AppState state;
-
-    private final MasterState masterState;
+    private final MasterService service;
 
     @PostMapping
-    @PreAuthorize(value = "hasAuthority('ROLE_USER') and authentication.principal.equals('slave') ")
-    public MasterState updateState(@RequestBody AppState state) {
-        this.state.setState(state.getState());
-        this.state.setOutputs(state.getOutputs());
-        this.state.setTanks(state.getTanks());
-        this.state.setTaps(state.getTaps());
-        return masterState;
+    @PreAuthorize(value = "hasAuthority('ROLE_USER') and authentication.principal.equals('slave') ")//TODO UserDetails
+    public MasterResponse updateState(@RequestBody SlaveStateDto state) {
+        return service.update(state);
     }
+
+
 }

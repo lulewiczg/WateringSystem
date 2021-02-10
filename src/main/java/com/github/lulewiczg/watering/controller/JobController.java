@@ -15,7 +15,7 @@ import java.util.List;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/rest/jobs")
-@ConditionalOnMissingBean(ActionMasterController.class)
+@ConditionalOnMissingBean(JobMasterController.class)
 public class JobController {
 
     private final ActionService actionService;

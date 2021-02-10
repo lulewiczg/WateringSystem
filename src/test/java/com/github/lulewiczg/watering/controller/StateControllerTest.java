@@ -2,7 +2,6 @@ package com.github.lulewiczg.watering.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.lulewiczg.watering.TestUtils;
-import com.github.lulewiczg.watering.exception.ApiError;
 import com.github.lulewiczg.watering.security.AuthEntryPoint;
 import com.github.lulewiczg.watering.security.AuthProvider;
 import org.junit.jupiter.api.Test;
@@ -52,14 +51,8 @@ class StateControllerTest {
     }
 
     @Test
-    void testGetActionsAnon() throws Exception {
-        ApiError expected = new ApiError(401, TestUtils.UNAUTHORIZED, TestUtils.UNAUTHORIZED_MSG);
-
-        String json = mvc.perform(get("/rest/actions"))
-                .andExpect(status().isUnauthorized())
-                .andReturn().getResponse().getContentAsString();
-
-        TestUtils.testError(json, expected, mapper);
+    void testGetActionsAnon() {
+        TestUtils.testUnauthorizedGet(mvc, mapper, "/rest/actions");
     }
 
 

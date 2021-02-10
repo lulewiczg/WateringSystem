@@ -31,11 +31,11 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @AutoConfigureMockMvc
-@ActiveProfiles("test")
+@ActiveProfiles({"test", "testSlave"})
 @ExtendWith(SpringExtension.class)
-@WebMvcTest(ActionController.class)
 @Import({AuthEntryPoint.class, AuthProvider.class})
-class ActionControllerTest {
+@WebMvcTest(ActionController.class)
+class ActionControllerSlaveTest {
 
     @MockBean
     private ActionService service;

@@ -46,7 +46,7 @@ public class AppConfig {
     private final List<WaterLevelSensorConfig> sensors;
 
     @JsonIgnore
-    @Value("${app.config.appConfig.runPostConstruct:true}")
+    @Value("#{${app.config.appConfig.runPostConstruct:true} && '${com.github.lulewiczg.watering.role:}' != 'master'}")
     private boolean runPostConstruct;
 
     @PostConstruct

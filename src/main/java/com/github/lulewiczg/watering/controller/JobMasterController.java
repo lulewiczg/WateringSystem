@@ -30,10 +30,16 @@ public class JobMasterController {
         return actionService.getJobs();
     }
 
+    @GetMapping("/pending")
+    @Secured({"ROLE_USER", "ROLE_ADMIN"})
+    public List<String> getPendingActions() {
+        return masterState.getJobs();
+    }
+
     @PostMapping("/{job}")
     @Secured({"ROLE_USER", "ROLE_ADMIN"})
     public void runJob(@PathVariable("job") String name) {
-        masterState.getJobs().add(name); //TODO validate name
+        actionService.runJob(name);
     }
 
 }

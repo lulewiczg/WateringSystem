@@ -1,0 +1,13 @@
+{
+  "actions": [
+    {
+      "name": "valveOpenAction",
+      "paramType": "Valve",
+      "param": "tank1"
+    }
+  ],
+  "jobs": [
+    "abc",
+    "cba"
+  ]
+}

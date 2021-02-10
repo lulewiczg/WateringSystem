@@ -28,7 +28,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 class ActionServiceDisabledTest {
 
     @Autowired
-    private ActionService service;
+    private ActionServiceImpl service;
 
     @MockBean
     private IOService ioService;

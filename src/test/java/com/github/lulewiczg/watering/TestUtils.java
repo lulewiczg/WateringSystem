@@ -6,12 +6,17 @@ import com.github.lulewiczg.watering.exception.ApiError;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import lombok.SneakyThrows;
+import org.springframework.http.MediaType;
+import org.springframework.test.web.servlet.MockMvc;
 
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.Date;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 /**
  * Utils for tests.
@@ -73,7 +78,7 @@ public final class TestUtils {
     /**
      * Tests REST error response.
      *
-     * @param error   actual error
+     * @param error    actual error
      * @param expected expected error
      */
     public static void testError(ApiError error, ApiError expected) {
@@ -84,4 +89,110 @@ public final class TestUtils {
         assertEquals(expected, error);
     }
 
+    /**
+     * Tests forbidden error for post.
+     *
+     * @param mvc     mock mvc
+     * @param mapper  mapper
+     * @param url     URL
+     * @param payload payload
+     */
+    @SneakyThrows
+    public static void testForbiddenPost(MockMvc mvc, ObjectMapper mapper, String url, Object payload) {
+        ApiError expected = new ApiError(403, FORBIDDEN, FORBIDDEN_MSG);
+
+        String json = mvc.perform(post(url)
+                .content(mapper.writeValueAsString(payload))
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isForbidden())
+                .andReturn().getResponse().getContentAsString();
+
+        testError(json, expected, mapper);
+    }
+
+    /**
+     * Tests unauthorized error for post.
+     *
+     * @param mvc     mock mvc
+     * @param mapper  mapper
+     * @param url     URL
+     * @param payload payload
+     */
+    @SneakyThrows
+    public static void testUnauthorizedPost(MockMvc mvc, ObjectMapper mapper, String url, Object payload) {
+        ApiError expected = new ApiError(401, UNAUTHORIZED, UNAUTHORIZED_MSG);
+
+        String json = mvc.perform(post(url)
+                .content(mapper.writeValueAsString(payload))
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isUnauthorized())
+                .andReturn().getResponse().getContentAsString();
+
+        testError(json, expected, mapper);
+    }
+
+    /**
+     * Tests forbidden error for get.
+     *
+     * @param mvc    mock mvc
+     * @param mapper mapper
+     * @param url    URL
+     */
+    @SneakyThrows
+    public static void testForbiddenGet(MockMvc mvc, ObjectMapper mapper, String url) {
+        ApiError expected = new ApiError(403, FORBIDDEN, FORBIDDEN_MSG);
+
+        String json = mvc.perform(get(url))
+                .andExpect(status().isForbidden())
+                .andReturn().getResponse().getContentAsString();
+
+        testError(json, expected, mapper);
+    }
+
+    /**
+     * Tests unauthorized error for get.
+     *
+     * @param mvc    mock mvc
+     * @param mapper mapper
+     * @param url    URL
+     */
+    @SneakyThrows
+    public static void testUnauthorizedGet(MockMvc mvc, ObjectMapper mapper, String url) {
+        ApiError expected = new ApiError(401, UNAUTHORIZED, UNAUTHORIZED_MSG);
+
+        String json = mvc.perform(get(url))
+                .andExpect(status().isUnauthorized())
+                .andReturn().getResponse().getContentAsString();
+
+        testError(json, expected, mapper);
+    }
+
+
+    /**
+     * Tests not found error for get.
+     *
+     * @param mvc    mock mvc
+     * @param mapper mapper
+     * @param url    URL
+     */
+    @SneakyThrows
+    public static void testNotFoundGet(MockMvc mvc, ObjectMapper mapper, String url) {
+        mvc.perform(get(url))
+                .andExpect(status().isNotFound());
+    }
+
+    /**
+     * Tests not found error for post.
+     *
+     * @param mvc    mock mvc
+     * @param mapper mapper
+     * @param url    URL
+     */
+    @SneakyThrows
+    public static void tesNotFoundPost(MockMvc mvc, ObjectMapper mapper, String url, Object payload) {
+        mvc.perform(post(url)
+                .content(mapper.writeValueAsString(payload))
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isNotFound());
+    }
 }
