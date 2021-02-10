@@ -25,7 +25,7 @@ import org.springframework.web.client.RestTemplate;
 @Service
 @RequiredArgsConstructor
 @ConditionalOnBean(SlaveConfig.class)
-public class ScheduledMasterListen extends ScheduledJob {
+public class ScheduledMasterSync extends ScheduledJob {
 
     private final AppState state;
 
