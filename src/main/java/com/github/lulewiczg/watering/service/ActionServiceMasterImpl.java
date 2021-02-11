@@ -1,11 +1,13 @@
 package com.github.lulewiczg.watering.service;
 
+import com.github.lulewiczg.watering.config.MasterConfig;
 import com.github.lulewiczg.watering.service.dto.ActionDefinitionDto;
 import com.github.lulewiczg.watering.service.dto.ActionDto;
 import com.github.lulewiczg.watering.service.dto.JobDefinitionDto;
 import com.github.lulewiczg.watering.state.MasterState;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.stereotype.Service;
 
@@ -17,7 +19,7 @@ import java.util.List;
 @Log4j2
 @Service
 @RequiredArgsConstructor
-@ConditionalOnMissingBean(ActionServiceImpl.class)
+@ConditionalOnBean(MasterConfig.class)
 public class ActionServiceMasterImpl implements ActionService {
 
     private final MasterState state;
