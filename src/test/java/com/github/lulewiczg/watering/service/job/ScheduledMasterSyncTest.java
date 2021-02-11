@@ -26,7 +26,6 @@ import org.springframework.web.client.RestTemplate;
 
 import java.util.List;
 
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
 
 @SpringBootTest
@@ -72,7 +71,7 @@ class ScheduledMasterSyncTest {
         headers.add("Authorization", "Basic " + base64);
         HttpEntity<SlaveStateDto> entity = new HttpEntity<>(new SlaveStateDto(state, List.of(actionDef), List.of(jobDef)), headers);
 
-        when(restTemplate.postForEntity(eq(url), eq(entity), eq(MasterResponse.class))).thenReturn(new ResponseEntity<>(response, HttpStatus.OK));
+        when(restTemplate.postForEntity(url, entity, MasterResponse.class)).thenReturn(new ResponseEntity<>(response, HttpStatus.OK));
         ActionDto action = new ActionDto("name", "type", "param");
         ActionDto action2 = new ActionDto("name2", "type2", "param2");
 
@@ -101,7 +100,7 @@ class ScheduledMasterSyncTest {
         headers.add("Authorization", "Basic " + base64);
         HttpEntity<SlaveStateDto> entity = new HttpEntity<>(new SlaveStateDto(state, List.of(actionDef), List.of(jobDef)), headers);
 
-        when(restTemplate.postForEntity(eq(url), eq(entity), eq(MasterResponse.class))).thenReturn(new ResponseEntity<>(response, HttpStatus.OK));
+        when(restTemplate.postForEntity(url, entity, MasterResponse.class)).thenReturn(new ResponseEntity<>(response, HttpStatus.OK));
 
         job.run();
 
@@ -124,7 +123,7 @@ class ScheduledMasterSyncTest {
         headers.add("Authorization", "Basic " + base64);
         HttpEntity<SlaveStateDto> entity = new HttpEntity<>(new SlaveStateDto(state, List.of(actionDef), List.of(jobDef)), headers);
 
-        when(restTemplate.postForEntity(eq(url), eq(entity), eq(MasterResponse.class))).thenThrow(HttpClientErrorException.BadRequest.class);
+        when(restTemplate.postForEntity(url, entity, MasterResponse.class)).thenThrow(HttpClientErrorException.BadRequest.class);
 
         job.run();
 

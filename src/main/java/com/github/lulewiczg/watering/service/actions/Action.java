@@ -62,6 +62,6 @@ public interface Action<T, R> {
 
     private ParameterizedType findType() {
         return Arrays.stream(this.getClass().getGenericInterfaces())
-                .map(i -> (ParameterizedType) i).filter(i -> i.getRawType() == Action.class).findFirst().orElseThrow();
+                .map(ParameterizedType.class::cast).filter(i -> i.getRawType() == Action.class).findFirst().orElseThrow();
     }
 }
