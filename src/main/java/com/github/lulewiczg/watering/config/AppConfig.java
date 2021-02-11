@@ -96,5 +96,4 @@ public class AppConfig {
         usedPins.add(name);
     }
 
-
 }

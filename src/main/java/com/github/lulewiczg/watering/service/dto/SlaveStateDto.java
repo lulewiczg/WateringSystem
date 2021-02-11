@@ -7,6 +7,9 @@ import lombok.NoArgsConstructor;
 
 import java.util.List;
 
+/**
+ * DTO for slave state.
+ */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor

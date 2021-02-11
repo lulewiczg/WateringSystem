@@ -29,5 +29,4 @@ public class StateMasterController {
         return service.update(state);
     }
 
-
 }

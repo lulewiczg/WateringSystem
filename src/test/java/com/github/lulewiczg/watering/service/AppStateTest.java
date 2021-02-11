@@ -77,5 +77,4 @@ class AppStateTest {
         assertThrows(ValveNotFoundException.class, () -> state.findValve("qweretyuiop"));
     }
 
-
 }

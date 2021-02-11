@@ -6,6 +6,9 @@ import lombok.NoArgsConstructor;
 
 import javax.validation.Valid;
 
+/**
+ * DTO for action.
+ */
 @Data
 @Valid
 @NoArgsConstructor

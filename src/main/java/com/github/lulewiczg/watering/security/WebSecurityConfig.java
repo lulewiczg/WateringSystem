@@ -42,5 +42,4 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .logout().logoutUrl("/rest/logout");
     }
 
-
 }

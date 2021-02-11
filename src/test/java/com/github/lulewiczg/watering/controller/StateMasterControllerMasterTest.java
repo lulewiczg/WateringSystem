@@ -47,7 +47,7 @@ class StateMasterControllerMasterTest {
 
     @Test
     @WithMockUser(roles = "SLAVE")
-    void testUpdateStateProperUser() throws Exception {
+    void testUpdateStateSlave() throws Exception {
         AppState appState = TestUtils.readJson("state.json", AppState.class, mapper);
         SlaveStateDto slaveState = new SlaveStateDto(appState, List.of(), List.of());
         MasterResponse response = TestUtils.readJson("masterResponse.json", MasterResponse.class, mapper);

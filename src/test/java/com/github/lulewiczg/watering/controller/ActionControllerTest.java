@@ -104,7 +104,7 @@ class ActionControllerTest {
     }
 
     @Test
-    void testRunActionGuestAnon() {
+    void testRunActionAnon() {
         ActionDto actionDto = new ActionDto("test", "test2", "test3");
 
         TestUtils.testUnauthorizedPost(mvc, mapper, "/rest/actions", actionDto);

@@ -66,5 +66,4 @@ class RestExceptionHandlerTest {
         TestUtils.testError(Objects.requireNonNull(response.getBody()), expected);
     }
 
-
 }

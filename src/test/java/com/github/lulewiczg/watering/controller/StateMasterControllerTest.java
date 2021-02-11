@@ -53,7 +53,6 @@ class StateMasterControllerTest {
         TestUtils.tesNotFoundPost(mvc, mapper, "/rest/state", new SlaveStateDto());
     }
 
-
     @Test
     void testUpdateStateAnon() {
         TestUtils.testUnauthorizedPost(mvc, mapper, "/rest/state", new SlaveStateDto());

@@ -58,5 +58,4 @@ class StateMasterControllerSlaveTest {
         TestUtils.testUnauthorizedPost(mvc, mapper, "/rest/state", new SlaveStateDto());
     }
 
-
 }
