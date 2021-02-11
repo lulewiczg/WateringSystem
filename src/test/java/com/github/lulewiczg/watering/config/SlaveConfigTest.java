@@ -57,6 +57,5 @@ class SlaveConfigTest {
         assertDoesNotThrow(() -> ctx.getBean(ActionController.class));
         assertDoesNotThrow(() -> ctx.getBean(JobController.class));
         assertDoesNotThrow(() -> ctx.getBean(ActionController.class));
-        assertDoesNotThrow(() -> ctx.getBean(ActionController.class));
     }
 }

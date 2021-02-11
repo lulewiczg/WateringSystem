@@ -16,6 +16,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 
 /**
@@ -75,11 +76,18 @@ public class ScheduledMasterSync extends ScheduledJob {
         headers.add("Authorization", "Basic " + base64);
         HttpEntity<SlaveStateDto> entity = new HttpEntity<>(new SlaveStateDto(state, actionService.getActions(), actionService.getJobs()), headers);
 
-        ResponseEntity<MasterResponse> response = restTemplate.postForEntity(url, entity, MasterResponse.class);
-        if (response.getStatusCode().isError()) {
-            log.error("Sync with master failed, error: {}", response.getStatusCodeValue());
+        ResponseEntity<MasterResponse> response;
+        try {
+            response = restTemplate.postForEntity(url, entity, MasterResponse.class);
+        } catch (RestClientException e) {
+            log.error("Sync with master failed", e);
             return;
         }
+        if (response.getBody() == null) {
+            log.error("Sync with master failed");
+            return;
+        }
+
         MasterResponse command = response.getBody();
         log.debug("Got commands: {}", command);
         command.getActions().forEach(actionService::runAction);

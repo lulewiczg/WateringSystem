@@ -18,8 +18,6 @@ public class StateController {
 
     private final AppState state;
 
-    private final ApplicationContext ctx;
-
     @GetMapping
     @Secured({"ROLE_GUEST", "ROLE_USER", "ROLE_ADMIN"})
     public AppState getState() {

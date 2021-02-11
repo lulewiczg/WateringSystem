@@ -26,7 +26,7 @@ public class StateMasterController {
 
     @PostMapping
     @PreAuthorize(value = "hasAuthority('ROLE_USER') and authentication.principal.username.equals('slave')")
-    public MasterResponse updateState(@RequestBody SlaveStateDto state, Authentication auth) {
+    public MasterResponse updateState(@RequestBody SlaveStateDto state) {
         return service.update(state);
     }
 

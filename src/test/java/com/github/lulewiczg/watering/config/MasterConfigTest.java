@@ -58,6 +58,5 @@ class MasterConfigTest {
         assertThrows(NoSuchBeanDefinitionException.class, () -> ctx.getBean(ActionController.class));
         assertThrows(NoSuchBeanDefinitionException.class, () -> ctx.getBean(JobController.class));
         assertThrows(NoSuchBeanDefinitionException.class, () -> ctx.getBean(ActionController.class));
-        assertThrows(NoSuchBeanDefinitionException.class, () -> ctx.getBean(ActionController.class));
     }
 }

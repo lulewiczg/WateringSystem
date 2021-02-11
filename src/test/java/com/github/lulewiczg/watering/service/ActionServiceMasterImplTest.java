@@ -51,8 +51,9 @@ class ActionServiceMasterImplTest {
     void testRunActionNotFound() {
         ActionDefinitionDto action = new ActionDefinitionDto("name", "type", "desc", "ret type");
         when(state.getActionDefinitions()).thenReturn(List.of(action));
+        ActionDto dto = new ActionDto("name2", "type", "param");
 
-        assertThrows(IllegalArgumentException.class, () -> service.runAction(new ActionDto("name2", "type", "param")));
+        assertThrows(IllegalArgumentException.class, () -> service.runAction(dto));
     }
 
     @Test
