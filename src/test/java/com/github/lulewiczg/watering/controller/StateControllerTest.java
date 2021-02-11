@@ -51,10 +51,15 @@ class StateControllerTest {
     }
 
     @Test
+    @WithMockUser(roles = "SLAVE")
+    void testGetActionsSlave() {
+        TestUtils.testForbiddenGet(mvc, mapper, "/rest/actions");
+    }
+
+    @Test
     void testGetActionsAnon() {
         TestUtils.testUnauthorizedGet(mvc, mapper, "/rest/actions");
     }
-
 
     private void testState() throws Exception {
         String json = Files.readString(Paths.get("src/test/resources/testData/json/state.json"));

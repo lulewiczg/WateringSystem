@@ -98,7 +98,7 @@ class ScheduledOverflowWaterControlTest {
 
         job.run();
 
-        verify(tanksCloseAction,never()).doAction(any());
+        verify(tanksCloseAction, never()).doAction(any());
         verify(state, never()).setState(any());
         verify(valveOpenAction, never()).doAction(any());
     }

@@ -65,6 +65,12 @@ class ActionControllerSlaveTest {
     }
 
     @Test
+    @WithMockUser(roles = "SLAVE")
+    void testGetActionsSlave() {
+        TestUtils.testForbiddenGet(mvc, mapper, "/rest/actions");
+    }
+
+    @Test
     void testGetActionsAnon() {
         TestUtils.testUnauthorizedGet(mvc, mapper, "/rest/actions");
     }
@@ -84,6 +90,14 @@ class ActionControllerSlaveTest {
     @Test
     @WithMockUser(roles = "GUEST")
     void testRunActionGuest() {
+        ActionDto actionDto = new ActionDto("test", "test2", "test3");
+
+        TestUtils.testForbiddenPost(mvc, mapper, "/rest/actions", actionDto);
+    }
+
+    @Test
+    @WithMockUser(roles = "SLAVE")
+    void testRunActionSlave() {
         ActionDto actionDto = new ActionDto("test", "test2", "test3");
 
         TestUtils.testForbiddenPost(mvc, mapper, "/rest/actions", actionDto);

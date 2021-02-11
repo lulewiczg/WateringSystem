@@ -54,7 +54,9 @@ class AuthProviderTest {
 
     @Test
     void testLogin() {
-        when(securityConfig.getUsers()).thenReturn(List.of(new User("name", PWD, List.of(Role.ADMIN)), new User("test2", "test2", List.of(Role.USER))));
+        when(securityConfig.getUsers()).thenReturn(List.of(
+                new User("name", PWD, List.of(Role.ADMIN), List.of(new SimpleGrantedAuthority("ROLE_ADMIN"))),
+                new User("test2", "test2", List.of(Role.USER), List.of(new SimpleGrantedAuthority("ROLE_USER")))));
 
         Authentication auth = authProvider.authenticate(new UsernamePasswordAuthenticationToken("name", "password"));
 

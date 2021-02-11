@@ -39,15 +39,20 @@ class StateMasterControllerTest {
     @WithMockUser(roles = "ADMIN")
     void testUpdateStateAdmin() {
         TestUtils.tesNotFoundPost(mvc, mapper, "/rest/state", new SlaveStateDto());
-
     }
 
     @Test
     @WithMockUser(roles = "GUEST")
     void testUpdateStateGuest() {
         TestUtils.tesNotFoundPost(mvc, mapper, "/rest/state", new SlaveStateDto());
-
     }
+
+    @Test
+    @WithMockUser(roles = "SLAVE")
+    void testUpdateStateSlave() {
+        TestUtils.tesNotFoundPost(mvc, mapper, "/rest/state", new SlaveStateDto());
+    }
+
 
     @Test
     void testUpdateStateAnon() {

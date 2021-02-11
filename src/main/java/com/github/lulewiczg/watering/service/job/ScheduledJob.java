@@ -33,6 +33,7 @@ public abstract class ScheduledJob {
     protected SystemStatus getState() {
         return null;
     }
+
     /**
      * Action logic.
      */

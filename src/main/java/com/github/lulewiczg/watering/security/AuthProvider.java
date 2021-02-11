@@ -7,11 +7,8 @@ import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.crypto.bcrypt.BCrypt;
 import org.springframework.stereotype.Component;
-
-import java.util.stream.Collectors;
 
 /**
  * Authentication provider for application.
@@ -33,8 +30,7 @@ public class AuthProvider implements AuthenticationProvider {
                 .orElseThrow(() -> new BadCredentialsException("Invalid credentials"));
 
         checkPassword(password, user);
-        return new UsernamePasswordAuthenticationToken(user, password,
-                user.getRoles().stream().map(i -> new SimpleGrantedAuthority("ROLE_" + i.getName())).collect(Collectors.toList()));
+        return new UsernamePasswordAuthenticationToken(user, password, user.getAuthorities());
     }
 
     @Override

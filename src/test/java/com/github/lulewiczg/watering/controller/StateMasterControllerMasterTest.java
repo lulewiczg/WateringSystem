@@ -46,7 +46,7 @@ class StateMasterControllerMasterTest {
     private ObjectMapper mapper;
 
     @Test
-    @WithMockUser(roles = "USER", value = "slave")
+    @WithMockUser(roles = "SLAVE")
     void testUpdateStateProperUser() throws Exception {
         AppState appState = TestUtils.readJson("state.json", AppState.class, mapper);
         SlaveStateDto slaveState = new SlaveStateDto(appState, List.of(), List.of());
@@ -80,7 +80,7 @@ class StateMasterControllerMasterTest {
 
     @Test
     @WithMockUser(roles = "GUEST")
-    void testUpdateStateGuest() throws Exception {
+    void testUpdateStateGuest() {
         AppState appState = TestUtils.readJson("state.json", AppState.class, mapper);
         SlaveStateDto slaveState = new SlaveStateDto(appState, List.of(), List.of());
 
@@ -88,7 +88,7 @@ class StateMasterControllerMasterTest {
     }
 
     @Test
-    void testUpdateStateAnon() throws Exception {
+    void testUpdateStateAnon() {
         AppState appState = TestUtils.readJson("state.json", AppState.class, mapper);
         SlaveStateDto slaveState = new SlaveStateDto(appState, List.of(), List.of());
 

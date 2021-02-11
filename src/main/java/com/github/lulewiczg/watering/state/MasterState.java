@@ -27,7 +27,7 @@ public class MasterState {
 
     private List<String> jobs = new ArrayList<>();
 
-    private List<ActionDefinitionDto> actionDefinitions= new ArrayList<>();
+    private List<ActionDefinitionDto> actionDefinitions = new ArrayList<>();
 
     private List<JobDefinitionDto> jobDefinitions = new ArrayList<>();
 }

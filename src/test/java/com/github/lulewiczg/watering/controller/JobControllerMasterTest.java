@@ -66,12 +66,18 @@ class JobControllerMasterTest {
 
     @Test
     @WithMockUser(roles = "GUEST")
-    void testGetJobsGuest() throws Exception {
+    void testGetJobsGuest() {
         TestUtils.testForbiddenGet(mvc, mapper, "/rest/jobs");
     }
 
     @Test
-    void testGetJobsAnon() throws Exception {
+    @WithMockUser(roles = "SLAVE")
+    void testGetJobsSlave() {
+        TestUtils.testForbiddenGet(mvc, mapper, "/rest/jobs");
+    }
+
+    @Test
+    void testGetJobsAnon() {
         TestUtils.testUnauthorizedGet(mvc, mapper, "/rest/jobs");
     }
 
@@ -90,6 +96,12 @@ class JobControllerMasterTest {
     @Test
     @WithMockUser(roles = "GUEST")
     void testRunJobsGuest() {
+        TestUtils.testForbiddenPost(mvc, mapper, "/rest/jobs/test123", null);
+    }
+
+    @Test
+    @WithMockUser(roles = "SLAVE")
+    void testRunJobsSlave() {
         TestUtils.testForbiddenPost(mvc, mapper, "/rest/jobs/test123", null);
     }
 
@@ -114,6 +126,18 @@ class JobControllerMasterTest {
     @Test
     @WithMockUser(roles = "GUEST")
     void testGetPendingGuest() throws Exception {
+        ApiError expected = new ApiError(403, TestUtils.FORBIDDEN, TestUtils.FORBIDDEN_MSG);
+
+        String json = mvc.perform(get("/rest/jobs/pending"))
+                .andExpect(status().isForbidden())
+                .andReturn().getResponse().getContentAsString();
+
+        TestUtils.testError(json, expected, mapper);
+    }
+
+    @Test
+    @WithMockUser(roles = "SLAVE")
+    void testGetPendingSlave() throws Exception {
         ApiError expected = new ApiError(403, TestUtils.FORBIDDEN, TestUtils.FORBIDDEN_MSG);
 
         String json = mvc.perform(get("/rest/jobs/pending"))

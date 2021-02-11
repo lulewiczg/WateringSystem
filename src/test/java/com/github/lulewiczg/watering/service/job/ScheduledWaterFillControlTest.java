@@ -112,8 +112,8 @@ class ScheduledWaterFillControlTest {
 
         job.run();
 
-        verify(tanksCloseAction,never()).doAction(any());
-        verify(state,never()).setState(any());
+        verify(tanksCloseAction, never()).doAction(any());
+        verify(state, never()).setState(any());
         verify(tapsOpenAction, never()).doAction(any());
         verify(valveOpenAction, never()).doAction(any());
         verify(outputsCloseAction, never()).doAction(any());

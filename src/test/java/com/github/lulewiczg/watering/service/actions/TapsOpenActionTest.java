@@ -56,14 +56,14 @@ class TapsOpenActionTest {
     }
 
     @Test
-    void testActionEnabled(){
+    void testActionEnabled() {
         when(state.getTaps()).thenReturn(List.of(new WaterSource()));
 
         assertTrue(action.isEnabled());
     }
 
     @Test
-    void testActionDisabled(){
+    void testActionDisabled() {
         assertFalse(action.isEnabled());
     }
 

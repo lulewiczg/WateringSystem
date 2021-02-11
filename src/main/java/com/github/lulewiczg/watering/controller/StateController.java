@@ -2,7 +2,6 @@ package com.github.lulewiczg.watering.controller;
 
 import com.github.lulewiczg.watering.state.AppState;
 import lombok.RequiredArgsConstructor;
-import org.springframework.context.ApplicationContext;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;

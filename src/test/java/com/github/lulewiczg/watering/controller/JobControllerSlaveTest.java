@@ -62,11 +62,16 @@ class JobControllerSlaveTest {
     @WithMockUser(roles = "GUEST")
     void testGetJobsGuest() {
         TestUtils.testForbiddenGet(mvc, mapper, "/rest/jobs");
-
     }
 
     @Test
-    void testGetJobsAnon() throws Exception {
+    @WithMockUser(roles = "SLAVE")
+    void testGetJobsSlave() {
+        TestUtils.testForbiddenGet(mvc, mapper, "/rest/jobs");
+    }
+
+    @Test
+    void testGetJobsAnon() {
         TestUtils.testUnauthorizedGet(mvc, mapper, "/rest/jobs");
     }
 
@@ -86,7 +91,12 @@ class JobControllerSlaveTest {
     @WithMockUser(roles = "GUEST")
     void testRunJobsGuest() {
         TestUtils.testForbiddenPost(mvc, mapper, "/rest/jobs/test123", null);
+    }
 
+    @Test
+    @WithMockUser(roles = "SLAVE")
+    void testRunJobsSlave() {
+        TestUtils.testForbiddenPost(mvc, mapper, "/rest/jobs/test123", null);
     }
 
     @Test
