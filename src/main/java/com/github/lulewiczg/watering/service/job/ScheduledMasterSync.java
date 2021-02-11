@@ -83,12 +83,12 @@ public class ScheduledMasterSync extends ScheduledJob {
             log.error("Sync with master failed", e);
             return;
         }
-        if (response.getBody() == null) {
+        MasterResponse command = response.getBody();
+        if (command == null) {
             log.error("Sync with master failed");
             return;
         }
 
-        MasterResponse command = response.getBody();
         log.debug("Got commands: {}", command);
         command.getActions().forEach(actionService::runAction);
         command.getJobs().forEach(actionService::runJob);
