@@ -8,6 +8,7 @@ import com.github.lulewiczg.watering.service.actions.WaterLevelReadAction;
 import com.github.lulewiczg.watering.service.dto.ActionDefinitionDto;
 import com.github.lulewiczg.watering.service.dto.ActionDto;
 import com.github.lulewiczg.watering.service.dto.JobDefinitionDto;
+import com.github.lulewiczg.watering.service.dto.JobDto;
 import com.github.lulewiczg.watering.service.io.IOService;
 import com.github.lulewiczg.watering.service.job.ScheduledSensorRead;
 import com.github.lulewiczg.watering.service.job.ScheduledWatering;
@@ -68,7 +69,7 @@ class ActionServiceDisabledTest {
     void testRunJob() {
         String jobName = deCapitalize(ScheduledSensorRead.class.getSimpleName());
 
-        String message = assertThrows(JobNotFoundException.class, () -> service.runJob(jobName)).getMessage();
+        String message = assertThrows(JobNotFoundException.class, () -> service.runJob(new JobDto(jobName))).getMessage();
 
         assertEquals("Job not found: scheduledSensorRead", message);
     }

@@ -5,6 +5,7 @@ import com.github.lulewiczg.watering.service.actions.OutputsCloseAction;
 import com.github.lulewiczg.watering.service.actions.TanksCloseAction;
 import com.github.lulewiczg.watering.service.actions.TapsOpenAction;
 import com.github.lulewiczg.watering.service.actions.ValveOpenAction;
+import com.github.lulewiczg.watering.service.dto.JobDto;
 import com.github.lulewiczg.watering.state.AppState;
 import com.github.lulewiczg.watering.state.SystemStatus;
 import com.github.lulewiczg.watering.state.dto.Tank;
@@ -40,7 +41,7 @@ public class ScheduledWaterFillControl extends ScheduledJob {
 
     @Scheduled(cron = "${com.github.lulewiczg.watering.schedule.overflow.cron}")
     void schedule() {
-        run();
+        run(new JobDto());
     }
 
     @Override

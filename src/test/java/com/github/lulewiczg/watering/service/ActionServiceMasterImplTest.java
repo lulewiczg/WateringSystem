@@ -7,6 +7,7 @@ import com.github.lulewiczg.watering.exception.ValueNotAllowedException;
 import com.github.lulewiczg.watering.service.dto.ActionDefinitionDto;
 import com.github.lulewiczg.watering.service.dto.ActionDto;
 import com.github.lulewiczg.watering.service.dto.JobDefinitionDto;
+import com.github.lulewiczg.watering.service.dto.JobDto;
 import com.github.lulewiczg.watering.state.MasterState;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -132,7 +133,7 @@ class ActionServiceMasterImplTest {
         JobDefinitionDto job = new JobDefinitionDto("test", true);
         when(state.getJobDefinitions()).thenReturn(List.of(job));
 
-        String message = assertThrows(JobNotFoundException.class, () -> service.runJob("test2")).getMessage();
+        String message = assertThrows(JobNotFoundException.class, () -> service.runJob(new JobDto("test2"))).getMessage();
 
         assertEquals("Job not found: test2", message);
     }
@@ -142,7 +143,7 @@ class ActionServiceMasterImplTest {
         JobDefinitionDto job = new JobDefinitionDto("test", true);
         when(state.getJobDefinitions()).thenReturn(List.of(job));
 
-        service.runJob("test");
+        service.runJob(new JobDto("test"));
     }
 
     @Test
@@ -151,7 +152,7 @@ class ActionServiceMasterImplTest {
         when(state.getJobDefinitions()).thenReturn(List.of(job));
 
 
-        String message = assertThrows(JobNotFoundException.class, () -> service.runJob("test")).getMessage();
+        String message = assertThrows(JobNotFoundException.class, () -> service.runJob(new JobDto("test"))).getMessage();
 
         assertEquals("Job not found: test", message);
     }

@@ -4,11 +4,11 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.lulewiczg.watering.TestUtils;
 import com.github.lulewiczg.watering.exception.ActionNotFoundException;
 import com.github.lulewiczg.watering.exception.ApiError;
-import com.github.lulewiczg.watering.exception.InvalidParamException;
 import com.github.lulewiczg.watering.security.AuthEntryPoint;
 import com.github.lulewiczg.watering.security.AuthProvider;
 import com.github.lulewiczg.watering.service.ActionService;
 import com.github.lulewiczg.watering.service.dto.JobDefinitionDto;
+import com.github.lulewiczg.watering.service.dto.JobDto;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,6 +16,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
+import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
@@ -25,7 +26,8 @@ import java.util.Arrays;
 import java.util.Date;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
@@ -46,6 +48,8 @@ class JobControllerTest {
 
     @Autowired
     private ObjectMapper mapper;
+
+    private final JobDto job = new JobDto("test");
 
     @Test
     @WithMockUser(roles = "USER")
@@ -91,29 +95,31 @@ class JobControllerTest {
     @Test
     @WithMockUser(roles = "GUEST")
     void testRunJobsGuest() {
-        TestUtils.testForbiddenPost(mvc, mapper, "/rest/jobs/test123", null);
+        TestUtils.testForbiddenPost(mvc, mapper, "/rest/jobs", job);
     }
 
     @Test
     @WithMockUser(roles = "SLAVE")
     void testRunJobsSlave() {
-        TestUtils.testForbiddenPost(mvc, mapper, "/rest/jobs/test123", null);
+        TestUtils.testForbiddenPost(mvc, mapper, "/rest/jobs", job);
     }
 
     @Test
     void testRunJobsAnon() {
-        TestUtils.testUnauthorizedPost(mvc, mapper, "/rest/jobs/test123", null);
+        TestUtils.testUnauthorizedPost(mvc, mapper, "/rest/jobs", job);
     }
 
     @Test
     @WithMockUser(roles = "USER")
     void testRunJobError() throws Exception {
         ActionNotFoundException ex = new ActionNotFoundException("test");
-        doThrow(ex).when(service).runJob("test123");
+        when(service.runJob(job)).thenThrow(ex);
         ApiError expected = new ApiError(400, "Bad Request", ex.getMessage());
         Date date = new Date();
 
-        String json = mvc.perform(post("/rest/jobs/test123"))
+        String json = mvc.perform(post("/rest/jobs")
+                .content(mapper.writeValueAsString(job))
+                .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest())
                 .andReturn().getResponse().getContentAsString();
 
@@ -134,11 +140,13 @@ class JobControllerTest {
     }
 
     private void testRun() throws Exception {
-        mvc.perform(post("/rest/jobs/test123"))
+        mvc.perform(post("/rest/jobs")
+                .content(mapper.writeValueAsString(job))
+                .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(content().string(""));
 
-        verify(service).runJob("test123");
+        verify(service).runJob(job);
     }
 
 }

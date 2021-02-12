@@ -5,6 +5,7 @@ import com.github.lulewiczg.watering.service.actions.OutputsCloseAction;
 import com.github.lulewiczg.watering.service.actions.OutputsOpenAction;
 import com.github.lulewiczg.watering.service.actions.TanksCloseAction;
 import com.github.lulewiczg.watering.service.actions.TanksOpenAction;
+import com.github.lulewiczg.watering.service.dto.JobDto;
 import com.github.lulewiczg.watering.state.AppState;
 import com.github.lulewiczg.watering.state.SystemStatus;
 import lombok.RequiredArgsConstructor;
@@ -46,7 +47,7 @@ public class ScheduledWatering extends ScheduledJob {
 
     @Scheduled(cron = "${com.github.lulewiczg.watering.schedule.watering.cron}")
     void schedule() {
-        run();
+        run(new JobDto());
     }
 
     @Override

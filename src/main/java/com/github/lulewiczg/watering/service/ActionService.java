@@ -4,10 +4,7 @@ import com.github.lulewiczg.watering.exception.ActionNotFoundException;
 import com.github.lulewiczg.watering.exception.JobNotFoundException;
 import com.github.lulewiczg.watering.exception.TypeMismatchException;
 import com.github.lulewiczg.watering.exception.ValueNotAllowedException;
-import com.github.lulewiczg.watering.service.dto.ActionDefinitionDto;
-import com.github.lulewiczg.watering.service.dto.ActionDto;
-import com.github.lulewiczg.watering.service.dto.JobDefinitionDto;
-import com.github.lulewiczg.watering.service.dto.ParamType;
+import com.github.lulewiczg.watering.service.dto.*;
 
 import java.util.List;
 
@@ -34,8 +31,9 @@ public interface ActionService {
      * Runs job
      *
      * @param jobName job name
+     * @return
      */
-    void runJob(String jobName);
+    ActionResultDto<Void> runJob(JobDto jobName);
 
     /**
      * Runs action.
@@ -64,8 +62,8 @@ public interface ActionService {
         return actionDef;
     }
 
-    default void validateJob(String jobName) {
-        getJobs().stream().filter(i -> i.getJobName().equals(jobName) && i.isCanBeRun()).findFirst()
-                .orElseThrow(() -> new JobNotFoundException(jobName));
+    default void validateJob(JobDto job) {
+        getJobs().stream().filter(i -> i.getJobName().equals(job.getName()) && i.isCanBeRun()).findFirst()
+                .orElseThrow(() -> new JobNotFoundException(job.getName()));
     }
 }

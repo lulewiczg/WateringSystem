@@ -1,7 +1,10 @@
 package com.github.lulewiczg.watering.service.job;
 
+import com.github.lulewiczg.watering.TestUtils;
 import com.github.lulewiczg.watering.config.dto.ValveType;
 import com.github.lulewiczg.watering.service.actions.EmergencyStopAction;
+import com.github.lulewiczg.watering.service.dto.ActionResultDto;
+import com.github.lulewiczg.watering.service.dto.JobDto;
 import com.github.lulewiczg.watering.state.AppState;
 import com.github.lulewiczg.watering.state.SystemStatus;
 import com.github.lulewiczg.watering.state.dto.Sensor;
@@ -22,7 +25,10 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.util.List;
+import java.util.UUID;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
@@ -45,9 +51,11 @@ class ScheduledWaterEscapeControlTest {
     @EnumSource(value = SystemStatus.class, names = {"WATERING", "DRAINING"})
     void testAlreadyRunning(SystemStatus status) {
         when(state.getState()).thenReturn(status);
+        JobDto syncDto = new JobDto("test");
 
-        job.run();
+        ActionResultDto<Void> result = job.run(syncDto);
 
+        TestUtils.testActionResult(result);
         verify(emergencyStopAction, never()).doAction(any());
         verify(state, never()).setState(any());
     }
@@ -61,15 +69,19 @@ class ScheduledWaterEscapeControlTest {
         Sensor sensor = new Sensor("sensor", 0, 100, level, RaspiPin.GPIO_01);
         Tank tank = new Tank("tank", 100, sensor, valve);
         when(state.getTanks()).thenReturn(List.of(tank));
+        JobDto syncDto = new JobDto("test");
 
-        job.run();
+        ActionResultDto<Void> result = job.run(syncDto);
 
+        TestUtils.testActionResult(result);
         verify(emergencyStopAction, never()).doAction(any());
         verify(state, never()).setState(any());
 
         sensor.setLevel(level2);
-        job.run();
+        ActionResultDto<Void> result2 = job.run(syncDto);
 
+        TestUtils.testActionResult(result2);
+        assertNotEquals(result.getId(), result2.getId());
         verify(emergencyStopAction, never()).doAction(any());
         verify(state, never()).setState(any());
     }
@@ -86,15 +98,20 @@ class ScheduledWaterEscapeControlTest {
         Sensor sensor2 = new Sensor("sensor2", 0, 100, 50, RaspiPin.GPIO_01);
         Tank tank2 = new Tank("tank2", 100, sensor2, valve2);
         when(state.getTanks()).thenReturn(List.of(tank, tank2));
+        JobDto syncDto = new JobDto("test");
 
-        job.run();
+        ActionResultDto<Void> result = job.run(syncDto);
 
+        TestUtils.testActionResult(result);
         verify(emergencyStopAction, never()).doAction(any());
         verify(state, never()).setState(any());
 
         sensor.setLevel(level2);
-        job.run();
 
+        ActionResultDto<Void> result2 = job.run(syncDto);
+
+        TestUtils.testActionResult(result2);
+        assertNotEquals(result.getId(), result2.getId());
         verify(state).setState(SystemStatus.ERROR);
         verify(emergencyStopAction).doAction(null);
     }
@@ -107,32 +124,45 @@ class ScheduledWaterEscapeControlTest {
         Sensor sensor = new Sensor("sensor", 0, 90, 90, RaspiPin.GPIO_01);
         Tank tank = new Tank("tank", 100, sensor, valve);
         when(state.getTanks()).thenReturn(List.of(tank));
+        JobDto syncDto = new JobDto("test");
 
-        job.run();
-        job.run();
+        job.run(syncDto);
+        job.run(syncDto);
 
         when(state.getState()).thenReturn(SystemStatus.WATERING);
         sensor.setLevel(89);
-        job.run();
+        job.run(syncDto);
         sensor.setLevel(80);
-        job.run();
+        job.run(syncDto);
         sensor.setLevel(70);
-        job.run();
+        job.run(syncDto);
 
         when(state.getState()).thenReturn(SystemStatus.DRAINING);
         sensor.setLevel(60);
-        job.run();
+        job.run(syncDto);
         sensor.setLevel(50);
-        job.run();
+        job.run(syncDto);
         sensor.setLevel(40);
-        job.run();
+        job.run(syncDto);
 
         when(state.getState()).thenReturn(SystemStatus.IDLE);
-        job.run();
-        job.run();
+        job.run(syncDto);
+        job.run(syncDto);
 
         verify(emergencyStopAction, never()).doAction(any());
         verify(state, never()).setState(any());
+    }
+
+    @ParameterizedTest
+    @EnumSource(value = SystemStatus.class)
+    void testWithUuid(SystemStatus status) {
+        when(state.getState()).thenReturn(status);
+        JobDto jobDto = new JobDto("test", UUID.randomUUID());
+
+        ActionResultDto<Void> result = job.run(jobDto);
+
+        TestUtils.testActionResult(result);
+        assertEquals(jobDto.getId(), result.getId());
     }
 
 }

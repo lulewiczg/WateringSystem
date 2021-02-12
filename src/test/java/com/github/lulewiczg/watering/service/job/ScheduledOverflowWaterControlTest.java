@@ -1,14 +1,18 @@
 package com.github.lulewiczg.watering.service.job;
 
+import com.github.lulewiczg.watering.TestUtils;
 import com.github.lulewiczg.watering.config.dto.ValveType;
 import com.github.lulewiczg.watering.service.actions.TanksCloseAction;
 import com.github.lulewiczg.watering.service.actions.ValveOpenAction;
+import com.github.lulewiczg.watering.service.dto.ActionResultDto;
+import com.github.lulewiczg.watering.service.dto.JobDto;
 import com.github.lulewiczg.watering.state.AppState;
 import com.github.lulewiczg.watering.state.SystemStatus;
 import com.github.lulewiczg.watering.state.dto.Sensor;
 import com.github.lulewiczg.watering.state.dto.Tank;
 import com.github.lulewiczg.watering.state.dto.Valve;
 import com.pi4j.io.gpio.RaspiPin;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvFileSource;
@@ -21,7 +25,9 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.util.List;
+import java.util.UUID;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
@@ -47,12 +53,26 @@ class ScheduledOverflowWaterControlTest {
     @EnumSource(value = SystemStatus.class, names = {"ERROR", "WATERING"})
     void testNotStart(SystemStatus status) {
         when(state.getState()).thenReturn(status);
+        JobDto jobDto = new JobDto("test");
 
-        job.run();
+        ActionResultDto<Void> result = job.run(jobDto);
 
+        TestUtils.testActionResult(result);
         verify(tanksCloseAction, never()).doAction(any());
         verify(valveOpenAction, never()).doAction(any());
         verify(state, never()).setState(any());
+    }
+
+    @ParameterizedTest
+    @EnumSource(value = SystemStatus.class)
+    void testWithUuid(SystemStatus status) {
+        when(state.getState()).thenReturn(status);
+        JobDto jobDto = new JobDto("test", UUID.randomUUID());
+
+        ActionResultDto<Void> result = job.run(jobDto);
+
+        TestUtils.testActionResult(result);
+        assertEquals(jobDto.getId(), result.getId());
     }
 
     @ParameterizedTest
@@ -63,9 +83,11 @@ class ScheduledOverflowWaterControlTest {
         Sensor sensor = new Sensor("sensor", minLevel, maxLevel, level, RaspiPin.GPIO_01);
         Tank tank = new Tank("tank", 100, sensor, valve);
         when(state.getTanks()).thenReturn(List.of(tank));
+        JobDto jobDto = new JobDto("test");
 
-        job.run();
+        ActionResultDto<Void> result = job.run(jobDto);
 
+        TestUtils.testActionResult(result);
         verify(tanksCloseAction, never()).doAction(any());
         verify(valveOpenAction, never()).doAction(any());
         verify(state, never()).setState(any());
@@ -79,9 +101,11 @@ class ScheduledOverflowWaterControlTest {
         Sensor sensor = new Sensor("sensor", minLevel, maxLevel, level, RaspiPin.GPIO_01);
         Tank tank = new Tank("tank", 100, sensor, valve);
         when(state.getTanks()).thenReturn(List.of(tank));
+        JobDto syncDto = new JobDto("test");
 
-        job.run();
+        ActionResultDto<Void> result = job.run(syncDto);
 
+        TestUtils.testActionResult(result);
         verify(tanksCloseAction).doAction(null);
         verify(state).setState(SystemStatus.IDLE);
         verify(valveOpenAction, never()).doAction(any());
@@ -95,9 +119,11 @@ class ScheduledOverflowWaterControlTest {
         Sensor sensor = new Sensor("sensor", minLevel, maxLevel, level, RaspiPin.GPIO_01);
         Tank tank = new Tank("tank", 100, sensor, valve);
         when(state.getTanks()).thenReturn(List.of(tank));
+        JobDto jobDto = new JobDto("test");
 
-        job.run();
+        ActionResultDto<Void> result = job.run(jobDto);
 
+        TestUtils.testActionResult(result);
         verify(tanksCloseAction, never()).doAction(any());
         verify(state, never()).setState(any());
         verify(valveOpenAction, never()).doAction(any());
@@ -114,12 +140,29 @@ class ScheduledOverflowWaterControlTest {
         Sensor sensor2 = new Sensor("sensor", 1, 3, 2, RaspiPin.GPIO_03);
         Tank tank2 = new Tank("tank2", 100, sensor2, valve2);
         when(state.getTanks()).thenReturn(List.of(tank, tank2));
+        JobDto jobDto = new JobDto("test");
 
-        job.run();
+        ActionResultDto<Void> result = job.run(jobDto);
 
+        TestUtils.testActionResult(result);
         verify(state).setState(SystemStatus.DRAINING);
         verify(tanksCloseAction, never()).doAction(null);
         verify(valveOpenAction).doAction(valve);
+    }
+
+    @Test
+    void testActionFail() {
+        when(state.getState()).thenReturn(SystemStatus.IDLE);
+        Valve valve = new Valve("valve", "valve", ValveType.OUTPUT, true, RaspiPin.GPIO_00);
+        Sensor sensor = new Sensor("sensor", 1, 11, 20, RaspiPin.GPIO_01);
+        Tank tank = new Tank("tank", 100, sensor, valve);
+        when(state.getTanks()).thenReturn(List.of(tank));
+        doThrow(new IllegalArgumentException("error")).when(valveOpenAction).doAction(valve);
+        JobDto jobDto = new JobDto("test");
+
+        ActionResultDto<Void> result = job.run(jobDto);
+
+        TestUtils.testActionResult(result, "error");
     }
 
 }

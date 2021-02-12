@@ -2,6 +2,7 @@ package com.github.lulewiczg.watering.service.job;
 
 import com.github.lulewiczg.watering.config.MasterConfig;
 import com.github.lulewiczg.watering.service.actions.WaterLevelReadAction;
+import com.github.lulewiczg.watering.service.dto.JobDto;
 import com.github.lulewiczg.watering.state.AppState;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
@@ -26,7 +27,7 @@ public class ScheduledSensorRead extends ScheduledIoJob {
 
     @Scheduled(cron = "${com.github.lulewiczg.watering.schedule.sensorsRead.cron}")
     void schedule() {
-        run();
+        run(new JobDto());
     }
 
     @Override

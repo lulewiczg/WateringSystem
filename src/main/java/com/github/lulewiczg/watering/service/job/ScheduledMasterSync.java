@@ -2,6 +2,7 @@ package com.github.lulewiczg.watering.service.job;
 
 import com.github.lulewiczg.watering.config.SlaveConfig;
 import com.github.lulewiczg.watering.service.ActionService;
+import com.github.lulewiczg.watering.service.dto.JobDto;
 import com.github.lulewiczg.watering.service.dto.SlaveStateDto;
 import com.github.lulewiczg.watering.state.AppState;
 import com.github.lulewiczg.watering.state.SystemStatus;
@@ -45,7 +46,7 @@ public class ScheduledMasterSync extends ScheduledJob {
 
     @Scheduled(cron = "${com.github.lulewiczg.watering.schedule.master.sync.cron}")
     void schedule() {
-        run();
+        run(new JobDto());
     }
 
     @Override
@@ -73,7 +74,7 @@ public class ScheduledMasterSync extends ScheduledJob {
         MasterResponse command = connect();
         if (command == null) {
             log.error("Sync with master failed");
-            return;
+            throw new IllegalStateException("Sync with master failed");
         }
 
         log.debug("Got commands: {}", command);
@@ -99,7 +100,7 @@ public class ScheduledMasterSync extends ScheduledJob {
             response = restTemplate.postForEntity(url, entity, MasterResponse.class);
         } catch (RestClientException e) {
             log.error("Sync with master failed", e);
-            return null;
+            throw e;
         }
         return response.getBody();
     }

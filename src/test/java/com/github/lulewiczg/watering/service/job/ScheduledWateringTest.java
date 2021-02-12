@@ -1,10 +1,13 @@
 package com.github.lulewiczg.watering.service.job;
 
+import com.github.lulewiczg.watering.TestUtils;
 import com.github.lulewiczg.watering.config.dto.ValveType;
 import com.github.lulewiczg.watering.service.actions.OutputsCloseAction;
 import com.github.lulewiczg.watering.service.actions.OutputsOpenAction;
 import com.github.lulewiczg.watering.service.actions.TanksCloseAction;
 import com.github.lulewiczg.watering.service.actions.TanksOpenAction;
+import com.github.lulewiczg.watering.service.dto.ActionResultDto;
+import com.github.lulewiczg.watering.service.dto.JobDto;
 import com.github.lulewiczg.watering.state.AppState;
 import com.github.lulewiczg.watering.state.SystemStatus;
 import com.github.lulewiczg.watering.state.dto.Tank;
@@ -22,7 +25,9 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.util.List;
+import java.util.UUID;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
@@ -57,9 +62,11 @@ class ScheduledWateringTest {
     @EnumSource(value = SystemStatus.class, names = {"WATERING", "ERROR", "FILLING"})
     void testNotStart(SystemStatus status) {
         when(state.getState()).thenReturn(status);
+        JobDto syncDto = new JobDto("test");
 
-        job.run();
+        ActionResultDto<Void> result = job.run(syncDto);
 
+        TestUtils.testActionResult(result);
         verify(tanksCloseAction, never()).doAction(any());
         verify(tanksOpenAction, never()).doAction(any());
         verify(outputsOpenAction, never()).doAction(any());
@@ -76,9 +83,11 @@ class ScheduledWateringTest {
         Valve valve2 = new Valve("valve2", "valve2", ValveType.OUTPUT, true, RaspiPin.GPIO_01);
         Tank tank2 = new Tank("tank2", 100, null, valve2);
         when(state.getTanks()).thenReturn(List.of(tank, tank2));
+        JobDto syncDto = new JobDto("test");
 
-        job.run();
+        ActionResultDto<Void> result = job.run(syncDto);
 
+        TestUtils.testActionResult(result);
         verify(state).setState(SystemStatus.WATERING);
         verify(tanksCloseAction, never()).doAction(any());
         verify(outputsCloseAction, never()).doAction(any());
@@ -90,5 +99,18 @@ class ScheduledWateringTest {
         verify(state).setState(SystemStatus.IDLE);
         verify(tanksCloseAction).doAction(null);
         verify(outputsCloseAction).doAction(null);
+    }
+
+    @ParameterizedTest
+    @EnumSource(value = SystemStatus.class)
+    void testWithUuid(SystemStatus status) throws InterruptedException {
+        when(state.getState()).thenReturn(status);
+        JobDto jobDto = new JobDto("test", UUID.randomUUID());
+
+        ActionResultDto<Void> result = job.run(jobDto);
+
+        Thread.sleep(1000);
+        TestUtils.testActionResult(result);
+        assertEquals(jobDto.getId(), result.getId());
     }
 }

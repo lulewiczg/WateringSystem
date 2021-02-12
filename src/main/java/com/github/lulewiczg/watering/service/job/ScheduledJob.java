@@ -1,7 +1,13 @@
 package com.github.lulewiczg.watering.service.job;
 
+import com.github.lulewiczg.watering.service.dto.ActionResultDto;
+import com.github.lulewiczg.watering.service.dto.JobDto;
 import com.github.lulewiczg.watering.state.SystemStatus;
+import lombok.NonNull;
 import lombok.extern.log4j.Log4j2;
+
+import java.time.LocalDateTime;
+import java.util.UUID;
 
 /**
  * Abstract class for scheduled job.
@@ -69,22 +75,54 @@ public abstract class ScheduledJob {
     }
 
     /**
-     * Runs action.
+     * Runs job.
+     *
+     * @param jobDto job DTO
+     * @return action result
      */
-    public final void run() {
-        log.debug("Staring {} job...", getName());
+    public final ActionResultDto<Void> run(@NonNull JobDto jobDto) {
+        UUID id = getUuid(jobDto.getId());
+        log.debug("Staring {} job with ID {} ...", getName(), id);
+        try {
+            tryRun(id);
+        } catch (Exception e) {
+            log.error(String.format("Job %s failed", id), e);
+            String message = e.getMessage();
+            if (message == null) {
+                message = "Unknown error!";
+            }
+            return new ActionResultDto<>(id, LocalDateTime.now(), message);
+        }
+        return new ActionResultDto<>(id, null, LocalDateTime.now());
+    }
+
+    /**
+     * Runs job with new UUID.
+     *
+     * @return action result
+     */
+    public final UUID getUuid(UUID uuid) {
+        if (uuid == null) {
+            log.debug("No UUID passed, generating new");
+            return UUID.randomUUID();
+        }
+        return uuid;
+    }
+
+    private void tryRun(UUID id) {
         if (canBeStarted()) {
-            log.debug("Job {} can start!", getName());
+            log.debug("Job {} with ID {} can start!", getName(), id);
             doJob();
         }
         if (isRunning()) {
             log.debug("Job {} is already running.", getName());
             doJobRunning();
         }
-        log.debug("Finishing {} job...", getName());
+        log.debug("Finishing {} job with ID {}...", getName(), id);
     }
 
     protected boolean isRunning() {
         return getJobStatus() == getState();
     }
+
 }

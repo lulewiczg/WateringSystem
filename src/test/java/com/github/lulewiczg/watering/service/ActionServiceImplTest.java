@@ -11,6 +11,7 @@ import com.github.lulewiczg.watering.service.actions.WaterLevelReadAction;
 import com.github.lulewiczg.watering.service.dto.ActionDefinitionDto;
 import com.github.lulewiczg.watering.service.dto.ActionDto;
 import com.github.lulewiczg.watering.service.dto.JobDefinitionDto;
+import com.github.lulewiczg.watering.service.dto.JobDto;
 import com.github.lulewiczg.watering.service.io.IOService;
 import com.github.lulewiczg.watering.service.job.*;
 import com.pi4j.io.gpio.RaspiPin;
@@ -121,21 +122,14 @@ class ActionServiceImplTest {
 
     @Test
     void testRunJob() {
-        service.runJob(deCapitalize(ScheduledSensorRead.class.getSimpleName()));
+        service.runJob(new JobDto(deCapitalize(ScheduledSensorRead.class.getSimpleName())));
 
         verify(ioService, atLeast(1)).analogRead(RaspiPin.GPIO_01);
     }
 
     @Test
-    void testRunJobNoName() {
-        String message = assertThrows(JobNotFoundException.class, () -> service.runJob(null)).getMessage();
-
-        assertEquals("Job not found: null", message);
-    }
-
-    @Test
     void testRunJobInvalidName() {
-        String message = assertThrows(JobNotFoundException.class, () -> service.runJob("abc")).getMessage();
+        String message = assertThrows(JobNotFoundException.class, () -> service.runJob(new JobDto("abc"))).getMessage();
 
         assertEquals("Job not found: abc", message);
     }

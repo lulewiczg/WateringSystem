@@ -1,9 +1,7 @@
 package com.github.lulewiczg.watering.service;
 
 import com.github.lulewiczg.watering.config.MasterConfig;
-import com.github.lulewiczg.watering.service.dto.ActionDefinitionDto;
-import com.github.lulewiczg.watering.service.dto.ActionDto;
-import com.github.lulewiczg.watering.service.dto.JobDefinitionDto;
+import com.github.lulewiczg.watering.service.dto.*;
 import com.github.lulewiczg.watering.state.MasterState;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
@@ -34,9 +32,10 @@ public class ActionServiceMasterImpl implements ActionService {
     }
 
     @Override
-    public void runJob(String jobName) {
+    public ActionResultDto<Void> runJob(JobDto jobName) {
         validateJob(jobName);
         state.getJobs().add(jobName);
+        return null;
     }
 
     @Override

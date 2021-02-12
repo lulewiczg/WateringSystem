@@ -2,11 +2,8 @@ package com.github.lulewiczg.watering.service;
 
 import com.github.lulewiczg.watering.config.MasterConfig;
 import com.github.lulewiczg.watering.exception.ActionNotFoundException;
-import com.github.lulewiczg.watering.exception.JobNotFoundException;
 import com.github.lulewiczg.watering.service.actions.Action;
-import com.github.lulewiczg.watering.service.dto.ActionDefinitionDto;
-import com.github.lulewiczg.watering.service.dto.ActionDto;
-import com.github.lulewiczg.watering.service.dto.JobDefinitionDto;
+import com.github.lulewiczg.watering.service.dto.*;
 import com.github.lulewiczg.watering.service.job.ScheduledJob;
 import com.github.lulewiczg.watering.state.AppState;
 import com.github.lulewiczg.watering.state.dto.Sensor;
@@ -64,17 +61,17 @@ public class ActionServiceImpl implements ActionService {
     }
 
     @Override
-    public void runJob(String jobName) {
-        validateJob(jobName);
+    public ActionResultDto<Void> runJob(JobDto jobDto) {
+        validateJob(jobDto);
         ScheduledJob job;
         try {
-            job = applicationContext.getBean(jobName, ScheduledJob.class);
+            job = applicationContext.getBean(jobDto.getName(), ScheduledJob.class);
         } catch (NoSuchBeanDefinitionException e) {
             log.error(e);
-            throw new IllegalArgumentException("Job not found: " + jobName);
+            throw new IllegalArgumentException("Job not found: " + jobDto.getName());
         }
         log.trace("Running job {}", job::getName);
-        job.run();
+        return job.run(jobDto);
     }
 
     @Override

@@ -3,6 +3,8 @@ package com.github.lulewiczg.watering;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.lulewiczg.watering.exception.ApiError;
+import com.github.lulewiczg.watering.service.dto.ActionResultDto;
+import com.github.lulewiczg.watering.service.dto.JobDto;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import lombok.SneakyThrows;
@@ -11,6 +13,7 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.time.LocalDateTime;
 import java.util.Date;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -195,4 +198,30 @@ public final class TestUtils {
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNotFound());
     }
+
+    /**
+     * Tests successful result of action.
+     *
+     * @param result result.
+     */
+    public static void testActionResult(ActionResultDto<?> result) {
+        assertNotNull(result.getId());
+        assertNull(result.getErrorMsg());
+        LocalDateTime date = LocalDateTime.now().minusMinutes(1);
+        assertTrue(date.isBefore(result.getExecDate()));
+    }
+
+    /**
+     * Tests failed result of action.
+     *
+     * @param result result.
+     * @param error  expected error
+     */
+    public static void testActionResult(ActionResultDto<?> result, String error) {
+        assertNotNull(result.getId());
+        assertEquals(error, result.getErrorMsg());
+        LocalDateTime date = LocalDateTime.now().minusMinutes(1);
+        assertTrue(date.isBefore(result.getExecDate()));
+    }
+
 }

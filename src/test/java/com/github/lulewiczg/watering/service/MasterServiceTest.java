@@ -3,6 +3,7 @@ package com.github.lulewiczg.watering.service;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.lulewiczg.watering.TestUtils;
 import com.github.lulewiczg.watering.service.dto.ActionDto;
+import com.github.lulewiczg.watering.service.dto.JobDto;
 import com.github.lulewiczg.watering.service.dto.SlaveStateDto;
 import com.github.lulewiczg.watering.state.AppState;
 import com.github.lulewiczg.watering.state.MasterState;
@@ -40,12 +41,13 @@ class MasterServiceTest {
     void testUpdate() {
         SlaveStateDto dto = TestUtils.readJson("slaveState.json", SlaveStateDto.class, mapper);
         ActionDto action = new ActionDto("name","param");
-        when(masterState.getJobs()).thenReturn(new ArrayList<>(List.of("test")));
+        JobDto job = new JobDto("test");
+        when(masterState.getJobs()).thenReturn(new ArrayList<>(List.of(job)));
         when(masterState.getActions()).thenReturn(new ArrayList<>(List.of(action)));
 
         MasterResponse result = service.update(dto);
 
-        assertEquals(List.of("test"), result.getJobs());
+        assertEquals(List.of(job), result.getJobs());
         assertEquals(List.of(action), result.getActions());
         assertEquals(List.of(), masterState.getActions());
         assertEquals(List.of(), masterState.getJobs());

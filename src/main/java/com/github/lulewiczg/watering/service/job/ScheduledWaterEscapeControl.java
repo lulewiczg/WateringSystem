@@ -2,6 +2,7 @@ package com.github.lulewiczg.watering.service.job;
 
 import com.github.lulewiczg.watering.config.MasterConfig;
 import com.github.lulewiczg.watering.service.actions.EmergencyStopAction;
+import com.github.lulewiczg.watering.service.dto.JobDto;
 import com.github.lulewiczg.watering.state.AppState;
 import com.github.lulewiczg.watering.state.SystemStatus;
 import com.github.lulewiczg.watering.state.dto.Tank;
@@ -35,7 +36,7 @@ public class ScheduledWaterEscapeControl extends ScheduledJob {
 
     @Scheduled(cron = "${com.github.lulewiczg.watering.schedule.escapeControl.cron}")
     void schedule() {
-        run();
+        run(new JobDto());
     }
 
     @Override

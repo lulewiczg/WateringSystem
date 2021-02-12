@@ -1,6 +1,9 @@
 package com.github.lulewiczg.watering.service.job;
 
+import com.github.lulewiczg.watering.TestUtils;
 import com.github.lulewiczg.watering.config.dto.ValveType;
+import com.github.lulewiczg.watering.service.dto.ActionResultDto;
+import com.github.lulewiczg.watering.service.dto.JobDto;
 import com.github.lulewiczg.watering.service.io.IOService;
 import com.github.lulewiczg.watering.state.AppState;
 import com.github.lulewiczg.watering.state.SystemStatus;
@@ -8,8 +11,9 @@ import com.github.lulewiczg.watering.state.dto.Sensor;
 import com.github.lulewiczg.watering.state.dto.Tank;
 import com.github.lulewiczg.watering.state.dto.Valve;
 import com.pi4j.io.gpio.RaspiPin;
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.EnumSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
@@ -18,7 +22,9 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.util.List;
+import java.util.UUID;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
@@ -37,8 +43,10 @@ class ScheduledValveReadTest {
     @Autowired
     private ScheduledValveRead job;
 
-    @Test
-    void testOk() {
+    @ParameterizedTest
+    @EnumSource(value = SystemStatus.class)
+    void testOk(SystemStatus status) {
+        when(state.getState()).thenReturn(status);
         Valve valve = new Valve("valve", "valve", ValveType.OUTPUT, true, RaspiPin.GPIO_00);
         Sensor sensor = new Sensor("sensor", 10, 90, null, RaspiPin.GPIO_01);
         Tank tank = new Tank("tank", 100, sensor, valve);
@@ -51,17 +59,21 @@ class ScheduledValveReadTest {
         when(state.getOutputs()).thenReturn(List.of(valve3));
         when(ioService.readPin(valve.getPin())).thenReturn(true);
         when(ioService.readPin(valve2.getPin())).thenReturn(false);
+        JobDto jobDto = new JobDto("test");
 
-        job.run();
+        ActionResultDto<Void> result = job.run(jobDto);
 
+        TestUtils.testActionResult(result);
         verify(ioService).readPin(valve.getPin());
         verify(ioService).readPin(valve2.getPin());
         verify(ioService).readPin(valve3.getPin());
         verify(state, never()).setState(any());
     }
 
-    @Test
-    void testNotOk() {
+    @ParameterizedTest
+    @EnumSource(value = SystemStatus.class)
+    void testNotOk(SystemStatus status) {
+        when(state.getState()).thenReturn(status);
         Valve valve = new Valve("valve", "valve", ValveType.OUTPUT, true, RaspiPin.GPIO_00);
         Sensor sensor = new Sensor("sensor", 10, 90, null, RaspiPin.GPIO_01);
         Tank tank = new Tank("tank", 100, sensor, valve);
@@ -71,11 +83,25 @@ class ScheduledValveReadTest {
         when(state.getTanks()).thenReturn(List.of(tank, tank2));
         when(ioService.readPin(valve.getPin())).thenReturn(true);
         when(ioService.readPin(valve2.getPin())).thenReturn(true);
+        JobDto jobDto = new JobDto("test");
 
-        job.run();
+        ActionResultDto<Void> result = job.run(jobDto);
 
+        TestUtils.testActionResult(result);
         verify(ioService).readPin(valve.getPin());
         verify(ioService).readPin(valve2.getPin());
         verify(state).setState(SystemStatus.ERROR);
+    }
+
+    @ParameterizedTest
+    @EnumSource(value = SystemStatus.class)
+    void testWithUuid(SystemStatus status) {
+        when(state.getState()).thenReturn(status);
+        JobDto jobDto = new JobDto("test", UUID.randomUUID());
+
+        ActionResultDto<Void> result = job.run(jobDto);
+
+        TestUtils.testActionResult(result);
+        assertEquals(jobDto.getId(), result.getId());
     }
 }

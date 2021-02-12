@@ -4,6 +4,7 @@ import com.github.lulewiczg.watering.config.MasterConfig;
 import com.github.lulewiczg.watering.service.dto.ActionDefinitionDto;
 import com.github.lulewiczg.watering.service.dto.ActionDto;
 import com.github.lulewiczg.watering.service.dto.JobDefinitionDto;
+import com.github.lulewiczg.watering.service.dto.JobDto;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -25,7 +26,7 @@ public class MasterState {
 
     private List<ActionDto> actions = new ArrayList<>();
 
-    private List<String> jobs = new ArrayList<>();
+    private List<JobDto> jobs = new ArrayList<>();
 
     private List<ActionDefinitionDto> actionDefinitions = new ArrayList<>();
 

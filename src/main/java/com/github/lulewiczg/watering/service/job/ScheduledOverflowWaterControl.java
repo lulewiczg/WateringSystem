@@ -3,6 +3,7 @@ package com.github.lulewiczg.watering.service.job;
 import com.github.lulewiczg.watering.config.MasterConfig;
 import com.github.lulewiczg.watering.service.actions.TanksCloseAction;
 import com.github.lulewiczg.watering.service.actions.ValveOpenAction;
+import com.github.lulewiczg.watering.service.dto.JobDto;
 import com.github.lulewiczg.watering.state.AppState;
 import com.github.lulewiczg.watering.state.SystemStatus;
 import com.github.lulewiczg.watering.state.dto.Tank;
@@ -34,7 +35,7 @@ public class ScheduledOverflowWaterControl extends ScheduledJob {
 
     @Scheduled(cron = "${com.github.lulewiczg.watering.schedule.fill.cron}")
     void schedule() {
-        run();
+        run(new JobDto());
     }
 
     @Override
