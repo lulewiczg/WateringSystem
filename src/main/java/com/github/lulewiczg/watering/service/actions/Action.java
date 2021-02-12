@@ -1,9 +1,5 @@
 package com.github.lulewiczg.watering.service.actions;
 
-import lombok.SneakyThrows;
-
-import java.lang.reflect.ParameterizedType;
-import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -12,7 +8,7 @@ import java.util.List;
  * @param <T> action parameter type
  * @param <R> action return type
  */
-public interface Action<T, R> {
+public abstract class Action<T, R> {
 
     /**
      * Executes action
@@ -20,21 +16,21 @@ public interface Action<T, R> {
      * @param param acton param
      * @return action result
      */
-    R doAction(T param);
+    public abstract R doAction(T param);
 
     /**
      * Gets action description.
      *
      * @return description
      */
-    String getDescription();
+    public abstract String getDescription();
 
     /**
      * Checks if action is enabled.
      *
      * @return true, if enabled
      */
-    default boolean isEnabled() {
+    public boolean isEnabled() {
         return true;
     }
 
@@ -43,7 +39,7 @@ public interface Action<T, R> {
      *
      * @return type
      */
-    default Class<?> getParamType() {
+    public Class<?> getParamType() {
         return Void.class;
     }
 
@@ -53,7 +49,7 @@ public interface Action<T, R> {
      *
      * @return type
      */
-    default Class<?> getDestinationParamType() {
+    public Class<?> getDestinationParamType() {
         return Void.class;
     }
 
@@ -62,7 +58,7 @@ public interface Action<T, R> {
      *
      * @return allowewd values
      */
-    default List<?> getAllowedValues() {
+    public List<?> getAllowedValues() {
         return null;
     }
 
@@ -71,7 +67,7 @@ public interface Action<T, R> {
      *
      * @return param description
      */
-    default String getParamDescription() {
+    public String getParamDescription() {
         return "";
     }
 
@@ -80,14 +76,8 @@ public interface Action<T, R> {
      *
      * @return type
      */
-    @SneakyThrows
-    default Class<?> getReturnType() {
-        ParameterizedType type = findType();
-        return Class.forName(type.getActualTypeArguments()[1].getTypeName());
+    public Class<?> getReturnType() {
+        return Void.class;
     }
 
-    private ParameterizedType findType() {
-        return Arrays.stream(this.getClass().getGenericInterfaces())
-                .map(ParameterizedType.class::cast).filter(i -> i.getRawType() == Action.class).findFirst().orElseThrow();
-    }
 }

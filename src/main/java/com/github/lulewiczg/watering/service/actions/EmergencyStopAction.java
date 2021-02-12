@@ -13,7 +13,7 @@ import org.springframework.stereotype.Component;
 @Component
 @RequiredArgsConstructor
 @ConditionalOnMissingBean(MasterConfig.class)
-public class EmergencyStopAction implements Action<Void, Void> {
+public class EmergencyStopAction extends Action<Void, Void> {
 
     private final TanksCloseAction tanksCloseAction;
 

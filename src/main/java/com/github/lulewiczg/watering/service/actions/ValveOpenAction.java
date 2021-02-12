@@ -20,7 +20,7 @@ import java.util.stream.Collectors;
 @Component
 @RequiredArgsConstructor
 @ConditionalOnMissingBean(MasterConfig.class)
-public class ValveOpenAction implements Action<Valve, Void> {
+public class ValveOpenAction extends Action<Valve, Void> {
 
     private final IOService service;
 

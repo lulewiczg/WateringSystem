@@ -20,7 +20,7 @@ import java.util.stream.Collectors;
 @Component
 @RequiredArgsConstructor
 @ConditionalOnMissingBean(MasterConfig.class)
-public class WaterLevelReadAction implements Action<Sensor, Double> {
+public class WaterLevelReadAction extends Action<Sensor, Double> {
 
     private final IOService service;
 
@@ -61,5 +61,9 @@ public class WaterLevelReadAction implements Action<Sensor, Double> {
     @Override
     public String getDescription() {
         return "Reads water level from sensor";
+    }
+
+    public Class<?> getReturnType() {
+        return Double.class;
     }
 }

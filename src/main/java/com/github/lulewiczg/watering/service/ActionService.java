@@ -31,7 +31,7 @@ public interface ActionService {
      * Runs job
      *
      * @param jobName job name
-     * @return
+     * @return job result
      */
     ActionResultDto<Void> runJob(JobDto jobName);
 
@@ -39,6 +39,7 @@ public interface ActionService {
      * Runs action.
      *
      * @param actionDto action details
+     * @return action result
      */
     Object runAction(ActionDto actionDto);
 

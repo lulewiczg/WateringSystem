@@ -14,7 +14,7 @@ import org.springframework.stereotype.Component;
 @Component
 @RequiredArgsConstructor
 @ConditionalOnMissingBean(MasterConfig.class)
-public class TapsOpenAction implements Action<Void, Void> {
+public class TapsOpenAction extends Action<Void, Void> {
 
     private final AppState state;
 
