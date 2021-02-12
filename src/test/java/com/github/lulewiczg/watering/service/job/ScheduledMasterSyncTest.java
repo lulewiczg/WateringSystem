@@ -56,12 +56,14 @@ class ScheduledMasterSyncTest {
     @Value("${com.github.lulewiczg.watering.master.password}")
     private String password;
 
+    private final ActionDefinitionDto actionDef = new ActionDefinitionDto("test", "desc",
+            String.class, Object.class, null, "param desc", String.class);
+
     @ParameterizedTest
     @EnumSource(value = SystemStatus.class)
     void testJob(SystemStatus status) {
         when(state.getState()).thenReturn(status);
         JobDefinitionDto jobDef = new JobDefinitionDto("test", true);
-        ActionDefinitionDto actionDef = new ActionDefinitionDto("test", "type", "desc", "ret type");
         when(actionService.getActions()).thenReturn(List.of(actionDef));
         when(actionService.getJobs()).thenReturn(List.of(jobDef));
 
@@ -72,8 +74,8 @@ class ScheduledMasterSyncTest {
         HttpEntity<SlaveStateDto> entity = new HttpEntity<>(new SlaveStateDto(state, List.of(actionDef), List.of(jobDef)), headers);
 
         when(restTemplate.postForEntity(url, entity, MasterResponse.class)).thenReturn(new ResponseEntity<>(response, HttpStatus.OK));
-        ActionDto action = new ActionDto("name", "type", "param");
-        ActionDto action2 = new ActionDto("name2", "type2", "param2");
+        ActionDto action = new ActionDto("name", "param");
+        ActionDto action2 = new ActionDto("name2", "param2");
 
         when(response.getActions()).thenReturn(List.of(action, action2));
         when(response.getJobs()).thenReturn(List.of("test"));
@@ -90,7 +92,6 @@ class ScheduledMasterSyncTest {
     void testJobNothingToDo(SystemStatus status) {
         when(state.getState()).thenReturn(status);
         JobDefinitionDto jobDef = new JobDefinitionDto("test", true);
-        ActionDefinitionDto actionDef = new ActionDefinitionDto("test", "type", "desc", "ret type");
         when(actionService.getActions()).thenReturn(List.of(actionDef));
         when(actionService.getJobs()).thenReturn(List.of(jobDef));
 
@@ -113,7 +114,6 @@ class ScheduledMasterSyncTest {
     void testJobFail(SystemStatus status) {
         when(state.getState()).thenReturn(status);
         JobDefinitionDto jobDef = new JobDefinitionDto("test", true);
-        ActionDefinitionDto actionDef = new ActionDefinitionDto("test", "type", "desc", "ret type");
         when(actionService.getActions()).thenReturn(List.of(actionDef));
         when(actionService.getJobs()).thenReturn(List.of(jobDef));
 

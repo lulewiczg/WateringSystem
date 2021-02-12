@@ -26,4 +26,9 @@ public class TanksCloseAction implements Action<Void, Void> {
         state.getTanks().forEach(i -> closeAction.doAction(i.getValve()));
         return null;
     }
+
+    @Override
+    public String getDescription() {
+        return "Closes tanks valves";
+    }
 }

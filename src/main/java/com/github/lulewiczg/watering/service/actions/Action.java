@@ -4,6 +4,7 @@ import lombok.SneakyThrows;
 
 import java.lang.reflect.ParameterizedType;
 import java.util.Arrays;
+import java.util.List;
 
 /**
  * Interface for system action.
@@ -22,6 +23,13 @@ public interface Action<T, R> {
     R doAction(T param);
 
     /**
+     * Gets action description.
+     *
+     * @return description
+     */
+    String getDescription();
+
+    /**
      * Checks if action is enabled.
      *
      * @return true, if enabled
@@ -35,9 +43,27 @@ public interface Action<T, R> {
      *
      * @return type
      */
-    @SneakyThrows
-    default String getParamType() {
-        return Void.class.getSimpleName();
+    default Class<?> getParamType() {
+        return Void.class;
+    }
+
+
+    /**
+     * Gets destination parameter type.
+     *
+     * @return type
+     */
+    default Class<?> getDestinationParamType() {
+        return Void.class;
+    }
+
+    /**
+     * Gets allowed values for action
+     *
+     * @return allowewd values
+     */
+    default List<?> getAllowedValues() {
+        return null;
     }
 
     /**
@@ -55,9 +81,9 @@ public interface Action<T, R> {
      * @return type
      */
     @SneakyThrows
-    default String getReturnType() {
+    default Class<?> getReturnType() {
         ParameterizedType type = findType();
-        return Class.forName(type.getActualTypeArguments()[1].getTypeName()).getSimpleName();
+        return Class.forName(type.getActualTypeArguments()[1].getTypeName());
     }
 
     private ParameterizedType findType() {

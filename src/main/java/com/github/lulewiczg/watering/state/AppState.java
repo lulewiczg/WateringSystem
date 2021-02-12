@@ -61,6 +61,20 @@ public class AppState {
                 .orElseThrow(() -> new SensorNotFoundException(id));
     }
 
+    /**
+     * Finds all valves.
+     *
+     * @return valves
+     */
+    public List<Valve> getAllValves() {
+        List<Valve> tankValves = tanks.stream().map(Tank::getValve).collect(Collectors.toList());
+        List<Valve> tapValves = taps.stream().map(WaterSource::getValve).collect(Collectors.toList());
+        tankValves.addAll(tapValves);
+        tankValves.addAll(outputs);
+
+        return tankValves;
+    }
+
     @Autowired
     public AppState(AppConfig config, ValveMapper valveMapper, TankMapper tankMapper, WaterSourceMapper waterSourceMapper) {
         this.tanks = tankMapper.map(config.getTanks().stream()

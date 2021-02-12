@@ -31,4 +31,9 @@ public class TapsCloseAction implements Action<Void, Void> {
     public boolean isEnabled() {
         return !state.getTaps().isEmpty();
     }
+
+    @Override
+    public String getDescription() {
+        return "Closes taps";
+    }
 }

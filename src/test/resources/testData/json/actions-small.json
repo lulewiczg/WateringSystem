@@ -1,44 +1,71 @@
 [
   {
     "actionName": "emergencyStopAction",
-    "parameterType": "Void",
+    "description": "Closes all valves",
+    "parameterType": "java.lang.Void",
+    "parameterDestinationType": "java.lang.Void",
+    "allowedValues": null,
     "parameterDescription": "",
-    "returnType": "Void"
+    "returnType": "java.lang.Void"
   },
   {
     "actionName": "outputsCloseAction",
-    "parameterType": "Void",
+    "description": "Closes output valves",
+    "parameterType": "java.lang.Void",
+    "parameterDestinationType": "java.lang.Void",
+    "allowedValues": null,
     "parameterDescription": "",
-    "returnType": "Void"
+    "returnType": "java.lang.Void"
   },
   {
     "actionName": "outputsOpenAction",
-    "parameterType": "Void",
+    "description": "Opens output valves",
+    "parameterType": "java.lang.Void",
+    "parameterDestinationType": "java.lang.Void",
+    "allowedValues": null,
     "parameterDescription": "",
-    "returnType": "Void"
+    "returnType": "java.lang.Void"
   },
   {
     "actionName": "tanksCloseAction",
-    "parameterType": "Void",
+    "description": "Closes tanks valves",
+    "parameterType": "java.lang.Void",
+    "parameterDestinationType": "java.lang.Void",
+    "allowedValues": null,
     "parameterDescription": "",
-    "returnType": "Void"
+    "returnType": "java.lang.Void"
   },
   {
     "actionName": "tanksOpenAction",
-    "parameterType": "Void",
+    "description": "Opens tank valves",
+    "parameterType": "java.lang.Void",
+    "parameterDestinationType": "java.lang.Void",
+    "allowedValues": null,
     "parameterDescription": "",
-    "returnType": "Void"
+    "returnType": "java.lang.Void"
   },
   {
     "actionName": "valveCloseAction",
-    "parameterType": "String",
+    "description": "Closes given valve",
+    "parameterType": "java.lang.String",
+    "parameterDestinationType": "com.github.lulewiczg.watering.state.dto.Valve",
+    "allowedValues": [
+      "valve1",
+      "out"
+    ],
     "parameterDescription": "Valve ID",
-    "returnType": "Void"
+    "returnType": "java.lang.Void"
   },
   {
     "actionName": "valveOpenAction",
-    "parameterType": "String",
+    "description": "Opens given valve",
+    "parameterType": "java.lang.String",
+    "parameterDestinationType": "com.github.lulewiczg.watering.state.dto.Valve",
+    "allowedValues": [
+      "valve1",
+      "out"
+    ],
     "parameterDescription": "Valve ID",
-    "returnType": "Void"
+    "returnType": "java.lang.Void"
   }
 ]

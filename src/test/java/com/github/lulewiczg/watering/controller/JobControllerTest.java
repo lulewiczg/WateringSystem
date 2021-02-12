@@ -2,6 +2,7 @@ package com.github.lulewiczg.watering.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.lulewiczg.watering.TestUtils;
+import com.github.lulewiczg.watering.exception.ActionNotFoundException;
 import com.github.lulewiczg.watering.exception.ApiError;
 import com.github.lulewiczg.watering.exception.InvalidParamException;
 import com.github.lulewiczg.watering.security.AuthEntryPoint;
@@ -107,7 +108,7 @@ class JobControllerTest {
     @Test
     @WithMockUser(roles = "USER")
     void testRunJobError() throws Exception {
-        InvalidParamException ex = new InvalidParamException(Object.class, String.class);
+        ActionNotFoundException ex = new ActionNotFoundException("test");
         doThrow(ex).when(service).runJob("test123");
         ApiError expected = new ApiError(400, "Bad Request", ex.getMessage());
         Date date = new Date();

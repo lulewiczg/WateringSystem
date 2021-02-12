@@ -2,6 +2,8 @@ package com.github.lulewiczg.watering.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.lulewiczg.watering.TestUtils;
+import com.github.lulewiczg.watering.exception.ActionNotFoundException;
+import com.github.lulewiczg.watering.exception.JobNotFoundException;
 import com.github.lulewiczg.watering.service.actions.WaterLevelReadAction;
 import com.github.lulewiczg.watering.service.dto.ActionDefinitionDto;
 import com.github.lulewiczg.watering.service.dto.ActionDto;
@@ -55,14 +57,20 @@ class ActionServiceDisabledTest {
 
     @Test
     void testRunAction() {
-        ActionDto actionDto = new ActionDto(deCapitalize(WaterLevelReadAction.class.getSimpleName()), "Sensor", "sensor2");
-        assertThrows(IllegalArgumentException.class, () -> service.runAction(actionDto));
+        ActionDto actionDto = new ActionDto(deCapitalize(WaterLevelReadAction.class.getSimpleName()), "sensor2");
+
+        String message = assertThrows(ActionNotFoundException.class, () -> service.runAction(actionDto)).getMessage();
+
+        assertEquals("Action not found: waterLevelReadAction", message);
     }
 
     @Test
     void testRunJob() {
         String jobName = deCapitalize(ScheduledSensorRead.class.getSimpleName());
-        assertThrows(IllegalArgumentException.class, () -> service.runJob(jobName));
+
+        String message = assertThrows(JobNotFoundException.class, () -> service.runJob(jobName)).getMessage();
+
+        assertEquals("Job not found: scheduledSensorRead", message);
     }
 
     private String deCapitalize(String str) {

@@ -8,7 +8,6 @@ import com.github.lulewiczg.watering.state.MasterState;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -36,15 +35,13 @@ public class ActionServiceMasterImpl implements ActionService {
 
     @Override
     public void runJob(String jobName) {
-        state.getJobDefinitions().stream().filter(i -> i.getJobName().equals(jobName)).findFirst()
-                .orElseThrow(() -> new IllegalArgumentException("Job not found: " + jobName));
+        validateJob(jobName);
         state.getJobs().add(jobName);
     }
 
     @Override
     public Object runAction(ActionDto actionDto) {
-        state.getActionDefinitions().stream().filter(i -> i.getActionName().equals(actionDto.getName()))
-                .findFirst().orElseThrow(() -> new IllegalArgumentException("Job not found: " + actionDto));
+        validateAndGetDefinition(actionDto);
         state.getActions().add(actionDto);
         return null;
     }

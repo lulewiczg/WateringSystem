@@ -2,9 +2,12 @@
   "actions": [
     {
       "actionName": "emergencyStopAction",
-      "parameterType": "Void",
+      "description": "Closes all valves",
+      "parameterType": "java.lang.Void",
+      "parameterDestinationType": "java.lang.Void",
+      "allowedValues": null,
       "parameterDescription": "",
-      "returnType": "Void"
+      "returnType": "java.lang.Void"
     }
   ],
   "jobs": [

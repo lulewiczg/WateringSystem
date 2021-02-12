@@ -29,4 +29,9 @@ public class EmergencyStopAction implements Action<Void, Void> {
         outputsCloseAction.doAction(null);
         return null;
     }
+
+    @Override
+    public String getDescription() {
+        return "Closes all valves";
+    }
 }

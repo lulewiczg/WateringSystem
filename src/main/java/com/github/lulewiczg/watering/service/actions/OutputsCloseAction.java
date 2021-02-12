@@ -26,4 +26,9 @@ public class OutputsCloseAction implements Action<Void, Void> {
         state.getOutputs().forEach(closeAction::doAction);
         return null;
     }
+
+    @Override
+    public String getDescription() {
+        return "Closes output valves";
+    }
 }

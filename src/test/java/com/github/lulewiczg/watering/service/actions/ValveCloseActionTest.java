@@ -2,6 +2,7 @@ package com.github.lulewiczg.watering.service.actions;
 
 import com.github.lulewiczg.watering.config.dto.ValveType;
 import com.github.lulewiczg.watering.service.io.IOService;
+import com.github.lulewiczg.watering.state.AppState;
 import com.github.lulewiczg.watering.state.dto.Valve;
 import com.pi4j.io.gpio.RaspiPin;
 import org.junit.jupiter.api.Test;
@@ -22,6 +23,10 @@ class ValveCloseActionTest {
 
     @MockBean
     private IOService service;
+
+    @MockBean
+    private AppState state;
+
 
     @Autowired
     private ValveCloseAction action;

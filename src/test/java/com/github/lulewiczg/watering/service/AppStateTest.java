@@ -14,6 +14,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.TestPropertySource;
 
+import java.util.List;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
@@ -70,6 +72,18 @@ class AppStateTest {
 
         Valve valve3 = state.findValve("out");
         assertEquals(state.getOutputs().get(0), valve3);
+    }
+
+    @Test
+    void testFindValves() {
+        Valve valve = state.findValve("valve1");
+        Valve valve2 = state.findValve("valve2");
+        Valve valve3 = state.findValve("tap");
+        Valve valve4 = state.findValve("out");
+
+        List<Valve> allValves = state.getAllValves();
+
+        assertEquals(List.of(valve, valve2, valve3, valve4), allValves);
     }
 
     @Test

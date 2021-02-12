@@ -26,4 +26,9 @@ public class TanksOpenAction implements Action<Void, Void> {
         state.getTanks().forEach(i -> openAction.doAction(i.getValve()));
         return null;
     }
+
+    @Override
+    public String getDescription() {
+        return "Opens tank valves";
+    }
 }

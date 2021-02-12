@@ -2,8 +2,8 @@ package com.github.lulewiczg.watering.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.lulewiczg.watering.TestUtils;
+import com.github.lulewiczg.watering.exception.ActionNotFoundException;
 import com.github.lulewiczg.watering.exception.ApiError;
-import com.github.lulewiczg.watering.exception.InvalidParamException;
 import com.github.lulewiczg.watering.security.AuthEntryPoint;
 import com.github.lulewiczg.watering.security.AuthProvider;
 import com.github.lulewiczg.watering.service.ActionService;
@@ -90,7 +90,7 @@ class ActionControllerTest {
     @Test
     @WithMockUser(roles = "GUEST")
     void testRunActionGuest() {
-        ActionDto actionDto = new ActionDto("test", "test2", "test3");
+        ActionDto actionDto = new ActionDto("test", "test2");
 
         TestUtils.testForbiddenPost(mvc, mapper, "/rest/actions", actionDto);
     }
@@ -98,14 +98,14 @@ class ActionControllerTest {
     @Test
     @WithMockUser(roles = "SLAVE")
     void testRunActionSlave() {
-        ActionDto actionDto = new ActionDto("test", "test2", "test3");
+        ActionDto actionDto = new ActionDto("test", "test2");
 
         TestUtils.testForbiddenPost(mvc, mapper, "/rest/actions", actionDto);
     }
 
     @Test
     void testRunActionAnon() {
-        ActionDto actionDto = new ActionDto("test", "test2", "test3");
+        ActionDto actionDto = new ActionDto("test", "test2");
 
         TestUtils.testUnauthorizedPost(mvc, mapper, "/rest/actions", actionDto);
     }
@@ -113,8 +113,8 @@ class ActionControllerTest {
     @Test
     @WithMockUser(roles = "USER")
     void testRunActionError() throws Exception {
-        ActionDto actionDto = new ActionDto("test", "test2", "test3");
-        InvalidParamException ex = new InvalidParamException(Object.class, String.class);
+        ActionDto actionDto = new ActionDto("test", "test2");
+        ActionNotFoundException ex = new ActionNotFoundException("test");
         when(service.runAction(actionDto)).thenThrow(ex);
         ApiError expected = new ApiError(400, "Bad Request", ex.getMessage());
 
@@ -137,7 +137,7 @@ class ActionControllerTest {
     }
 
     private void testRun() throws Exception {
-        ActionDto actionDto = new ActionDto("test", "test2", "test3");
+        ActionDto actionDto = new ActionDto("test", "test2");
         when(service.runAction(actionDto)).thenReturn("testResult");
         mvc.perform(post("/rest/actions")
                 .content(mapper.writeValueAsString(actionDto))

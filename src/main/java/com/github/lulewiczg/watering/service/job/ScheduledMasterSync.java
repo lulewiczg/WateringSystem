@@ -70,6 +70,24 @@ public class ScheduledMasterSync extends ScheduledJob {
 
     @Override
     protected void doJob() {
+        MasterResponse command = connect();
+        if (command == null) {
+            log.error("Sync with master failed");
+            return;
+        }
+
+        log.debug("Got commands: {}", command);
+        command.getActions().forEach(i -> {
+            log.info("Running action: {}", i);
+            actionService.runAction(i);
+        });
+        command.getJobs().forEach(i -> {
+            log.info("Running action: {}", i);
+            actionService.runJob(i);
+        });
+    }
+
+    private MasterResponse connect() {
         String credentials = login + ":" + password;
         String base64 = Base64.encodeBase64String(credentials.getBytes());
         HttpHeaders headers = new HttpHeaders();
@@ -81,17 +99,9 @@ public class ScheduledMasterSync extends ScheduledJob {
             response = restTemplate.postForEntity(url, entity, MasterResponse.class);
         } catch (RestClientException e) {
             log.error("Sync with master failed", e);
-            return;
+            return null;
         }
-        MasterResponse command = response.getBody();
-        if (command == null) {
-            log.error("Sync with master failed");
-            return;
-        }
-
-        log.debug("Got commands: {}", command);
-        command.getActions().forEach(actionService::runAction);
-        command.getJobs().forEach(actionService::runJob);
+        return response.getBody();
     }
 
     @Override

@@ -37,9 +37,9 @@ class MasterServiceTest {
     private AppState state;
 
     @Test
-    void test() {
+    void testUpdate() {
         SlaveStateDto dto = TestUtils.readJson("slaveState.json", SlaveStateDto.class, mapper);
-        ActionDto action = new ActionDto("name", "type", "param");
+        ActionDto action = new ActionDto("name","param");
         when(masterState.getJobs()).thenReturn(new ArrayList<>(List.of("test")));
         when(masterState.getActions()).thenReturn(new ArrayList<>(List.of(action)));
 

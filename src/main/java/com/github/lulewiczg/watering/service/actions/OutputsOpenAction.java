@@ -26,4 +26,9 @@ public class OutputsOpenAction implements Action<Void, Void> {
         state.getOutputs().forEach(openAction::doAction);
         return null;
     }
+
+    @Override
+    public String getDescription() {
+        return "Opens output valves";
+    }
 }
