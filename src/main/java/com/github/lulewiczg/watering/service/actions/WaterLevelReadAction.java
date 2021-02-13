@@ -1,6 +1,7 @@
 package com.github.lulewiczg.watering.service.actions;
 
 import com.github.lulewiczg.watering.config.MasterConfig;
+import com.github.lulewiczg.watering.service.dto.ActionDto;
 import com.github.lulewiczg.watering.service.io.IOService;
 import com.github.lulewiczg.watering.state.AppState;
 import com.github.lulewiczg.watering.state.dto.Sensor;
@@ -48,7 +49,7 @@ public class WaterLevelReadAction extends Action<Sensor, Double> {
     }
 
     @Override
-    public Double doAction(Sensor sensor) {
+    protected Double doActionInternal(ActionDto actionDto, Sensor sensor) {
         log.info("Reading water level for sensor {}", sensor);
         return service.analogRead(sensor.getPin());
     }

@@ -3,6 +3,7 @@ package com.github.lulewiczg.watering.service.job;
 import com.github.lulewiczg.watering.TestUtils;
 import com.github.lulewiczg.watering.config.dto.ValveType;
 import com.github.lulewiczg.watering.service.actions.EmergencyStopAction;
+import com.github.lulewiczg.watering.service.dto.ActionDto;
 import com.github.lulewiczg.watering.service.dto.ActionResultDto;
 import com.github.lulewiczg.watering.service.dto.JobDto;
 import com.github.lulewiczg.watering.state.AppState;
@@ -56,7 +57,7 @@ class ScheduledWaterEscapeControlTest {
         ActionResultDto<Void> result = job.run(syncDto);
 
         TestUtils.testActionResult(result);
-        verify(emergencyStopAction, never()).doAction(any());
+        verify(emergencyStopAction, never()).doAction(any(), any());
         verify(state, never()).setState(any());
     }
 
@@ -74,7 +75,7 @@ class ScheduledWaterEscapeControlTest {
         ActionResultDto<Void> result = job.run(syncDto);
 
         TestUtils.testActionResult(result);
-        verify(emergencyStopAction, never()).doAction(any());
+        verify(emergencyStopAction, never()).doAction(any(), any());
         verify(state, never()).setState(any());
 
         sensor.setLevel(level2);
@@ -82,7 +83,7 @@ class ScheduledWaterEscapeControlTest {
 
         TestUtils.testActionResult(result2);
         assertNotEquals(result.getId(), result2.getId());
-        verify(emergencyStopAction, never()).doAction(any());
+        verify(emergencyStopAction, never()).doAction(any(), any());
         verify(state, never()).setState(any());
     }
 
@@ -103,7 +104,7 @@ class ScheduledWaterEscapeControlTest {
         ActionResultDto<Void> result = job.run(syncDto);
 
         TestUtils.testActionResult(result);
-        verify(emergencyStopAction, never()).doAction(any());
+        verify(emergencyStopAction, never()).doAction(any(), any());
         verify(state, never()).setState(any());
 
         sensor.setLevel(level2);
@@ -113,7 +114,7 @@ class ScheduledWaterEscapeControlTest {
         TestUtils.testActionResult(result2);
         assertNotEquals(result.getId(), result2.getId());
         verify(state).setState(SystemStatus.ERROR);
-        verify(emergencyStopAction).doAction(null);
+        verify(emergencyStopAction).doAction(new ActionDto(), null);
     }
 
     @Test
@@ -149,7 +150,7 @@ class ScheduledWaterEscapeControlTest {
         job.run(syncDto);
         job.run(syncDto);
 
-        verify(emergencyStopAction, never()).doAction(any());
+        verify(emergencyStopAction, never()).doAction(any(), any());
         verify(state, never()).setState(any());
     }
 

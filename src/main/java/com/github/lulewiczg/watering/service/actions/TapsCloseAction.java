@@ -1,6 +1,7 @@
 package com.github.lulewiczg.watering.service.actions;
 
 import com.github.lulewiczg.watering.config.MasterConfig;
+import com.github.lulewiczg.watering.service.dto.ActionDto;
 import com.github.lulewiczg.watering.state.AppState;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
@@ -21,9 +22,9 @@ public class TapsCloseAction extends Action<Void, Void> {
     private final ValveCloseAction closeAction;
 
     @Override
-    public Void doAction(Void param) {
+    protected Void doActionInternal(ActionDto actionDto, Void param) {
         log.info("Closing taps...");
-        state.getTaps().forEach(i -> closeAction.doAction(i.getValve()));
+        state.getTaps().forEach(i -> closeAction.doAction(actionDto, i.getValve()));
         return null;
     }
 

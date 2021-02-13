@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 import javax.validation.Valid;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
+import java.util.UUID;
 
 /**
  * DTO for action.
@@ -21,5 +22,12 @@ public class ActionDto {
     @NotEmpty
     private String name;
 
+    private UUID id;
+
     private Object param;
+
+    public ActionDto(@NotNull @NotEmpty String name, Object param) {
+        this.name = name;
+        this.param = param;
+    }
 }

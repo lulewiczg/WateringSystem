@@ -1,5 +1,6 @@
 package com.github.lulewiczg.watering.service.actions;
 
+import com.github.lulewiczg.watering.service.dto.ActionDto;
 import com.github.lulewiczg.watering.state.AppState;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -33,11 +34,13 @@ class EmergencyStopActionTest {
 
     @Test
     void testAction() {
-        action.doAction(null);
+        ActionDto actionDto = new ActionDto();
 
-        verify(tanksCloseAction).doAction(null);
-        verify(tapsCloseAction).doAction(null);
-        verify(outputsCloseAction).doAction(null);
+        action.doAction(actionDto, null);
+
+        verify(tanksCloseAction).doAction(actionDto, null);
+        verify(tapsCloseAction).doAction(actionDto, null);
+        verify(outputsCloseAction).doAction(actionDto, null);
     }
 
 }

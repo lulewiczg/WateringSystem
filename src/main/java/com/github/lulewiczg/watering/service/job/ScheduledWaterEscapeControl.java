@@ -2,6 +2,7 @@ package com.github.lulewiczg.watering.service.job;
 
 import com.github.lulewiczg.watering.config.MasterConfig;
 import com.github.lulewiczg.watering.service.actions.EmergencyStopAction;
+import com.github.lulewiczg.watering.service.dto.ActionDto;
 import com.github.lulewiczg.watering.service.dto.JobDto;
 import com.github.lulewiczg.watering.state.AppState;
 import com.github.lulewiczg.watering.state.SystemStatus;
@@ -74,7 +75,7 @@ public class ScheduledWaterEscapeControl extends ScheduledJob {
         if (!leaks.isEmpty()) {
             log.error("Water leak in tanks: {}", leaks);
             state.setState(SystemStatus.ERROR);
-            emergencyStopAction.doAction(null);
+            emergencyStopAction.doAction(new ActionDto(), null);
         }
         log.debug("Escape control finished.");
         prevLevels = levels;

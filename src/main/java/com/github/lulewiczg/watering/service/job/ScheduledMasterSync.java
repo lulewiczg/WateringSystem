@@ -46,7 +46,7 @@ public class ScheduledMasterSync extends ScheduledJob {
 
     @Scheduled(cron = "${com.github.lulewiczg.watering.schedule.master.sync.cron}")
     void schedule() {
-        run(new JobDto());
+        run(job);
     }
 
     @Override

@@ -1,6 +1,7 @@
 package com.github.lulewiczg.watering.service.actions;
 
 import com.github.lulewiczg.watering.config.dto.ValveType;
+import com.github.lulewiczg.watering.service.dto.ActionDto;
 import com.github.lulewiczg.watering.service.io.IOService;
 import com.github.lulewiczg.watering.state.AppState;
 import com.github.lulewiczg.watering.state.dto.Valve;
@@ -35,7 +36,7 @@ class ValveCloseActionTest {
     void testClose() {
         Valve valve = new Valve("test", "test", ValveType.OUTPUT, true, RaspiPin.GPIO_00);
 
-        action.doAction(valve);
+        action.doAction(new ActionDto(), valve);
 
         verify(service).toggleOff(valve.getPin());
         assertFalse(valve.isOpen());
@@ -45,7 +46,7 @@ class ValveCloseActionTest {
     void testAlreadyClosed() {
         Valve valve = new Valve("test", "test", ValveType.OUTPUT, false, RaspiPin.GPIO_00);
 
-        action.doAction(valve);
+        action.doAction(new ActionDto(), valve);
 
         verify(service).toggleOff(valve.getPin());
         assertFalse(valve.isOpen());

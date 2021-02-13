@@ -4,6 +4,7 @@ import com.github.lulewiczg.watering.TestUtils;
 import com.github.lulewiczg.watering.config.dto.ValveType;
 import com.github.lulewiczg.watering.service.actions.TanksCloseAction;
 import com.github.lulewiczg.watering.service.actions.ValveOpenAction;
+import com.github.lulewiczg.watering.service.dto.ActionDto;
 import com.github.lulewiczg.watering.service.dto.ActionResultDto;
 import com.github.lulewiczg.watering.service.dto.JobDto;
 import com.github.lulewiczg.watering.state.AppState;
@@ -58,8 +59,8 @@ class ScheduledOverflowWaterControlTest {
         ActionResultDto<Void> result = job.run(jobDto);
 
         TestUtils.testActionResult(result);
-        verify(tanksCloseAction, never()).doAction(any());
-        verify(valveOpenAction, never()).doAction(any());
+        verify(tanksCloseAction, never()).doAction(any(), any());
+        verify(valveOpenAction, never()).doAction(any(), any());
         verify(state, never()).setState(any());
     }
 
@@ -88,8 +89,8 @@ class ScheduledOverflowWaterControlTest {
         ActionResultDto<Void> result = job.run(jobDto);
 
         TestUtils.testActionResult(result);
-        verify(tanksCloseAction, never()).doAction(any());
-        verify(valveOpenAction, never()).doAction(any());
+        verify(tanksCloseAction, never()).doAction(any(), any());
+        verify(valveOpenAction, never()).doAction(any(), any());
         verify(state, never()).setState(any());
     }
 
@@ -106,9 +107,9 @@ class ScheduledOverflowWaterControlTest {
         ActionResultDto<Void> result = job.run(syncDto);
 
         TestUtils.testActionResult(result);
-        verify(tanksCloseAction).doAction(null);
+        verify(tanksCloseAction).doAction(new ActionDto(), null);
         verify(state).setState(SystemStatus.IDLE);
-        verify(valveOpenAction, never()).doAction(any());
+        verify(valveOpenAction, never()).doAction(any(), any());
     }
 
     @ParameterizedTest
@@ -124,9 +125,9 @@ class ScheduledOverflowWaterControlTest {
         ActionResultDto<Void> result = job.run(jobDto);
 
         TestUtils.testActionResult(result);
-        verify(tanksCloseAction, never()).doAction(any());
+        verify(tanksCloseAction, never()).doAction(any(), any());
         verify(state, never()).setState(any());
-        verify(valveOpenAction, never()).doAction(any());
+        verify(valveOpenAction, never()).doAction(any(), any());
     }
 
     @ParameterizedTest
@@ -146,8 +147,8 @@ class ScheduledOverflowWaterControlTest {
 
         TestUtils.testActionResult(result);
         verify(state).setState(SystemStatus.DRAINING);
-        verify(tanksCloseAction, never()).doAction(null);
-        verify(valveOpenAction).doAction(valve);
+        verify(tanksCloseAction, never()).doAction(new ActionDto(), null);
+        verify(valveOpenAction).doAction(new ActionDto(), valve);
     }
 
     @Test
@@ -157,7 +158,7 @@ class ScheduledOverflowWaterControlTest {
         Sensor sensor = new Sensor("sensor", 1, 11, 20, RaspiPin.GPIO_01);
         Tank tank = new Tank("tank", 100, sensor, valve);
         when(state.getTanks()).thenReturn(List.of(tank));
-        doThrow(new IllegalArgumentException("error")).when(valveOpenAction).doAction(valve);
+        doThrow(new IllegalArgumentException("error")).when(valveOpenAction).doAction(new ActionDto(), valve);
         JobDto jobDto = new JobDto("test");
 
         ActionResultDto<Void> result = job.run(jobDto);

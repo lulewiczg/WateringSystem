@@ -6,6 +6,7 @@ import com.github.lulewiczg.watering.service.actions.OutputsCloseAction;
 import com.github.lulewiczg.watering.service.actions.OutputsOpenAction;
 import com.github.lulewiczg.watering.service.actions.TanksCloseAction;
 import com.github.lulewiczg.watering.service.actions.TanksOpenAction;
+import com.github.lulewiczg.watering.service.dto.ActionDto;
 import com.github.lulewiczg.watering.service.dto.ActionResultDto;
 import com.github.lulewiczg.watering.service.dto.JobDto;
 import com.github.lulewiczg.watering.state.AppState;
@@ -67,10 +68,10 @@ class ScheduledWateringTest {
         ActionResultDto<Void> result = job.run(syncDto);
 
         TestUtils.testActionResult(result);
-        verify(tanksCloseAction, never()).doAction(any());
-        verify(tanksOpenAction, never()).doAction(any());
-        verify(outputsOpenAction, never()).doAction(any());
-        verify(outputsCloseAction, never()).doAction(any());
+        verify(tanksCloseAction, never()).doAction(any(), any());
+        verify(tanksOpenAction, never()).doAction(any(), any());
+        verify(outputsOpenAction, never()).doAction(any(), any());
+        verify(outputsCloseAction, never()).doAction(any(), any());
         verify(state, never()).setState(any());
     }
 
@@ -89,16 +90,17 @@ class ScheduledWateringTest {
 
         TestUtils.testActionResult(result);
         verify(state).setState(SystemStatus.WATERING);
-        verify(tanksCloseAction, never()).doAction(any());
-        verify(outputsCloseAction, never()).doAction(any());
-        verify(tanksOpenAction).doAction(null);
-        verify(outputsOpenAction).doAction(null);
+        verify(tanksCloseAction, never()).doAction(any(), any());
+        verify(outputsCloseAction, never()).doAction(any(), any());
+        ActionDto actionDto = new ActionDto();
+        verify(tanksOpenAction).doAction(actionDto, null);
+        verify(outputsOpenAction).doAction(actionDto, null);
 
         Thread.sleep(1500);
 
         verify(state).setState(SystemStatus.IDLE);
-        verify(tanksCloseAction).doAction(null);
-        verify(outputsCloseAction).doAction(null);
+        verify(tanksCloseAction).doAction(actionDto, null);
+        verify(outputsCloseAction).doAction(actionDto, null);
     }
 
     @ParameterizedTest

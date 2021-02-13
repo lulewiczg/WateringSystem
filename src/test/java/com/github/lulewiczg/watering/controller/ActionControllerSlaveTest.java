@@ -4,14 +4,15 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.lulewiczg.watering.TestUtils;
 import com.github.lulewiczg.watering.exception.ActionNotFoundException;
 import com.github.lulewiczg.watering.exception.ApiError;
-import com.github.lulewiczg.watering.exception.InvalidParamException;
 import com.github.lulewiczg.watering.security.AuthEntryPoint;
 import com.github.lulewiczg.watering.security.AuthProvider;
 import com.github.lulewiczg.watering.service.ActionService;
 import com.github.lulewiczg.watering.service.dto.ActionDefinitionDto;
 import com.github.lulewiczg.watering.service.dto.ActionDto;
+import com.github.lulewiczg.watering.service.dto.ActionResultDto;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -23,7 +24,9 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 
+import java.time.LocalDateTime;
 import java.util.Arrays;
+import java.util.UUID;
 
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -46,6 +49,8 @@ class ActionControllerSlaveTest {
 
     @Autowired
     private ObjectMapper mapper;
+
+    private final ActionResultDto<?> result = new ActionResultDto<>(UUID.randomUUID(), "testResult", LocalDateTime.now());
 
     @Test
     @WithMockUser(roles = "USER")
@@ -139,12 +144,12 @@ class ActionControllerSlaveTest {
 
     private void testRun() throws Exception {
         ActionDto actionDto = new ActionDto("test", "test2");
-        when(service.runAction(actionDto)).thenReturn("testResult");
+        Mockito.<ActionResultDto<?>>when(service.runAction(actionDto)).thenReturn(result);
         mvc.perform(post("/rest/actions")
                 .content(mapper.writeValueAsString(actionDto))
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(content().string("testResult"));
+                .andExpect(content().json(mapper.writeValueAsString(result)));
     }
 
 }

@@ -5,6 +5,7 @@ import com.github.lulewiczg.watering.service.actions.OutputsCloseAction;
 import com.github.lulewiczg.watering.service.actions.TanksCloseAction;
 import com.github.lulewiczg.watering.service.actions.TapsOpenAction;
 import com.github.lulewiczg.watering.service.actions.ValveOpenAction;
+import com.github.lulewiczg.watering.service.dto.ActionDto;
 import com.github.lulewiczg.watering.service.dto.JobDto;
 import com.github.lulewiczg.watering.state.AppState;
 import com.github.lulewiczg.watering.state.SystemStatus;
@@ -68,9 +69,9 @@ public class ScheduledWaterFillControl extends ScheduledJob {
         }
         log.info("Water level too low for {}", tanks);
         state.setState(SystemStatus.FILLING);
-        outputsCloseAction.doAction(null);
-        tapsOpenAction.doAction(null);
-        tanks.forEach(i -> valveOpenAction.doAction(i.getValve()));
+        outputsCloseAction.doAction(new ActionDto(), null);
+        tapsOpenAction.doAction(new ActionDto(), null);
+        tanks.forEach(i -> valveOpenAction.doAction(new ActionDto(), i.getValve()));
         log.info("Filling tanks started.");
     }
 
@@ -80,7 +81,7 @@ public class ScheduledWaterFillControl extends ScheduledJob {
         List<Tank> tanks = findTanks();
         if (tanks.isEmpty()) {
             log.info("Water levels are OK, filling finished");
-            tanksCloseAction.doAction(null);
+            tanksCloseAction.doAction(new ActionDto(), null);
             state.setState(SystemStatus.IDLE);
         }
     }

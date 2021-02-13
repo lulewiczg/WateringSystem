@@ -3,6 +3,7 @@ package com.github.lulewiczg.watering.service.job;
 import com.github.lulewiczg.watering.TestUtils;
 import com.github.lulewiczg.watering.config.dto.ValveType;
 import com.github.lulewiczg.watering.service.actions.WaterLevelReadAction;
+import com.github.lulewiczg.watering.service.dto.ActionDto;
 import com.github.lulewiczg.watering.service.dto.ActionResultDto;
 import com.github.lulewiczg.watering.service.dto.JobDto;
 import com.github.lulewiczg.watering.state.AppState;
@@ -21,6 +22,7 @@ import org.springframework.context.annotation.PropertySource;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
@@ -54,15 +56,18 @@ class ScheduledSensorReadTest {
         Sensor sensor2 = new Sensor("sensor2", 10, 90, 10, RaspiPin.GPIO_02);
         Tank tank2 = new Tank("tank2", 100, sensor2, valve2);
         when(state.getTanks()).thenReturn(List.of(tank, tank2));
-        when(readAction.doAction(sensor)).thenReturn(11.0);
-        when(readAction.doAction(sensor2)).thenReturn(22.0);
+        when(readAction.doAction(new ActionDto(), sensor))
+                .thenReturn(new ActionResultDto<>(UUID.randomUUID(), 11.0, LocalDateTime.now()));
+        when(readAction.doAction(new ActionDto(), sensor2))
+                .thenReturn(new ActionResultDto<>(UUID.randomUUID(), 22.0, LocalDateTime.now()));
+
         JobDto jobDto = new JobDto("test");
 
         ActionResultDto<Void> result = job.run(jobDto);
 
         TestUtils.testActionResult(result);
-        verify(readAction).doAction(sensor);
-        verify(readAction).doAction(sensor2);
+        verify(readAction).doAction(new ActionDto(), sensor);
+        verify(readAction).doAction(new ActionDto(), sensor2);
         assertEquals(11, sensor.getLevel());
         assertEquals(22, sensor2.getLevel());
     }

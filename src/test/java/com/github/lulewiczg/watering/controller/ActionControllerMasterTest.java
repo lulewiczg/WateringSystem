@@ -10,6 +10,7 @@ import com.github.lulewiczg.watering.security.AuthProvider;
 import com.github.lulewiczg.watering.service.ActionService;
 import com.github.lulewiczg.watering.service.dto.ActionDefinitionDto;
 import com.github.lulewiczg.watering.service.dto.ActionDto;
+import com.github.lulewiczg.watering.service.dto.ActionResultDto;
 import com.github.lulewiczg.watering.state.MasterState;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -24,8 +25,10 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 
+import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
+import java.util.UUID;
 
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -51,6 +54,8 @@ class ActionControllerMasterTest {
 
     @Autowired
     private ObjectMapper mapper;
+
+    private ActionResultDto result = new ActionResultDto<>(UUID.randomUUID(), "testResult", LocalDateTime.now());
 
     @Test
     @WithMockUser(roles = "USER")
@@ -174,12 +179,12 @@ class ActionControllerMasterTest {
 
     private void testRun() throws Exception {
         ActionDto actionDto = new ActionDto("test", "test2");
-        when(service.runAction(actionDto)).thenReturn("testResult");
+        when(service.runAction(actionDto)).thenReturn(result);
         mvc.perform(post("/rest/actions")
                 .content(mapper.writeValueAsString(actionDto))
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(content().string(""));
+                .andExpect(content().json(mapper.writeValueAsString(result)));
     }
 
     private void testPending() throws Exception {

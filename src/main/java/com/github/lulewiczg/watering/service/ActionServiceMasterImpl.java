@@ -39,7 +39,7 @@ public class ActionServiceMasterImpl implements ActionService {
     }
 
     @Override
-    public Object runAction(ActionDto actionDto) {
+    public ActionResultDto<?> runAction(ActionDto actionDto) {
         validateAndGetDefinition(actionDto);
         state.getActions().add(actionDto);
         return null;

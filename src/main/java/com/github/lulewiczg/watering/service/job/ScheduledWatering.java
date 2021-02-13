@@ -5,6 +5,7 @@ import com.github.lulewiczg.watering.service.actions.OutputsCloseAction;
 import com.github.lulewiczg.watering.service.actions.OutputsOpenAction;
 import com.github.lulewiczg.watering.service.actions.TanksCloseAction;
 import com.github.lulewiczg.watering.service.actions.TanksOpenAction;
+import com.github.lulewiczg.watering.service.dto.ActionDto;
 import com.github.lulewiczg.watering.service.dto.JobDto;
 import com.github.lulewiczg.watering.state.AppState;
 import com.github.lulewiczg.watering.state.SystemStatus;
@@ -73,16 +74,16 @@ public class ScheduledWatering extends ScheduledJob {
     @Override
     protected void doJob() {
         state.setState(SystemStatus.WATERING);
-        tanksOpenAction.doAction(null);
-        outputsOpenAction.doAction(null);
+        tanksOpenAction.doAction(new ActionDto(), null);
+        outputsOpenAction.doAction(new ActionDto(), null);
         log.info("Valves opened");
         exec.schedule(this::finish, wateringLength, TimeUnit.SECONDS);
     }
 
     private void finish() {
         log.info("Stopping watering job...");
-        tanksCloseAction.doAction(null);
-        outputsCloseAction.doAction(null);
+        tanksCloseAction.doAction(new ActionDto(), null);
+        outputsCloseAction.doAction(new ActionDto(), null);
         state.setState(SystemStatus.IDLE);
         log.info("Watering finished!");
     }

@@ -15,6 +15,8 @@ import java.util.UUID;
 @Log4j2
 public abstract class ScheduledJob {
 
+    protected final JobDto job = new JobDto();
+
     /**
      * Action name.
      *
@@ -101,7 +103,7 @@ public abstract class ScheduledJob {
      *
      * @return action result
      */
-    public final UUID getUuid(UUID uuid) {
+    private final UUID getUuid(UUID uuid) {
         if (uuid == null) {
             log.debug("No UUID passed, generating new");
             return UUID.randomUUID();

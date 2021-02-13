@@ -1,6 +1,7 @@
 package com.github.lulewiczg.watering.service.actions;
 
 import com.github.lulewiczg.watering.config.MasterConfig;
+import com.github.lulewiczg.watering.service.dto.ActionDto;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
@@ -22,11 +23,11 @@ public class EmergencyStopAction extends Action<Void, Void> {
     private final OutputsCloseAction outputsCloseAction;
 
     @Override
-    public Void doAction(Void param) {
+    protected Void doActionInternal(ActionDto actionDto, Void param) {
         log.info("System emergency stop...");
-        tanksCloseAction.doAction(null);
-        tapsCloseAction.doAction(null);
-        outputsCloseAction.doAction(null);
+        tanksCloseAction.doAction(actionDto, null);
+        tapsCloseAction.doAction(actionDto, null);
+        outputsCloseAction.doAction(actionDto, null);
         return null;
     }
 

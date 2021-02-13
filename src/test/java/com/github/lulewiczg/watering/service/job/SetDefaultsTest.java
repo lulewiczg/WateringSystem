@@ -4,6 +4,7 @@ import com.github.lulewiczg.watering.TestUtils;
 import com.github.lulewiczg.watering.config.dto.ValveType;
 import com.github.lulewiczg.watering.service.actions.ValveCloseAction;
 import com.github.lulewiczg.watering.service.actions.ValveOpenAction;
+import com.github.lulewiczg.watering.service.dto.ActionDto;
 import com.github.lulewiczg.watering.service.dto.ActionResultDto;
 import com.github.lulewiczg.watering.service.dto.JobDto;
 import com.github.lulewiczg.watering.state.AppState;
@@ -62,10 +63,10 @@ class SetDefaultsTest {
         ActionResultDto<Void> result = job.run(syncDto);
 
         TestUtils.testActionResult(result);
-        verify(openAction).doAction(valve);
-        verify(openAction).doAction(valve3);
-        verify(closeAction).doAction(valve2);
-        verify(closeAction).doAction(valve4);
+        verify(openAction).doAction(new ActionDto(), valve);
+        verify(openAction).doAction(new ActionDto(), valve3);
+        verify(closeAction).doAction(new ActionDto(), valve2);
+        verify(closeAction).doAction(new ActionDto(), valve4);
     }
 
     @ParameterizedTest

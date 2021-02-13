@@ -6,6 +6,7 @@ import com.github.lulewiczg.watering.service.actions.OutputsCloseAction;
 import com.github.lulewiczg.watering.service.actions.TanksCloseAction;
 import com.github.lulewiczg.watering.service.actions.TapsOpenAction;
 import com.github.lulewiczg.watering.service.actions.ValveOpenAction;
+import com.github.lulewiczg.watering.service.dto.ActionDto;
 import com.github.lulewiczg.watering.service.dto.ActionResultDto;
 import com.github.lulewiczg.watering.service.dto.JobDto;
 import com.github.lulewiczg.watering.state.AppState;
@@ -65,10 +66,10 @@ class ScheduledWaterFillControlTest {
         ActionResultDto<Void> result = job.run(jobDto);
 
         TestUtils.testActionResult(result);
-        verify(tanksCloseAction, never()).doAction(any());
-        verify(tapsOpenAction, never()).doAction(any());
-        verify(valveOpenAction, never()).doAction(any());
-        verify(outputsCloseAction, never()).doAction(any());
+        verify(tanksCloseAction, never()).doAction(any(), any());
+        verify(tapsOpenAction, never()).doAction(any(), any());
+        verify(valveOpenAction, never()).doAction(any(), any());
+        verify(outputsCloseAction, never()).doAction(any(), any());
         verify(state, never()).setState(any());
     }
 
@@ -97,11 +98,11 @@ class ScheduledWaterFillControlTest {
         ActionResultDto<Void> result = job.run(jobDto);
 
         TestUtils.testActionResult(result);
-        verify(tanksCloseAction).doAction(null);
+        verify(tanksCloseAction).doAction(new ActionDto(), null);
         verify(state).setState(SystemStatus.IDLE);
-        verify(tapsOpenAction, never()).doAction(any());
-        verify(valveOpenAction, never()).doAction(any());
-        verify(outputsCloseAction, never()).doAction(any());
+        verify(tapsOpenAction, never()).doAction(any(), any());
+        verify(valveOpenAction, never()).doAction(any(), any());
+        verify(outputsCloseAction, never()).doAction(any(), any());
     }
 
     @ParameterizedTest
@@ -117,11 +118,11 @@ class ScheduledWaterFillControlTest {
         ActionResultDto<Void> result = job.run(jobDto);
 
         TestUtils.testActionResult(result);
-        verify(tanksCloseAction).doAction(null);
+        verify(tanksCloseAction).doAction(new ActionDto(), null);
         verify(state).setState(SystemStatus.IDLE);
-        verify(tapsOpenAction, never()).doAction(any());
-        verify(valveOpenAction, never()).doAction(any());
-        verify(outputsCloseAction, never()).doAction(any());
+        verify(tapsOpenAction, never()).doAction(any(), any());
+        verify(valveOpenAction, never()).doAction(any(), any());
+        verify(outputsCloseAction, never()).doAction(any(), any());
     }
 
     @ParameterizedTest
@@ -137,11 +138,11 @@ class ScheduledWaterFillControlTest {
         ActionResultDto<Void> result = job.run(jobDto);
 
         TestUtils.testActionResult(result);
-        verify(tanksCloseAction, never()).doAction(any());
+        verify(tanksCloseAction, never()).doAction(any(), any());
         verify(state, never()).setState(any());
-        verify(tapsOpenAction, never()).doAction(any());
-        verify(valveOpenAction, never()).doAction(any());
-        verify(outputsCloseAction, never()).doAction(any());
+        verify(tapsOpenAction, never()).doAction(any(), any());
+        verify(valveOpenAction, never()).doAction(any(), any());
+        verify(outputsCloseAction, never()).doAction(any(), any());
     }
 
     @ParameterizedTest
@@ -161,10 +162,10 @@ class ScheduledWaterFillControlTest {
 
         TestUtils.testActionResult(result);
         verify(state).setState(SystemStatus.FILLING);
-        verify(outputsCloseAction).doAction(null);
-        verify(tapsOpenAction).doAction(null);
-        verify(valveOpenAction).doAction(valve);
-        verify(tanksCloseAction, never()).doAction(any());
+        verify(outputsCloseAction).doAction(new ActionDto(), null);
+        verify(tapsOpenAction).doAction(new ActionDto(), null);
+        verify(valveOpenAction).doAction(any(), eq(valve));
+        verify(tanksCloseAction, never()).doAction(any(), any());
     }
 
 }

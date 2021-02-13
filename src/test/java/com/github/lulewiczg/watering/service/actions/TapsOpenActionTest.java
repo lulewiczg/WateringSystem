@@ -1,6 +1,7 @@
 package com.github.lulewiczg.watering.service.actions;
 
 import com.github.lulewiczg.watering.config.dto.ValveType;
+import com.github.lulewiczg.watering.service.dto.ActionDto;
 import com.github.lulewiczg.watering.state.AppState;
 import com.github.lulewiczg.watering.state.dto.Tank;
 import com.github.lulewiczg.watering.state.dto.Valve;
@@ -46,13 +47,14 @@ class TapsOpenActionTest {
         when(state.getOutputs()).thenReturn(valves);
         when(state.getTanks()).thenReturn(tanks);
         when(state.getTaps()).thenReturn(taps);
+        ActionDto actionDto = new ActionDto();
 
-        action.doAction(null);
+        action.doAction(actionDto, null);
 
-        verify(openAction).doAction(valve4);
-        verify(openAction, never()).doAction(valve);
-        verify(openAction, never()).doAction(valve2);
-        verify(openAction, never()).doAction(valve3);
+        verify(openAction).doAction(actionDto, valve4);
+        verify(openAction, never()).doAction(actionDto, valve);
+        verify(openAction, never()).doAction(actionDto, valve2);
+        verify(openAction, never()).doAction(actionDto, valve3);
     }
 
     @Test

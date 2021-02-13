@@ -2,6 +2,8 @@ package com.github.lulewiczg.watering.service.job;
 
 import com.github.lulewiczg.watering.config.MasterConfig;
 import com.github.lulewiczg.watering.service.actions.WaterLevelReadAction;
+import com.github.lulewiczg.watering.service.dto.ActionDto;
+import com.github.lulewiczg.watering.service.dto.ActionResultDto;
 import com.github.lulewiczg.watering.service.dto.JobDto;
 import com.github.lulewiczg.watering.state.AppState;
 import lombok.RequiredArgsConstructor;
@@ -39,9 +41,9 @@ public class ScheduledSensorRead extends ScheduledIoJob {
     protected void doJob() {
         log.debug("Reading sensors...");
         state.getTanks().forEach(i -> {
-            double result = readAction.doAction(i.getSensor());
+            ActionResultDto<Double> result = readAction.doAction(new ActionDto(), i.getSensor());
             log.debug("Read water level for {}: {}", i.getId(), result);
-            i.getSensor().setLevel((int) result);
+            i.getSensor().setLevel(result.getResult().intValue());
         });
     }
 

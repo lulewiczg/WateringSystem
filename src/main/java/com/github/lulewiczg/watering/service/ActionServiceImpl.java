@@ -1,7 +1,6 @@
 package com.github.lulewiczg.watering.service;
 
 import com.github.lulewiczg.watering.config.MasterConfig;
-import com.github.lulewiczg.watering.exception.ActionNotFoundException;
 import com.github.lulewiczg.watering.service.actions.Action;
 import com.github.lulewiczg.watering.service.dto.*;
 import com.github.lulewiczg.watering.service.job.ScheduledJob;
@@ -18,9 +17,8 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Service;
 
 import java.lang.reflect.Method;
-import java.util.Arrays;
 import java.util.List;
-import java.util.Optional;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
@@ -52,6 +50,12 @@ public class ActionServiceImpl implements ActionService {
                 .collect(Collectors.toList());
     }
 
+    @Cacheable
+    private Map<String, Action<?, ?>> getActionsMap() {
+        return applicationContext.getBeansOfType(Action.class).values().stream().filter(Action::isEnabled)
+                .collect(Collectors.toMap(i -> fixBeanName(i.getClass().getSimpleName()), i -> i));
+    }
+
     @Override
     @Cacheable
     public List<JobDefinitionDto> getJobs() {
@@ -76,35 +80,24 @@ public class ActionServiceImpl implements ActionService {
 
     @Override
     @SneakyThrows
-    public Object runAction(ActionDto actionDto) {
+    public ActionResultDto<?> runAction(ActionDto actionDto) {
         ActionDefinitionDto actionDef = validateAndGetDefinition(actionDto);
-        Action<?, ?> action = Optional.of(applicationContext.getBean(actionDto.getName(), Action.class))
-                .filter(Action::isEnabled).orElseThrow(() -> new IllegalArgumentException("Action not found: " + actionDto.getName()));
-        Object param = getParam(actionDto, actionDef);
-        Method method = getMethod(actionDef, action);
-        log.trace("Running action {} with param {}", actionDto.getName(), actionDto.getParam());
-        return method.invoke(action, param);
+        Action<?, ?> action = getActionsMap().get(actionDef.getActionName());
+        if (action == null) {
+            throw new IllegalArgumentException("Action not found: " + actionDto.getName());
+        }
+        try {
+            Object param = mapParam(actionDto, actionDef);
+            Method method = action.getClass().getMethod("doAction", ActionDto.class, Object.class);
+            log.trace("Running action {} with param {}", actionDto.getName(), actionDto.getParam());
+            return (ActionResultDto<?>) method.invoke(action, actionDto, param);
+        } catch (Exception e) {
+            log.error("Error while running action {}", actionDto.getName());
+            throw e;
+        }
     }
 
-    private Method getMethod(ActionDefinitionDto actionDef, Action<?, ?> action) {
-        List<Method> methods = Arrays.stream(action.getClass().getMethods())
-                .filter(i -> i.getName().equals("doAction")).collect(Collectors.toList());
-        Method method;
-        if (methods.size() > 1) {
-            method = methods.stream().filter(i -> i.getParameters()[0].getType() != Object.class).findFirst().orElseThrow();
-        } else {
-            method = methods.get(0);
-        }
-        log.trace(method);
-        Class<?> methodParamType = method.getParameters()[0].getType();
-        if (methodParamType != actionDef.getParameterDestinationType()) {
-            log.error("Method parameter types mismatch ({} vs {})", methodParamType, actionDef.getParameterDestinationType());
-            throw new ActionNotFoundException(actionDef.getActionName());
-        }
-        return method;
-    }
-
-    private Object getParam(ActionDto actionDto, ActionDefinitionDto definition) {
+    private Object mapParam(ActionDto actionDto, ActionDefinitionDto definition) {
         if (Valve.class.equals(definition.getParameterDestinationType())) {
             return state.findValve(actionDto.getParam().toString());
         } else if (Sensor.class.equals(definition.getParameterDestinationType())) {

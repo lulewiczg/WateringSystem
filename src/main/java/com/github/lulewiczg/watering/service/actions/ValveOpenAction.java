@@ -1,6 +1,7 @@
 package com.github.lulewiczg.watering.service.actions;
 
 import com.github.lulewiczg.watering.config.MasterConfig;
+import com.github.lulewiczg.watering.service.dto.ActionDto;
 import com.github.lulewiczg.watering.service.io.IOService;
 import com.github.lulewiczg.watering.state.AppState;
 import com.github.lulewiczg.watering.state.dto.Valve;
@@ -48,7 +49,7 @@ public class ValveOpenAction extends Action<Valve, Void> {
     }
 
     @Override
-    public Void doAction(Valve valve) {
+    protected Void doActionInternal(ActionDto actionDto, Valve valve) {
         log.info("Opening valve: {}", valve.getName());
         service.toggleOn(valve.getPin());
         valve.setOpen(true);

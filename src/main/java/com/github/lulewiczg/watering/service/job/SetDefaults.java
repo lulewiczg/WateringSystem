@@ -3,6 +3,7 @@ package com.github.lulewiczg.watering.service.job;
 import com.github.lulewiczg.watering.config.MasterConfig;
 import com.github.lulewiczg.watering.service.actions.ValveCloseAction;
 import com.github.lulewiczg.watering.service.actions.ValveOpenAction;
+import com.github.lulewiczg.watering.service.dto.ActionDto;
 import com.github.lulewiczg.watering.service.dto.JobDto;
 import com.github.lulewiczg.watering.state.AppState;
 import com.github.lulewiczg.watering.state.dto.Tank;
@@ -59,9 +60,9 @@ public class SetDefaults extends ScheduledJob {
 
     private void setValveState(Valve i) {
         if (i.isOpen()) {
-            openAction.doAction(i);
+            openAction.doAction(new ActionDto(), i);
         } else {
-            closeAction.doAction(i);
+            closeAction.doAction(new ActionDto(), i);
         }
     }
 

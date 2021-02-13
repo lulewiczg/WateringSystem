@@ -3,6 +3,7 @@ package com.github.lulewiczg.watering.service.job;
 import com.github.lulewiczg.watering.config.MasterConfig;
 import com.github.lulewiczg.watering.service.actions.TanksCloseAction;
 import com.github.lulewiczg.watering.service.actions.ValveOpenAction;
+import com.github.lulewiczg.watering.service.dto.ActionDto;
 import com.github.lulewiczg.watering.service.dto.JobDto;
 import com.github.lulewiczg.watering.state.AppState;
 import com.github.lulewiczg.watering.state.SystemStatus;
@@ -62,7 +63,7 @@ public class ScheduledOverflowWaterControl extends ScheduledJob {
         }
         state.setState(SystemStatus.DRAINING);
         log.info("Water level too high for {}", () -> tanks.stream().map(Tank::getId).collect(Collectors.toList()));
-        tanks.forEach(i -> valveOpenAction.doAction(i.getValve()));
+        tanks.forEach(i -> valveOpenAction.doAction(new ActionDto(), i.getValve()));
         log.info("Draining tanks started.");
     }
 
@@ -71,7 +72,7 @@ public class ScheduledOverflowWaterControl extends ScheduledJob {
         List<Tank> tanks = findOverflowTanks();
         if (tanks.isEmpty()) {
             log.info("Water levels are OK, stopping");
-            tanksCloseAction.doAction(null);
+            tanksCloseAction.doAction(new ActionDto(), null);
             state.setState(SystemStatus.IDLE);
         }
     }

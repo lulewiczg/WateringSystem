@@ -41,7 +41,7 @@ public interface ActionService {
      * @param actionDto action details
      * @return action result
      */
-    Object runAction(ActionDto actionDto);
+    ActionResultDto<?> runAction(ActionDto actionDto);
 
     /**
      * Finds action definition and validates parameter.
