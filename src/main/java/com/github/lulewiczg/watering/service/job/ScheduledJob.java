@@ -79,11 +79,14 @@ public abstract class ScheduledJob {
     /**
      * Runs job.
      *
-     * @param jobDto job DTO
+     * @param originalJob job DTO
      * @return action result
      */
-    public final ActionResultDto<Void> run(@NonNull JobDto jobDto) {
-        UUID id = getUuid(jobDto.getId());
+    public final ActionResultDto<Void> run(@NonNull JobDto originalJob) {
+        JobDto jobDto = originalJob.toBuilder().build();
+
+        generateUuid(jobDto);
+        String id = jobDto.getId();
         log.debug("Staring {} job with ID {} ...", getName(), id);
         try {
             tryRun(id);
@@ -99,19 +102,22 @@ public abstract class ScheduledJob {
     }
 
     /**
-     * Runs job with new UUID.
+     * Generates UUID if required
      *
-     * @return action result
+     * @param jobDto job DTO
      */
-    private final UUID getUuid(UUID uuid) {
-        if (uuid == null) {
+    private void generateUuid(JobDto jobDto) {
+        String id = jobDto.getId();
+        if (id == null) {
             log.debug("No UUID passed, generating new");
-            return UUID.randomUUID();
+            jobDto.setId(UUID.randomUUID().toString());
+        } else if (id.endsWith(".")) {
+            log.debug("Nested invocation, appending new id...");
+            jobDto.appendId(UUID.randomUUID().toString());
         }
-        return uuid;
     }
 
-    private void tryRun(UUID id) {
+    private void tryRun(String id) {
         if (canBeStarted()) {
             log.debug("Job {} with ID {} can start!", getName(), id);
             doJob();

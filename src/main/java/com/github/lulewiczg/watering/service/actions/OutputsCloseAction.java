@@ -15,7 +15,7 @@ import org.springframework.stereotype.Component;
 @Component
 @RequiredArgsConstructor
 @ConditionalOnMissingBean(MasterConfig.class)
-public class OutputsCloseAction extends Action<Void, Void> {
+public class    OutputsCloseAction extends Action<Void, Void> {
 
     private final AppState state;
 
@@ -24,6 +24,7 @@ public class OutputsCloseAction extends Action<Void, Void> {
     @Override
     protected Void doActionInternal(ActionDto actionDto, Void param) {
         log.info("Closing outputs...");
+        actionDto.appendId(".");
         state.getOutputs().forEach(i -> closeAction.doAction(actionDto, i));
         return null;
     }

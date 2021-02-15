@@ -24,6 +24,7 @@ public class TapsCloseAction extends Action<Void, Void> {
     @Override
     protected Void doActionInternal(ActionDto actionDto, Void param) {
         log.info("Closing taps...");
+        actionDto.appendId(".");
         state.getTaps().forEach(i -> closeAction.doAction(actionDto, i.getValve()));
         return null;
     }

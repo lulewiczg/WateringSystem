@@ -24,6 +24,7 @@ public class TanksOpenAction extends Action<Void, Void> {
     @Override
     protected Void doActionInternal(ActionDto actionDto, Void param) {
         log.info("Opening tanks...");
+        actionDto.appendId(".");
         state.getTanks().forEach(i -> openAction.doAction(actionDto, i.getValve()));
         return null;
     }

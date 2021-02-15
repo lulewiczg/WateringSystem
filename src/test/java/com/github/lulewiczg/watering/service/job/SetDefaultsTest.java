@@ -71,9 +71,9 @@ class SetDefaultsTest {
 
     @ParameterizedTest
     @EnumSource(value = SystemStatus.class)
-    void testWithUuid(SystemStatus status) {
+    void testWithId(SystemStatus status) {
         when(state.getState()).thenReturn(status);
-        JobDto jobDto = new JobDto("test", UUID.randomUUID());
+        JobDto jobDto = new JobDto("test", UUID.randomUUID().toString());
 
         ActionResultDto<Void> result = job.run(jobDto);
 

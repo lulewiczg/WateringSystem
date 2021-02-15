@@ -92,9 +92,9 @@ class ScheduledMasterSyncTest {
 
     @ParameterizedTest
     @EnumSource(value = SystemStatus.class)
-    void testWithUuid(SystemStatus status) {
+    void testWithId(SystemStatus status) {
         when(state.getState()).thenReturn(status);
-        JobDto jobDto = new JobDto("test", UUID.randomUUID());
+        JobDto jobDto = new JobDto("test", UUID.randomUUID().toString());
         when(restTemplate.postForEntity(eq(url), any(), eq(MasterResponse.class))).thenReturn(new ResponseEntity<>(null, HttpStatus.OK));
 
         ActionResultDto<Void> result = job.run(jobDto);

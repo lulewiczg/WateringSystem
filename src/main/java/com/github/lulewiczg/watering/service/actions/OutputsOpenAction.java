@@ -24,6 +24,7 @@ public class OutputsOpenAction extends Action<Void, Void> {
     @Override
     protected Void doActionInternal(ActionDto actionDto, Void param) {
         log.info("Opening outputs...");
+        actionDto.appendId(".");
         state.getOutputs().forEach(i -> openAction.doAction(actionDto, i));
         return null;
     }

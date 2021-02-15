@@ -57,9 +57,9 @@ class ScheduledSensorReadTest {
         Tank tank2 = new Tank("tank2", 100, sensor2, valve2);
         when(state.getTanks()).thenReturn(List.of(tank, tank2));
         when(readAction.doAction(new ActionDto(), sensor))
-                .thenReturn(new ActionResultDto<>(UUID.randomUUID(), 11.0, LocalDateTime.now()));
+                .thenReturn(new ActionResultDto<>(UUID.randomUUID().toString(), 11.0, LocalDateTime.now()));
         when(readAction.doAction(new ActionDto(), sensor2))
-                .thenReturn(new ActionResultDto<>(UUID.randomUUID(), 22.0, LocalDateTime.now()));
+                .thenReturn(new ActionResultDto<>(UUID.randomUUID().toString(), 22.0, LocalDateTime.now()));
 
         JobDto jobDto = new JobDto("test");
 
@@ -74,9 +74,9 @@ class ScheduledSensorReadTest {
 
     @ParameterizedTest
     @EnumSource(value = SystemStatus.class)
-    void testWithUuid(SystemStatus status) {
+    void testWithId(SystemStatus status) {
         when(state.getState()).thenReturn(status);
-        JobDto jobDto = new JobDto("test", UUID.randomUUID());
+        JobDto jobDto = new JobDto("test", UUID.randomUUID().toString());
 
         ActionResultDto<Void> result = job.run(jobDto);
 

@@ -14,6 +14,7 @@ import com.github.lulewiczg.watering.service.dto.ActionResultDto;
 import com.github.lulewiczg.watering.state.MasterState;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -55,7 +56,7 @@ class ActionControllerMasterTest {
     @Autowired
     private ObjectMapper mapper;
 
-    private ActionResultDto result = new ActionResultDto<>(UUID.randomUUID(), "testResult", LocalDateTime.now());
+    private final ActionResultDto<?> result = new ActionResultDto<>(UUID.randomUUID().toString(), "testResult", LocalDateTime.now());
 
     @Test
     @WithMockUser(roles = "USER")
@@ -179,7 +180,7 @@ class ActionControllerMasterTest {
 
     private void testRun() throws Exception {
         ActionDto actionDto = new ActionDto("test", "test2");
-        when(service.runAction(actionDto)).thenReturn(result);
+        Mockito.<ActionResultDto<?>>when(service.runAction(actionDto)).thenReturn(result);
         mvc.perform(post("/rest/actions")
                 .content(mapper.writeValueAsString(actionDto))
                 .contentType(MediaType.APPLICATION_JSON))

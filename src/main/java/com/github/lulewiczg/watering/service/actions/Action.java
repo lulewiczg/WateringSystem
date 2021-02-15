@@ -2,6 +2,7 @@ package com.github.lulewiczg.watering.service.actions;
 
 import com.github.lulewiczg.watering.service.dto.ActionDto;
 import com.github.lulewiczg.watering.service.dto.ActionResultDto;
+import lombok.Builder;
 import lombok.NonNull;
 import lombok.extern.log4j.Log4j2;
 
@@ -21,12 +22,14 @@ public abstract class Action<T, R> {
     /**
      * Runs action.
      *
-     * @param actionDto action DTO
+     * @param originalDto action DTO
      * @param param     parameter
      * @return action result
      */
-    public ActionResultDto<R> doAction(@NonNull ActionDto actionDto, T param) {
-        UUID id = getUuid(actionDto.getId());
+    public ActionResultDto<R> doAction(@NonNull ActionDto originalDto, T param) {
+        ActionDto actionDto = originalDto.toBuilder().build();
+        generateUuid(actionDto);
+        String id = actionDto.getId();
         log.debug("Executing {} action with ID {} ...", actionDto.getName(), id);
         R result;
         try {
@@ -43,16 +46,19 @@ public abstract class Action<T, R> {
     }
 
     /**
-     * Runs job with new UUID.
+     * Generates UUID if required
      *
-     * @return action result
+     * @param actionDto action
      */
-    private UUID getUuid(UUID uuid) {
-        if (uuid == null) {
+    private void generateUuid(ActionDto actionDto) {
+        String id = actionDto.getId();
+        if (id == null) {
             log.debug("No UUID passed, generating new");
-            return UUID.randomUUID();
+            actionDto.setId(UUID.randomUUID().toString());
+        } else if (id.endsWith(".")) {
+            log.debug("Nested invocation, appending new id...");
+            actionDto.appendId(UUID.randomUUID().toString());
         }
-        return uuid;
     }
 
     /**

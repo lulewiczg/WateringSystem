@@ -1,5 +1,6 @@
 package com.github.lulewiczg.watering.service.actions;
 
+import com.github.lulewiczg.watering.TestUtils;
 import com.github.lulewiczg.watering.service.dto.ActionDto;
 import com.github.lulewiczg.watering.service.dto.ActionResultDto;
 import com.github.lulewiczg.watering.service.io.IOService;
@@ -41,6 +42,18 @@ class WaterLevelReadActionTest {
 
         ActionResultDto<Double> result = action.doAction(new ActionDto(), sensor);
         assertEquals(12.34, result.getResult());
+        TestUtils.testActionResult(result);
+    }
+
+    @Test
+    void testActionWithId() {
+        when(service.analogRead(RaspiPin.GPIO_01)).thenReturn(12.34);
+        Sensor sensor = new Sensor("test", null, null, 12, RaspiPin.GPIO_01);
+
+        ActionResultDto<Double> result = action.doAction(new ActionDto("test"), sensor);
+        assertEquals(12.34, result.getResult());
+        TestUtils.testActionResult(result);
+        assertEquals("test", result.getId());
     }
 
     @Test

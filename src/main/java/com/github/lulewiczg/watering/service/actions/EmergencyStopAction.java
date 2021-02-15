@@ -25,6 +25,7 @@ public class EmergencyStopAction extends Action<Void, Void> {
     @Override
     protected Void doActionInternal(ActionDto actionDto, Void param) {
         log.info("System emergency stop...");
+        actionDto.appendId(".");
         tanksCloseAction.doAction(actionDto, null);
         tapsCloseAction.doAction(actionDto, null);
         outputsCloseAction.doAction(actionDto, null);

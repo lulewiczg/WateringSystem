@@ -50,7 +50,7 @@ class ActionControllerSlaveTest {
     @Autowired
     private ObjectMapper mapper;
 
-    private final ActionResultDto<?> result = new ActionResultDto<>(UUID.randomUUID(), "testResult", LocalDateTime.now());
+    private final ActionResultDto<?> result = new ActionResultDto<>(UUID.randomUUID().toString(), "testResult", LocalDateTime.now());
 
     @Test
     @WithMockUser(roles = "USER")
