@@ -1,13 +1,11 @@
 package com.github.lulewiczg.watering.service;
 
+import com.github.lulewiczg.watering.TestUtils;
 import com.github.lulewiczg.watering.exception.ActionNotFoundException;
 import com.github.lulewiczg.watering.exception.JobNotFoundException;
 import com.github.lulewiczg.watering.exception.TypeMismatchException;
 import com.github.lulewiczg.watering.exception.ValueNotAllowedException;
-import com.github.lulewiczg.watering.service.dto.ActionDefinitionDto;
-import com.github.lulewiczg.watering.service.dto.ActionDto;
-import com.github.lulewiczg.watering.service.dto.JobDefinitionDto;
-import com.github.lulewiczg.watering.service.dto.JobDto;
+import com.github.lulewiczg.watering.service.dto.*;
 import com.github.lulewiczg.watering.state.MasterState;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -74,9 +72,11 @@ class ActionServiceMasterImplTest {
     void testRunAction() {
         when(state.getActionDefinitions()).thenReturn(List.of(actionDef));
 
-        Object result = service.runAction(new ActionDto("name", "param"));
+        ActionResultDto<?> result = service.runAction(new ActionDto("name", "param"));
 
-        assertNull(result);
+        assertNotNull(result.getId());
+        assertNull(result.getErrorMsg());
+        assertEquals("name", result.getResult());
     }
 
     @Test
@@ -113,9 +113,11 @@ class ActionServiceMasterImplTest {
     void testRunActionAllowedValue() {
         when(state.getActionDefinitions()).thenReturn(List.of(actionDefAllowedValues));
 
-        Object result = service.runAction(new ActionDto("name", "val"));
+        ActionResultDto<?> result = service.runAction(new ActionDto("name", "val"));
 
-        assertNull(result);
+        assertNotNull(result.getId());
+        assertNull(result.getErrorMsg());
+        assertEquals("name", result.getResult());
     }
 
     @Test
@@ -143,14 +145,17 @@ class ActionServiceMasterImplTest {
         JobDefinitionDto job = new JobDefinitionDto("test", true);
         when(state.getJobDefinitions()).thenReturn(List.of(job));
 
-        service.runJob(new JobDto("test"));
+        ActionResultDto<?> result = service.runJob(new JobDto("test"));
+
+        assertNotNull(result.getId());
+        assertNull(result.getErrorMsg());
+        assertEquals("test", result.getResult());
     }
 
     @Test
     void testRunDisabledJob() {
         JobDefinitionDto job = new JobDefinitionDto("test", false);
         when(state.getJobDefinitions()).thenReturn(List.of(job));
-
 
         String message = assertThrows(JobNotFoundException.class, () -> service.runJob(new JobDto("test"))).getMessage();
 

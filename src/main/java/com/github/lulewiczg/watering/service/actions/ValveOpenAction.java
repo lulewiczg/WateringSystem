@@ -51,7 +51,6 @@ public class ValveOpenAction extends Action<Valve, Void> {
     @Override
     protected Void doActionInternal(ActionDto actionDto, Valve valve) {
         log.info("Opening valve: {}", valve.getName());
-        actionDto.appendId(".");
         service.toggleOn(valve.getPin());
         valve.setOpen(true);
         return null;

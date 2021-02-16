@@ -21,4 +21,9 @@ public class SlaveStateDto {
 
     private List<JobDefinitionDto> jobs;
 
+    private List<ActionResultDto<?>> actionResults;
+
+    private List<ActionResultDto<?>> jobResults;
+
+
 }

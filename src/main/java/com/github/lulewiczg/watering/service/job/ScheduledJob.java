@@ -121,8 +121,7 @@ public abstract class ScheduledJob {
         if (canBeStarted()) {
             log.debug("Job {} with ID {} can start!", getName(), id);
             doJob();
-        }
-        if (isRunning()) {
+        } else if (isRunning()) {
             log.debug("Job {} is already running.", getName());
             doJobRunning();
         }

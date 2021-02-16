@@ -76,8 +76,37 @@ class JobControllerTest {
     }
 
     @Test
-    void testGetJobsAnon() throws Exception {
+    void testGetJobsAnon() {
         TestUtils.testUnauthorizedGet(mvc, mapper, "/rest/jobs");
+    }
+
+    @Test
+    @WithMockUser(roles = "USER")
+    void testGetResults() {
+        TestUtils.testNotFoundGet(mvc, mapper, "/rest/jobs/results");
+    }
+
+    @Test
+    @WithMockUser(roles = "ADMIN")
+    void testGetResultsAdmin() {
+        TestUtils.testNotFoundGet(mvc, mapper, "/rest/jobs/results");
+    }
+
+    @Test
+    @WithMockUser(roles = "GUEST")
+    void testGetResultsGuest() {
+        TestUtils.testNotFoundGet(mvc, mapper, "/rest/jobs/results");
+    }
+
+    @Test
+    @WithMockUser(roles = "SLAVE")
+    void testGetResultsSlave() {
+        TestUtils.testNotFoundGet(mvc, mapper, "/rest/jobs/results");
+    }
+
+    @Test
+    void testGetResultsAnon() {
+        TestUtils.testUnauthorizedGet(mvc, mapper, "/rest/jobs/results");
     }
 
     @Test

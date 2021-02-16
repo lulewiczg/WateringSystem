@@ -2,12 +2,15 @@ package com.github.lulewiczg.watering.service.job;
 
 import com.github.lulewiczg.watering.config.SlaveConfig;
 import com.github.lulewiczg.watering.service.ActionService;
-import com.github.lulewiczg.watering.service.dto.JobDto;
+import com.github.lulewiczg.watering.service.dto.ActionResultDto;
 import com.github.lulewiczg.watering.service.dto.SlaveStateDto;
 import com.github.lulewiczg.watering.state.AppState;
 import com.github.lulewiczg.watering.state.SystemStatus;
 import com.github.lulewiczg.watering.state.dto.MasterResponse;
+import lombok.AccessLevel;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import lombok.Setter;
 import lombok.extern.log4j.Log4j2;
 import org.apache.tomcat.util.codec.binary.Base64;
 import org.springframework.beans.factory.annotation.Value;
@@ -20,12 +23,17 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * Job for scheduled water tanks filling.
  */
 @Log4j2
 @Service
 @RequiredArgsConstructor
+@Getter(AccessLevel.PACKAGE)
+@Setter(AccessLevel.PACKAGE)
 @ConditionalOnBean(SlaveConfig.class)
 public class ScheduledMasterSync extends ScheduledJob {
 
@@ -34,6 +42,11 @@ public class ScheduledMasterSync extends ScheduledJob {
     private final RestTemplate restTemplate;
 
     private final ActionService actionService;
+
+    private List<ActionResultDto<?>> actionResults = new ArrayList<>();
+
+    private List<ActionResultDto<?>> jobResults = new ArrayList<>();
+
 
     @Value("${com.github.lulewiczg.watering.master.url}")
     private String url;
@@ -71,20 +84,20 @@ public class ScheduledMasterSync extends ScheduledJob {
 
     @Override
     protected void doJob() {
-        MasterResponse command = connect();
-        if (command == null) {
+        MasterResponse response = connect();
+        if (response == null) {
             log.error("Sync with master failed");
             throw new IllegalStateException("Sync with master failed");
         }
 
-        log.debug("Got commands: {}", command);
-        command.getActions().forEach(i -> {
+        log.debug("Got commands: {}", response);
+        response.getActions().forEach(i -> {
             log.info("Running action: {}", i);
-            actionService.runAction(i);
+            actionResults.add(actionService.runAction(i));
         });
-        command.getJobs().forEach(i -> {
+        response.getJobs().forEach(i -> {
             log.info("Running action: {}", i);
-            actionService.runJob(i);
+            jobResults.add(actionService.runJob(i));
         });
     }
 
@@ -93,7 +106,9 @@ public class ScheduledMasterSync extends ScheduledJob {
         String base64 = Base64.encodeBase64String(credentials.getBytes());
         HttpHeaders headers = new HttpHeaders();
         headers.add("Authorization", "Basic " + base64);
-        HttpEntity<SlaveStateDto> entity = new HttpEntity<>(new SlaveStateDto(state, actionService.getActions(), actionService.getJobs()), headers);
+        HttpEntity<SlaveStateDto> entity = new HttpEntity<>(
+                new SlaveStateDto(state, actionService.getActions(), actionService.getJobs(), actionResults, jobResults),
+                headers);
 
         ResponseEntity<MasterResponse> response;
         try {
@@ -102,6 +117,9 @@ public class ScheduledMasterSync extends ScheduledJob {
             log.error("Sync with master failed", e);
             throw e;
         }
+        actionResults = new ArrayList<>();
+        jobResults = new ArrayList<>();
+
         return response.getBody();
     }
 

@@ -8,6 +8,7 @@ import com.github.lulewiczg.watering.exception.ApiError;
 import com.github.lulewiczg.watering.security.AuthEntryPoint;
 import com.github.lulewiczg.watering.security.AuthProvider;
 import com.github.lulewiczg.watering.service.ActionService;
+import com.github.lulewiczg.watering.service.dto.ActionResultDto;
 import com.github.lulewiczg.watering.service.dto.JobDefinitionDto;
 import com.github.lulewiczg.watering.service.dto.JobDto;
 import com.github.lulewiczg.watering.state.MasterState;
@@ -117,6 +118,35 @@ class JobControllerMasterTest {
 
     @Test
     @WithMockUser(roles = "USER")
+    void testGetResults() throws Exception {
+        testResults();
+    }
+
+    @Test
+    @WithMockUser(roles = "ADMIN")
+    void testGetResultsAdmin() throws Exception {
+        testResults();
+    }
+
+    @Test
+    @WithMockUser(roles = "GUEST")
+    void testGetResultsGuest() {
+        TestUtils.testForbiddenGet(mvc, mapper, "/rest/jobs/results");
+    }
+
+    @Test
+    @WithMockUser(roles = "SLAVE")
+    void testGetResultsSlave() {
+        TestUtils.testForbiddenGet(mvc, mapper, "/rest/jobs/results");
+    }
+
+    @Test
+    void testGetResultsAnon() {
+        TestUtils.testUnauthorizedGet(mvc, mapper, "/rest/jobs/results");
+    }
+
+    @Test
+    @WithMockUser(roles = "USER")
     void testGetPending() throws Exception {
         testPending();
     }
@@ -160,7 +190,7 @@ class JobControllerMasterTest {
 
         ApiError error = mapper.readValue(json, ApiError.class);
         assertNotNull(error.getTimestamp());
-        assertTrue(date.before(error.getTimestamp()));
+        assertFalse(date.after(error.getTimestamp()));
         error.setTimestamp(expected.getTimestamp());
         assertEquals(expected, error);
     }
@@ -190,6 +220,15 @@ class JobControllerMasterTest {
         mvc.perform(get("/rest/jobs/pending"))
                 .andExpect(status().isOk())
                 .andExpect(content().json(mapper.writeValueAsString(list)));
+    }
+
+    private void testResults() throws Exception {
+        ActionResultDto<?>[] jobDefinitionDto = TestUtils.readJson("actionResults.json", ActionResultDto[].class, mapper);
+        when(masterState.getJobResults()).thenReturn(Arrays.asList(jobDefinitionDto));
+
+        mvc.perform(get("/rest/jobs/results"))
+                .andExpect(status().isOk())
+                .andExpect(content().json(mapper.writeValueAsString(jobDefinitionDto)));
     }
 
 }

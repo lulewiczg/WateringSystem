@@ -31,7 +31,7 @@ public class JobController {
 
     @PostMapping
     @Secured({"ROLE_USER", "ROLE_ADMIN"})
-    public ActionResultDto<Void> runJob(@RequestBody JobDto job) {
+    public ActionResultDto<?> runJob(@RequestBody JobDto job) {
         return actionService.runJob(job);
     }
 

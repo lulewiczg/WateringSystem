@@ -52,7 +52,7 @@ public class ActionServiceImpl implements ActionService {
 
     @Cacheable
     private Map<String, Action<?, ?>> getActionsMap() {
-        return applicationContext.getBeansOfType(Action.class).values().stream().filter(Action::isEnabled)
+        return applicationContext.getBeansOfType(Action.class).values().stream().filter(Action::isEnabled).map(i -> (Action<?, ?>) i)
                 .collect(Collectors.toMap(i -> fixBeanName(i.getClass().getSimpleName()), i -> i));
     }
 
@@ -65,7 +65,7 @@ public class ActionServiceImpl implements ActionService {
     }
 
     @Override
-    public ActionResultDto<Void> runJob(JobDto jobDto) {
+    public ActionResultDto<?> runJob(JobDto jobDto) {
         validateJob(jobDto);
         ScheduledJob job;
         try {

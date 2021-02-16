@@ -9,6 +9,7 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.UUID;
 
 /**
  * Service for handling actions.
@@ -32,17 +33,17 @@ public class ActionServiceMasterImpl implements ActionService {
     }
 
     @Override
-    public ActionResultDto<Void> runJob(JobDto jobName) {
+    public ActionResultDto<?> runJob(JobDto jobName) {
         validateJob(jobName);
         state.getJobs().add(jobName);
-        return null;
+        return new ActionResultDto<>(UUID.randomUUID().toString(), jobName.getName(), null);
     }
 
     @Override
     public ActionResultDto<?> runAction(ActionDto actionDto) {
         validateAndGetDefinition(actionDto);
         state.getActions().add(actionDto);
-        return null;
+        return new ActionResultDto<>(UUID.randomUUID().toString(), actionDto.getName(), null);
     }
 
 }

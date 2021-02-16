@@ -8,6 +8,7 @@ import com.github.lulewiczg.watering.security.AuthProvider;
 import com.github.lulewiczg.watering.service.MasterService;
 import com.github.lulewiczg.watering.service.dto.SlaveStateDto;
 import com.github.lulewiczg.watering.state.AppState;
+import com.github.lulewiczg.watering.state.MasterState;
 import com.github.lulewiczg.watering.state.dto.MasterResponse;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -49,7 +50,7 @@ class StateMasterControllerMasterTest {
     @WithMockUser(roles = "SLAVE")
     void testUpdateStateSlave() throws Exception {
         AppState appState = TestUtils.readJson("state.json", AppState.class, mapper);
-        SlaveStateDto slaveState = new SlaveStateDto(appState, List.of(), List.of());
+        SlaveStateDto slaveState = new SlaveStateDto(appState, List.of(), List.of(), null, null); //TODO
         MasterResponse response = TestUtils.readJson("masterResponse.json", MasterResponse.class, mapper);
         when(service.update(slaveState)).thenReturn(response);
 
@@ -64,7 +65,7 @@ class StateMasterControllerMasterTest {
     @WithMockUser(roles = "USER")
     void testUpdateState() {
         AppState appState = TestUtils.readJson("state.json", AppState.class, mapper);
-        SlaveStateDto slaveState = new SlaveStateDto(appState, List.of(), List.of());
+        SlaveStateDto slaveState = new SlaveStateDto(appState, List.of(), List.of(), null, null);
 
         TestUtils.testForbiddenPost(mvc, mapper, "/rest/state", slaveState);
     }
@@ -73,7 +74,7 @@ class StateMasterControllerMasterTest {
     @WithMockUser(roles = "ADMIN")
     void testUpdateStateAdmin() {
         AppState appState = TestUtils.readJson("state.json", AppState.class, mapper);
-        SlaveStateDto slaveState = new SlaveStateDto(appState, List.of(), List.of());
+        SlaveStateDto slaveState = new SlaveStateDto(appState, List.of(), List.of(), null, null);
 
         TestUtils.testForbiddenPost(mvc, mapper, "/rest/state", slaveState);
     }
@@ -82,7 +83,7 @@ class StateMasterControllerMasterTest {
     @WithMockUser(roles = "GUEST")
     void testUpdateStateGuest() {
         AppState appState = TestUtils.readJson("state.json", AppState.class, mapper);
-        SlaveStateDto slaveState = new SlaveStateDto(appState, List.of(), List.of());
+        SlaveStateDto slaveState = new SlaveStateDto(appState, List.of(), List.of(), null, null);
 
         TestUtils.testForbiddenPost(mvc, mapper, "/rest/state", slaveState);
     }
@@ -90,7 +91,7 @@ class StateMasterControllerMasterTest {
     @Test
     void testUpdateStateAnon() {
         AppState appState = TestUtils.readJson("state.json", AppState.class, mapper);
-        SlaveStateDto slaveState = new SlaveStateDto(appState, List.of(), List.of());
+        SlaveStateDto slaveState = new SlaveStateDto(appState, List.of(), List.of(), null, null);
 
         TestUtils.testUnauthorizedPost(mvc, mapper, "/rest/state", slaveState);
     }

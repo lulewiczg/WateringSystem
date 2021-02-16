@@ -89,6 +89,35 @@ class ActionControllerMasterTest {
 
     @Test
     @WithMockUser(roles = "USER")
+    void testGetResults() throws Exception {
+        testResults();
+    }
+
+    @Test
+    @WithMockUser(roles = "ADMIN")
+    void testGetResultsAdmin() throws Exception {
+        testResults();
+    }
+
+    @Test
+    @WithMockUser(roles = "GUEST")
+    void testGetResultsGuest() {
+        TestUtils.testForbiddenGet(mvc, mapper, "/rest/actions/results");
+    }
+
+    @Test
+    @WithMockUser(roles = "SLAVE")
+    void testGetResultsSlave() {
+        TestUtils.testForbiddenGet(mvc, mapper, "/rest/actions/results");
+    }
+
+    @Test
+    void testGetResultsAnon() {
+        TestUtils.testUnauthorizedGet(mvc, mapper, "/rest/actions/results");
+    }
+
+    @Test
+    @WithMockUser(roles = "USER")
     void testRunAction() throws Exception {
         testRun();
     }
@@ -167,6 +196,15 @@ class ActionControllerMasterTest {
                 .andReturn().getResponse().getContentAsString();
 
         TestUtils.testError(json, expected, mapper);
+    }
+
+    private void testResults() throws Exception {
+        ActionResultDto<?>[] jobDefinitionDto = TestUtils.readJson("actionResults.json", ActionResultDto[].class, mapper);
+        when(masterState.getActionResults()).thenReturn(Arrays.asList(jobDefinitionDto));
+
+        mvc.perform(get("/rest/actions/results"))
+                .andExpect(status().isOk())
+                .andExpect(content().json(mapper.writeValueAsString(jobDefinitionDto)));
     }
 
     private void testGetAction() throws Exception {

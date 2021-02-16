@@ -2,6 +2,7 @@ package com.github.lulewiczg.watering.controller;
 
 import com.github.lulewiczg.watering.config.MasterConfig;
 import com.github.lulewiczg.watering.service.ActionService;
+import com.github.lulewiczg.watering.service.dto.ActionResultDto;
 import com.github.lulewiczg.watering.service.dto.JobDefinitionDto;
 import com.github.lulewiczg.watering.service.dto.JobDto;
 import com.github.lulewiczg.watering.state.MasterState;
@@ -35,6 +36,12 @@ public class JobMasterController {
     @Secured({"ROLE_USER", "ROLE_ADMIN"})
     public List<JobDto> getPendingJobs() {
         return masterState.getJobs();
+    }
+
+    @GetMapping("/results")
+    @Secured({"ROLE_USER", "ROLE_ADMIN"})
+    public List<ActionResultDto<?>> getResults() {
+        return masterState.getJobResults();
     }
 
     @PostMapping

@@ -33,7 +33,7 @@ public interface ActionService {
      * @param jobName job name
      * @return job result
      */
-    ActionResultDto<Void> runJob(JobDto jobName);
+    ActionResultDto<?> runJob(JobDto jobName);
 
     /**
      * Runs action.

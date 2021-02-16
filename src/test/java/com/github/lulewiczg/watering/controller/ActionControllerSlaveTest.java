@@ -83,6 +83,35 @@ class ActionControllerSlaveTest {
 
     @Test
     @WithMockUser(roles = "USER")
+    void testGetResults() {
+        TestUtils.testNotFoundGet(mvc, mapper, "/rest/actions/results");
+    }
+
+    @Test
+    @WithMockUser(roles = "ADMIN")
+    void testGetResultsAdmin() {
+        TestUtils.testNotFoundGet(mvc, mapper, "/rest/actions/results");
+    }
+
+    @Test
+    @WithMockUser(roles = "GUEST")
+    void testGetResultsGuest() {
+        TestUtils.testNotFoundGet(mvc, mapper, "/rest/actions/results");
+    }
+
+    @Test
+    @WithMockUser(roles = "SLAVE")
+    void testGetResultsSlave() {
+        TestUtils.testNotFoundGet(mvc, mapper, "/rest/actions/results");
+    }
+
+    @Test
+    void testGetResultsAnon() {
+        TestUtils.testUnauthorizedGet(mvc, mapper, "/rest/actions/results");
+    }
+
+    @Test
+    @WithMockUser(roles = "USER")
     void testRunAction() throws Exception {
         testRun();
     }

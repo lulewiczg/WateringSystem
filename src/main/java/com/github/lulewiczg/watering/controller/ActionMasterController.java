@@ -39,6 +39,12 @@ public class ActionMasterController {
         return masterState.getActions();
     }
 
+    @GetMapping("/results")
+    @Secured({"ROLE_USER", "ROLE_ADMIN"})
+    public List<ActionResultDto<?>> getResults() {
+        return masterState.getActionResults();
+    }
+
     @PostMapping
     @Secured({"ROLE_USER", "ROLE_ADMIN"})
     public ActionResultDto<?> runAction(@Valid @RequestBody ActionDto actionDto) {
