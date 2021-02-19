@@ -3,6 +3,7 @@ package com.github.lulewiczg.watering.service.job;
 import com.github.lulewiczg.watering.config.SlaveConfig;
 import com.github.lulewiczg.watering.service.ActionService;
 import com.github.lulewiczg.watering.service.dto.ActionResultDto;
+import com.github.lulewiczg.watering.service.dto.JobDto;
 import com.github.lulewiczg.watering.service.dto.SlaveStateDto;
 import com.github.lulewiczg.watering.state.AppState;
 import com.github.lulewiczg.watering.state.SystemStatus;
@@ -83,7 +84,7 @@ public class ScheduledMasterSync extends ScheduledJob {
     }
 
     @Override
-    protected void doJob() {
+    protected void doJob(JobDto job) {
         MasterResponse response = connect();
         if (response == null) {
             log.error("Sync with master failed");
@@ -124,7 +125,7 @@ public class ScheduledMasterSync extends ScheduledJob {
     }
 
     @Override
-    protected void doJobRunning() {
+    protected void doJobRunning(JobDto job) {
         //Do nothing
     }
 

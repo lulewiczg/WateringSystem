@@ -39,7 +39,7 @@ public class ScheduledValveRead extends ScheduledIoJob {
     }
 
     @Override
-    protected void doJob() {
+    protected void doJob(JobDto job) {
         log.debug("Checking valves...");
         state.getOutputs().forEach(this::readValve);
         state.getTanks().stream().map(Tank::getValve).forEach(this::readValve);

@@ -66,7 +66,7 @@ public class ScheduledWaterEscapeControl extends ScheduledJob {
     }
 
     @Override
-    protected void doJob() {
+    protected void doJob(JobDto job) {
         log.debug("Staring escape control job...");
 
         Map<String, Integer> levels = getLevels();
@@ -75,7 +75,7 @@ public class ScheduledWaterEscapeControl extends ScheduledJob {
         if (!leaks.isEmpty()) {
             log.error("Water leak in tanks: {}", leaks);
             state.setState(SystemStatus.ERROR);
-            emergencyStopAction.doAction(new ActionDto(), null);
+            emergencyStopAction.doAction(job.toAction(), null);
         }
         log.debug("Escape control finished.");
         prevLevels = levels;

@@ -56,7 +56,7 @@ class ScheduledWaterEscapeControlTest {
 
         ActionResultDto<Void> result = job.run(syncDto);
 
-        TestUtils.testActionResult(result);
+        TestUtils.testActionResult(result, "Action [Water leak control] can not be started!");
         verify(emergencyStopAction, never()).doAction(any(), any());
         verify(state, never()).setState(any());
     }
@@ -100,7 +100,7 @@ class ScheduledWaterEscapeControlTest {
         Tank tank2 = new Tank("tank2", 100, sensor2, valve2);
         when(state.getTanks()).thenReturn(List.of(tank, tank2));
         JobDto syncDto = new JobDto("test");
-
+        when(emergencyStopAction.doAction(argThat(i -> i.getId() != null), isNull())).thenCallRealMethod();
         ActionResultDto<Void> result = job.run(syncDto);
 
         TestUtils.testActionResult(result);
@@ -114,7 +114,7 @@ class ScheduledWaterEscapeControlTest {
         TestUtils.testActionResult(result2);
         assertNotEquals(result.getId(), result2.getId());
         verify(state).setState(SystemStatus.ERROR);
-        verify(emergencyStopAction).doAction(new ActionDto(), null);
+        verify(emergencyStopAction).doAction(argThat(i -> i.getId() != null), isNull());
     }
 
     @Test
@@ -155,7 +155,7 @@ class ScheduledWaterEscapeControlTest {
     }
 
     @ParameterizedTest
-    @EnumSource(value = SystemStatus.class)
+    @EnumSource(value = SystemStatus.class, names = {"IDLE", "FILLING"})
     void testWithId(SystemStatus status) {
         when(state.getState()).thenReturn(status);
         JobDto jobDto = new JobDto("test", UUID.randomUUID().toString());

@@ -72,18 +72,20 @@ public class ScheduledWatering extends ScheduledJob {
     }
 
     @Override
-    protected void doJob() {
+    protected void doJob(JobDto job) {
         state.setState(SystemStatus.WATERING);
-        tanksOpenAction.doAction(new ActionDto(), null);
-        outputsOpenAction.doAction(new ActionDto(), null);
+        ActionDto dto = job.toAction();
+        tanksOpenAction.doAction(dto, null);
+        outputsOpenAction.doAction(dto, null);
         log.info("Valves opened");
-        exec.schedule(this::finish, wateringLength, TimeUnit.SECONDS);
+        exec.schedule(()->finish(job), wateringLength, TimeUnit.SECONDS);
     }
 
-    private void finish() {
+    private void finish(JobDto job) {
         log.info("Stopping watering job...");
-        tanksCloseAction.doAction(new ActionDto(), null);
-        outputsCloseAction.doAction(new ActionDto(), null);
+        ActionDto dto = job.toAction();
+        tanksCloseAction.doAction(dto, null);
+        outputsCloseAction.doAction(dto, null);
         state.setState(SystemStatus.IDLE);
         log.info("Watering finished!");
     }

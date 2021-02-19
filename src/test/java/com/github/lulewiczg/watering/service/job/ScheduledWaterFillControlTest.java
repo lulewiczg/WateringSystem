@@ -65,7 +65,7 @@ class ScheduledWaterFillControlTest {
 
         ActionResultDto<Void> result = job.run(jobDto);
 
-        TestUtils.testActionResult(result);
+        TestUtils.testActionResult(result, "Action [Water fill] can not be started!");
         verify(tanksCloseAction, never()).doAction(any(), any());
         verify(tapsOpenAction, never()).doAction(any(), any());
         verify(valveOpenAction, never()).doAction(any(), any());
@@ -74,14 +74,14 @@ class ScheduledWaterFillControlTest {
     }
 
     @ParameterizedTest
-    @EnumSource(value = SystemStatus.class)
-    void testWitId(SystemStatus status) {
+    @EnumSource(value = SystemStatus.class, names = {"ERROR", "WATERING", "DRAINING"})
+    void testWithId(SystemStatus status) {
         when(state.getState()).thenReturn(status);
         JobDto jobDto = new JobDto("test", UUID.randomUUID().toString());
 
         ActionResultDto<Void> result = job.run(jobDto);
 
-        TestUtils.testActionResult(result);
+        TestUtils.testActionResult(result, "Action [Water fill] can not be started!");
         assertEquals(jobDto.getId(), result.getId());
     }
 
@@ -157,14 +157,19 @@ class ScheduledWaterFillControlTest {
         Tank tank2 = new Tank("tank2", 100, sensor2, valve2);
         when(state.getTanks()).thenReturn(List.of(tank, tank2));
         JobDto jobDto = new JobDto("test");
+        ActionDto actionDto = jobDto.toAction();
+        when(outputsCloseAction.doAction(argThat(i -> i.getId() != null), isNull())).thenCallRealMethod();
+        when(tapsOpenAction.doAction(argThat(i -> i.getId() != null), isNull())).thenCallRealMethod();
+        when(valveOpenAction.doAction(argThat(i -> i.getId() != null), isNull())).thenCallRealMethod();
+        when(tanksCloseAction.doAction(argThat(i -> i.getId() != null), isNull())).thenCallRealMethod();
 
         ActionResultDto<Void> result = job.run(jobDto);
 
         TestUtils.testActionResult(result);
         verify(state).setState(SystemStatus.FILLING);
-        verify(outputsCloseAction).doAction(new ActionDto(), null);
-        verify(tapsOpenAction).doAction(new ActionDto(), null);
-        verify(valveOpenAction).doAction(any(), eq(valve));
+        verify(outputsCloseAction).doAction(argThat(i -> i.getId() != null), isNull());
+        verify(tapsOpenAction).doAction(argThat(i -> i.getId() != null), isNull());
+        verify(valveOpenAction).doAction(argThat(i -> i.getId() != null), eq(valve));
         verify(tanksCloseAction, never()).doAction(any(), any());
     }
 

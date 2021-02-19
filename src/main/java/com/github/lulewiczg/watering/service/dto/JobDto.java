@@ -36,4 +36,13 @@ public class JobDto {
     public JobDto(@NotNull String name) {
         this.name = name;
     }
+
+    /**
+     * Converts to action DTO.
+     *
+     * @return action DTO
+     */
+    public ActionDto toAction() {
+        return new ActionDto(name, id, null);
+    }
 }

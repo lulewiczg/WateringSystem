@@ -38,10 +38,10 @@ public class ScheduledSensorRead extends ScheduledIoJob {
     }
 
     @Override
-    protected void doJob() {
+    protected void doJob(JobDto job) {
         log.debug("Reading sensors...");
         state.getTanks().forEach(i -> {
-            ActionResultDto<Double> result = readAction.doAction(new ActionDto(), i.getSensor());
+            ActionResultDto<Double> result = readAction.doAction(job.toAction(), i.getSensor());
             log.debug("Read water level for {}: {}", i.getId(), result);
             i.getSensor().setLevel(result.getResult().intValue());
         });

@@ -6,7 +6,6 @@ import com.github.lulewiczg.watering.service.actions.OutputsCloseAction;
 import com.github.lulewiczg.watering.service.actions.OutputsOpenAction;
 import com.github.lulewiczg.watering.service.actions.TanksCloseAction;
 import com.github.lulewiczg.watering.service.actions.TanksOpenAction;
-import com.github.lulewiczg.watering.service.dto.ActionDto;
 import com.github.lulewiczg.watering.service.dto.ActionResultDto;
 import com.github.lulewiczg.watering.service.dto.JobDto;
 import com.github.lulewiczg.watering.state.AppState;
@@ -67,7 +66,7 @@ class ScheduledWateringTest {
 
         ActionResultDto<Void> result = job.run(syncDto);
 
-        TestUtils.testActionResult(result);
+        TestUtils.testActionResult(result, "Action [Watering] can not be started!");
         verify(tanksCloseAction, never()).doAction(any(), any());
         verify(tanksOpenAction, never()).doAction(any(), any());
         verify(outputsOpenAction, never()).doAction(any(), any());
@@ -85,6 +84,10 @@ class ScheduledWateringTest {
         Tank tank2 = new Tank("tank2", 100, null, valve2);
         when(state.getTanks()).thenReturn(List.of(tank, tank2));
         JobDto syncDto = new JobDto("test");
+        when(tanksOpenAction.doAction(argThat(i -> i.getId() != null), isNull())).thenCallRealMethod();
+        when(tanksCloseAction.doAction(argThat(i -> i.getId() != null), isNull())).thenCallRealMethod();
+        when(outputsOpenAction.doAction(argThat(i -> i.getId() != null), isNull())).thenCallRealMethod();
+        when(outputsCloseAction.doAction(argThat(i -> i.getId() != null), isNull())).thenCallRealMethod();
 
         ActionResultDto<Void> result = job.run(syncDto);
 
@@ -92,19 +95,18 @@ class ScheduledWateringTest {
         verify(state).setState(SystemStatus.WATERING);
         verify(tanksCloseAction, never()).doAction(any(), any());
         verify(outputsCloseAction, never()).doAction(any(), any());
-        ActionDto actionDto = new ActionDto();
-        verify(tanksOpenAction).doAction(actionDto, null);
-        verify(outputsOpenAction).doAction(actionDto, null);
+        verify(tanksOpenAction).doAction(argThat(i -> i.getId() != null), isNull());
+        verify(outputsOpenAction).doAction(argThat(i -> i.getId() != null), isNull());
 
         Thread.sleep(1500);
 
         verify(state).setState(SystemStatus.IDLE);
-        verify(tanksCloseAction).doAction(actionDto, null);
-        verify(outputsCloseAction).doAction(actionDto, null);
+        verify(tanksCloseAction).doAction(argThat(i -> i.getId() != null), isNull());
+        verify(outputsCloseAction).doAction(argThat(i -> i.getId() != null), isNull());
     }
 
     @ParameterizedTest
-    @EnumSource(value = SystemStatus.class)
+    @EnumSource(value = SystemStatus.class, names = {"IDLE", "DRAINING"})
     void testWithId(SystemStatus status) throws InterruptedException {
         when(state.getState()).thenReturn(status);
         JobDto jobDto = new JobDto("test", UUID.randomUUID().toString());

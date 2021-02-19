@@ -1,5 +1,6 @@
 package com.github.lulewiczg.watering.service.job;
 
+import com.github.lulewiczg.watering.exception.ActionNotStartedException;
 import com.github.lulewiczg.watering.service.dto.ActionResultDto;
 import com.github.lulewiczg.watering.service.dto.JobDto;
 import com.github.lulewiczg.watering.state.SystemStatus;
@@ -44,13 +45,17 @@ public abstract class ScheduledJob {
 
     /**
      * Action logic.
+     *
+     * @param job job DTO
      */
-    protected abstract void doJob();
+    protected abstract void doJob(JobDto job);
 
     /**
      * Action logic when already running.
+     *
+     * @param job job DTO
      */
-    protected void doJobRunning() {
+    protected void doJobRunning(JobDto job) {
         //Do nothing
     }
 
@@ -84,12 +89,11 @@ public abstract class ScheduledJob {
      */
     public final ActionResultDto<Void> run(@NonNull JobDto originalJob) {
         JobDto jobDto = originalJob.toBuilder().build();
-
         generateUuid(jobDto);
         String id = jobDto.getId();
         log.debug("Staring {} job with ID {} ...", getName(), id);
         try {
-            tryRun(id);
+            tryRun(jobDto);
         } catch (Exception e) {
             log.error(String.format("Job %s failed", id), e);
             String message = e.getMessage();
@@ -117,15 +121,17 @@ public abstract class ScheduledJob {
         }
     }
 
-    private void tryRun(String id) {
+    private void tryRun(JobDto job) {
         if (canBeStarted()) {
-            log.debug("Job {} with ID {} can start!", getName(), id);
-            doJob();
+            log.debug("Job {} with ID {} can start!", getName(), job.getId());
+            doJob(job);
         } else if (isRunning()) {
             log.debug("Job {} is already running.", getName());
-            doJobRunning();
+            doJobRunning(job);
+        } else {
+            throw new ActionNotStartedException(getName());
         }
-        log.debug("Finishing {} job with ID {}...", getName(), id);
+        log.debug("Finishing {} job with ID {}...", getName(), job.getId());
     }
 
     protected boolean isRunning() {

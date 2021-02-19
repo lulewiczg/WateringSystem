@@ -55,7 +55,7 @@ public class ScheduledOverflowWaterControl extends ScheduledJob {
     }
 
     @Override
-    protected void doJob() {
+    protected void doJob(JobDto job) {
         List<Tank> tanks = findOverflowTanks();
         if (tanks.isEmpty()) {
             log.debug("Water levels are OK, no need to drain");
@@ -63,12 +63,12 @@ public class ScheduledOverflowWaterControl extends ScheduledJob {
         }
         state.setState(SystemStatus.DRAINING);
         log.info("Water level too high for {}", () -> tanks.stream().map(Tank::getId).collect(Collectors.toList()));
-        tanks.forEach(i -> valveOpenAction.doAction(new ActionDto(), i.getValve()));
+        tanks.forEach(i -> valveOpenAction.doAction(job.toAction(), i.getValve()));
         log.info("Draining tanks started.");
     }
 
     @Override
-    protected void doJobRunning() {
+    protected void doJobRunning(JobDto job) {
         List<Tank> tanks = findOverflowTanks();
         if (tanks.isEmpty()) {
             log.info("Water levels are OK, stopping");

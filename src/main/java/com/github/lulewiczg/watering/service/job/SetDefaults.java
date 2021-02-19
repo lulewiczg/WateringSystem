@@ -52,7 +52,7 @@ public class SetDefaults extends ScheduledJob {
     }
 
     @Override
-    protected void doJob() {
+    protected void doJob(JobDto job) {
         log.info("Settings defaults...");
         state.getTanks().stream().map(Tank::getValve).forEach(this::setValveState);
         state.getOutputs().forEach(this::setValveState);

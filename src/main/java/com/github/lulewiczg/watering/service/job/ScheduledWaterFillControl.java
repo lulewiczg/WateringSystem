@@ -61,7 +61,7 @@ public class ScheduledWaterFillControl extends ScheduledJob {
     }
 
     @Override
-    protected void doJob() {
+    protected void doJob(JobDto job) {
         List<Tank> tanks = findTanks();
         if (tanks.isEmpty()) {
             log.debug("Water levels are OK");
@@ -69,15 +69,16 @@ public class ScheduledWaterFillControl extends ScheduledJob {
         }
         log.info("Water level too low for {}", tanks);
         state.setState(SystemStatus.FILLING);
-        outputsCloseAction.doAction(new ActionDto(), null);
-        tapsOpenAction.doAction(new ActionDto(), null);
-        tanks.forEach(i -> valveOpenAction.doAction(new ActionDto(), i.getValve()));
+        ActionDto dto = job.toAction();
+        outputsCloseAction.doAction(dto, null);
+        tapsOpenAction.doAction(dto, null);
+        tanks.forEach(i -> valveOpenAction.doAction(dto, i.getValve()));
         log.info("Filling tanks started.");
     }
 
 
     @Override
-    protected void doJobRunning() {
+    protected void doJobRunning(JobDto job) {
         List<Tank> tanks = findTanks();
         if (tanks.isEmpty()) {
             log.info("Water levels are OK, filling finished");

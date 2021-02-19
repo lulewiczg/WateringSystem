@@ -27,6 +27,7 @@ import java.util.List;
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -56,18 +57,17 @@ class ScheduledSensorReadTest {
         Sensor sensor2 = new Sensor("sensor2", 10, 90, 10, RaspiPin.GPIO_02);
         Tank tank2 = new Tank("tank2", 100, sensor2, valve2);
         when(state.getTanks()).thenReturn(List.of(tank, tank2));
-        when(readAction.doAction(new ActionDto(), sensor))
-                .thenReturn(new ActionResultDto<>(UUID.randomUUID().toString(), 11.0, LocalDateTime.now()));
-        when(readAction.doAction(new ActionDto(), sensor2))
-                .thenReturn(new ActionResultDto<>(UUID.randomUUID().toString(), 22.0, LocalDateTime.now()));
-
         JobDto jobDto = new JobDto("test");
+        when(readAction.doAction(any(), eq(sensor)))
+                .thenReturn(new ActionResultDto<>(UUID.randomUUID().toString(), 11.0, LocalDateTime.now()));
+        when(readAction.doAction(any(), eq(sensor2)))
+                .thenReturn(new ActionResultDto<>(UUID.randomUUID().toString(), 22.0, LocalDateTime.now()));
 
         ActionResultDto<Void> result = job.run(jobDto);
 
         TestUtils.testActionResult(result);
-        verify(readAction).doAction(new ActionDto(), sensor);
-        verify(readAction).doAction(new ActionDto(), sensor2);
+        verify(readAction).doAction(argThat(i -> i.getId() != null), eq(sensor));
+        verify(readAction).doAction(argThat(i -> i.getId() != null), eq(sensor2));
         assertEquals(11, sensor.getLevel());
         assertEquals(22, sensor2.getLevel());
     }
