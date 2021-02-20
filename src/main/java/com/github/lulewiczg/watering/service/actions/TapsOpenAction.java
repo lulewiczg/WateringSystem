@@ -26,7 +26,6 @@ public class TapsOpenAction extends Action<Void, Void> {
     @Override
     protected Void run(ActionDto actionDto, Void param) {
         log.info("Opening taps...");
-        actionDto.appendId(".");
         state.getTaps().forEach(i -> {
             actionRunner.run(getNestedId(actionDto), openAction, i.getValve());
         });

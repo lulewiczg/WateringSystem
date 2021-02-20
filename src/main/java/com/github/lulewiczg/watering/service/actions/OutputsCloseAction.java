@@ -26,7 +26,6 @@ public class OutputsCloseAction extends Action<Void, Void> {
     @Override
     protected Void run(ActionDto actionDto, Void param) {
         log.info("Closing outputs...");
-        actionDto.appendId(".");
         state.getOutputs().forEach(i -> {
             actionRunner.run(getNestedId(actionDto), closeAction, i);
         });

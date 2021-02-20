@@ -154,7 +154,7 @@ class JobControllerTest {
 
         ApiError error = mapper.readValue(json, ApiError.class);
         assertNotNull(error.getTimestamp());
-        assertTrue(date.before(error.getTimestamp()));
+        assertFalse(date.after(error.getTimestamp()));
         error.setTimestamp(expected.getTimestamp());
         assertEquals(expected, error);
     }

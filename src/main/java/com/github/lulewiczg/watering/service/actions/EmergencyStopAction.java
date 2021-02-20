@@ -27,10 +27,10 @@ public class EmergencyStopAction extends Action<Void, Void> {
     @Override
     protected Void run(ActionDto actionDto, Void param) {
         log.info("System emergency stop...");
-        actionDto.appendId(".");
-        actionRunner.run(getNestedId(actionDto), tanksCloseAction, null);
-        actionRunner.run(getNestedId(actionDto), tapsCloseAction, null);
-        actionRunner.run(getNestedId(actionDto), outputsCloseAction, null);
+        String nestedId = getNestedId(actionDto);
+        actionRunner.run(nestedId, tanksCloseAction, null);
+        actionRunner.run(nestedId, tapsCloseAction, null);
+        actionRunner.run(nestedId, outputsCloseAction, null);
         return null;
     }
 

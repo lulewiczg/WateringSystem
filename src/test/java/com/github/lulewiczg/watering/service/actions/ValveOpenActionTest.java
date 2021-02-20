@@ -34,26 +34,23 @@ class ValveOpenActionTest {
     @Autowired
     private ValveOpenAction action;
 
-//    @Test
-//    void testOpen() {
-//        Valve valve = new Valve("test", "test", ValveType.OUTPUT, false, RaspiPin.GPIO_00);
-//
-//        ActionResultDto<Void> result = action.doAction(new ActionDto(), valve);
-//
-//        verify(service).toggleOn(valve.getPin());
-//        assertTrue(valve.isOpen());
-//        TestUtils.testActionResult(result);
-//    }
-//
-//    @Test
-//    void testAlreadyOpened() {
-//        Valve valve = new Valve("test", "test", ValveType.OUTPUT, true, RaspiPin.GPIO_00);
-//
-//        ActionResultDto<Void> result = action.doAction(new ActionDto("test"), valve);
-//
-//        verify(service).toggleOn(valve.getPin());
-//        assertTrue(valve.isOpen());
-//        TestUtils.testActionResult(result);
-//        assertEquals("test", result.getId());
-//    }
+    @Test
+    void testOpen() {
+        Valve valve = new Valve("test", "test", ValveType.OUTPUT, false, RaspiPin.GPIO_00);
+
+       action.run(new ActionDto(), valve);
+
+        verify(service).toggleOn(valve.getPin());
+        assertTrue(valve.isOpen());
+    }
+
+    @Test
+    void testAlreadyOpened() {
+        Valve valve = new Valve("test", "test", ValveType.OUTPUT, true, RaspiPin.GPIO_00);
+
+        action.run(new ActionDto(), valve);
+
+        verify(service).toggleOn(valve.getPin());
+        assertTrue(valve.isOpen());
+    }
 }

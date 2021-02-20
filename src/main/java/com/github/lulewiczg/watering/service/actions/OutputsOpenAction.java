@@ -26,9 +26,8 @@ public class OutputsOpenAction extends Action<Void, Void> {
     @Override
     protected Void run(ActionDto actionDto, Void param) {
         log.info("Opening outputs...");
-        actionDto.appendId(".");
         state.getOutputs().forEach(i -> {
-            actionRunner.run(getNestedId(actionDto), openAction, i);
+            actionRunner.run(getNestedId(actionDto), openAction, i);//TODO error validation
         });
         return null;
     }
