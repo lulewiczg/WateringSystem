@@ -22,13 +22,15 @@ public class EmergencyStopAction extends Action<Void, Void> {
 
     private final OutputsCloseAction outputsCloseAction;
 
+    private final ActionRunner actionRunner;
+
     @Override
-    protected Void doActionInternal(ActionDto actionDto, Void param) {
+    protected Void run(ActionDto actionDto, Void param) {
         log.info("System emergency stop...");
         actionDto.appendId(".");
-        tanksCloseAction.doAction(actionDto, null);
-        tapsCloseAction.doAction(actionDto, null);
-        outputsCloseAction.doAction(actionDto, null);
+        actionRunner.run(getNestedId(actionDto), tanksCloseAction, null);
+        actionRunner.run(getNestedId(actionDto), tapsCloseAction, null);
+        actionRunner.run(getNestedId(actionDto), outputsCloseAction, null);
         return null;
     }
 

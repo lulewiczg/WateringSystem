@@ -21,11 +21,15 @@ public class TanksCloseAction extends Action<Void, Void> {
 
     private final ValveCloseAction closeAction;
 
+    private final ActionRunner actionRunner;
+
     @Override
-    protected Void doActionInternal(ActionDto actionDto, Void param) {
+    protected Void run(ActionDto actionDto, Void param) {
         log.info("Closing tanks...");
         actionDto.appendId(".");
-        state.getTanks().forEach(i -> closeAction.doAction(actionDto, i.getValve()));
+        state.getTanks().forEach(i -> {
+            actionRunner.run(getNestedId(actionDto), closeAction, i.getValve());
+        });
         return null;
     }
 

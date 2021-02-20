@@ -2,7 +2,9 @@ package com.github.lulewiczg.watering.service;
 
 import com.github.lulewiczg.watering.config.MasterConfig;
 import com.github.lulewiczg.watering.service.actions.Action;
+import com.github.lulewiczg.watering.service.actions.ActionRunner;
 import com.github.lulewiczg.watering.service.dto.*;
+import com.github.lulewiczg.watering.service.job.JobRunner;
 import com.github.lulewiczg.watering.service.job.ScheduledJob;
 import com.github.lulewiczg.watering.state.AppState;
 import com.github.lulewiczg.watering.state.dto.Sensor;
@@ -31,6 +33,10 @@ import java.util.stream.Collectors;
 public class ActionServiceImpl implements ActionService {
 
     private final ApplicationContext applicationContext;
+
+    private final ActionRunner actionRunner;
+
+    private final JobRunner jobRunner;
 
     private final AppState state;
 
@@ -75,7 +81,8 @@ public class ActionServiceImpl implements ActionService {
             throw new IllegalArgumentException("Job not found: " + jobDto.getName());
         }
         log.trace("Running job {}", job::getName);
-        return job.run(jobDto);
+        jobDto.setJob(job);
+        return jobRunner.run(jobDto);
     }
 
     @Override
@@ -88,9 +95,11 @@ public class ActionServiceImpl implements ActionService {
         }
         try {
             Object param = mapParam(actionDto, actionDef);
-            Method method = action.getClass().getMethod("doAction", ActionDto.class, Object.class);
-            log.trace("Running action {} with param {}", actionDto.getName(), actionDto.getParam());
-            return (ActionResultDto<?>) method.invoke(action, actionDto, param);
+//            Method method = action.getClass().getDeclaredMethod("run", ActionDto.class, action.getDestinationParamType());
+//            log.trace("Running action {} with param {}", actionDto.getName(), actionDto.getParam());
+//            return (ActionResultDto<?>) method.invoke(action, actionDto, param);
+            actionDto.setAction(action);
+            return actionRunner.run(actionDto, param);
         } catch (Exception e) {
             log.error("Error while running action {}", actionDto.getName());
             throw e;

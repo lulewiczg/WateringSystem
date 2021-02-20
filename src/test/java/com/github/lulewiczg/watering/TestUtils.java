@@ -220,6 +220,7 @@ public final class TestUtils {
      */
     public static void testActionResult(ActionResultDto<?> result, String error) {
         assertNotNull(result.getId());
+        assertNull(result.getResult());
         assertEquals(error, result.getErrorMsg());
         LocalDateTime date = LocalDateTime.now().minusMinutes(1);
         assertTrue(date.isBefore(result.getExecDate()));

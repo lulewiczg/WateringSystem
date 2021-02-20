@@ -36,26 +36,26 @@ class ValveCloseActionTest {
 
     @Autowired
     private ValveCloseAction action;
-
-    @Test
-    void testClose() {
-        Valve valve = new Valve("test", "test", ValveType.OUTPUT, true, RaspiPin.GPIO_00);
-
-        ActionResultDto<Void> result = action.doAction(new ActionDto(), valve);
-
-        verify(service).toggleOff(valve.getPin());
-        TestUtils.testActionResult(result);
-    }
-
-    @Test
-    void testAlreadyClosed() {
-        Valve valve = new Valve("test", "test", ValveType.OUTPUT, false, RaspiPin.GPIO_00);
-
-        ActionResultDto<Void> result = action.doAction(new ActionDto("test"), valve);
-
-        verify(service).toggleOff(valve.getPin());
-        assertFalse(valve.isOpen());
-        TestUtils.testActionResult(result);
-        assertEquals("test", result.getId());
-    }
+//
+//    @Test
+//    void testClose() {
+//        Valve valve = new Valve("test", "test", ValveType.OUTPUT, true, RaspiPin.GPIO_00);
+//
+//        ActionResultDto<Void> result = action.doAction(new ActionDto(), valve);
+//
+//        verify(service).toggleOff(valve.getPin());
+//        TestUtils.testActionResult(result);
+//    }
+//
+//    @Test
+//    void testAlreadyClosed() {
+//        Valve valve = new Valve("test", "test", ValveType.OUTPUT, false, RaspiPin.GPIO_00);
+//
+//        ActionResultDto<Void> result = action.doAction(new ActionDto("test"), valve);
+//
+//        verify(service).toggleOff(valve.getPin());
+//        assertFalse(valve.isOpen());
+//        TestUtils.testActionResult(result);
+//        assertEquals("test", result.getId());
+//    }
 }

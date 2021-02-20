@@ -1,8 +1,8 @@
 package com.github.lulewiczg.watering.service.job;
 
 import com.github.lulewiczg.watering.config.MasterConfig;
+import com.github.lulewiczg.watering.service.actions.ActionRunner;
 import com.github.lulewiczg.watering.service.actions.WaterLevelReadAction;
-import com.github.lulewiczg.watering.service.dto.ActionDto;
 import com.github.lulewiczg.watering.service.dto.ActionResultDto;
 import com.github.lulewiczg.watering.service.dto.JobDto;
 import com.github.lulewiczg.watering.state.AppState;
@@ -27,9 +27,13 @@ public class ScheduledSensorRead extends ScheduledIoJob {
 
     private final WaterLevelReadAction readAction;
 
+    private final JobRunner jobRunner;
+
+    private final ActionRunner actionRunner;
+
     @Scheduled(cron = "${com.github.lulewiczg.watering.schedule.sensorsRead.cron}")
     void schedule() {
-        run(new JobDto());
+        schedule(jobRunner);
     }
 
     @Override
@@ -38,10 +42,10 @@ public class ScheduledSensorRead extends ScheduledIoJob {
     }
 
     @Override
-    protected void doJob(JobDto job) {
+    public void doJob(JobDto job) {
         log.debug("Reading sensors...");
         state.getTanks().forEach(i -> {
-            ActionResultDto<Double> result = readAction.doAction(job.toAction(), i.getSensor());
+            ActionResultDto<Double> result = actionRunner.run(getNestedId(job), readAction, i.getSensor());
             log.debug("Read water level for {}: {}", i.getId(), result);
             i.getSensor().setLevel(result.getResult().intValue());
         });

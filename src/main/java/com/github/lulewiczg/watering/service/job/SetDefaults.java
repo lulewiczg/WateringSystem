@@ -1,9 +1,10 @@
 package com.github.lulewiczg.watering.service.job;
 
 import com.github.lulewiczg.watering.config.MasterConfig;
+import com.github.lulewiczg.watering.service.actions.ActionRunner;
 import com.github.lulewiczg.watering.service.actions.ValveCloseAction;
 import com.github.lulewiczg.watering.service.actions.ValveOpenAction;
-import com.github.lulewiczg.watering.service.dto.ActionDto;
+import com.github.lulewiczg.watering.service.dto.ActionResultDto;
 import com.github.lulewiczg.watering.service.dto.JobDto;
 import com.github.lulewiczg.watering.state.AppState;
 import com.github.lulewiczg.watering.state.dto.Tank;
@@ -31,13 +32,17 @@ public class SetDefaults extends ScheduledJob {
 
     private final ValveCloseAction closeAction;
 
+    private final JobRunner jobRunner;
+
+    private final ActionRunner actionRunner;
+
     @Value("${com.github.lulewiczg.watering.schedule.setDefaults.enabled}")
     private boolean enabled;
 
     @PostConstruct
     void postConstruct() {
         if (enabled) {
-            run(new JobDto());
+            schedule(jobRunner);
         }
     }
 
@@ -52,17 +57,17 @@ public class SetDefaults extends ScheduledJob {
     }
 
     @Override
-    protected void doJob(JobDto job) {
+    public void doJob(JobDto job) {
         log.info("Settings defaults...");
-        state.getTanks().stream().map(Tank::getValve).forEach(this::setValveState);
-        state.getOutputs().forEach(this::setValveState);
+        state.getTanks().stream().map(Tank::getValve).forEach(i -> setValveState(i, job));
+        state.getOutputs().forEach(i -> setValveState(i, job));
     }
 
-    private void setValveState(Valve i) {
+    private void setValveState(Valve i, JobDto jobDto) {
         if (i.isOpen()) {
-            openAction.doAction(new ActionDto(), i);
+            ActionResultDto<Void> result = actionRunner.run(getNestedId(jobDto), openAction, i);
         } else {
-            closeAction.doAction(new ActionDto(), i);
+            ActionResultDto<Void> result = actionRunner.run(getNestedId(jobDto), closeAction, i);
         }
     }
 

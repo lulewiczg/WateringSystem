@@ -35,6 +35,11 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
 
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ApiError> handle(Exception e, WebRequest request) {
+        return getGenericError(e, HttpStatus.INTERNAL_SERVER_ERROR, request);
+    }
+
+    @ExceptionHandler(ActionNotFoundException.class)
+    public ResponseEntity<ApiError> handle(ActionNotFoundException e, WebRequest request) {
         return getGenericError(e, HttpStatus.BAD_REQUEST, request);
     }
 

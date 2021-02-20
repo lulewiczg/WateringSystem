@@ -21,11 +21,15 @@ public class TapsCloseAction extends Action<Void, Void> {
 
     private final ValveCloseAction closeAction;
 
+    private final ActionRunner actionRunner;
+
     @Override
-    protected Void doActionInternal(ActionDto actionDto, Void param) {
+    protected Void run(ActionDto actionDto, Void param) {
         log.info("Closing taps...");
         actionDto.appendId(".");
-        state.getTaps().forEach(i -> closeAction.doAction(actionDto, i.getValve()));
+        state.getTaps().forEach(i -> {
+            actionRunner.run(getNestedId(actionDto), closeAction, i.getValve());
+        });
         return null;
     }
 

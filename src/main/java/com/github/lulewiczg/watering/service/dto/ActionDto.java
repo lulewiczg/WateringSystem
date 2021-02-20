@@ -1,5 +1,7 @@
 package com.github.lulewiczg.watering.service.dto;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.github.lulewiczg.watering.service.actions.Action;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -25,6 +27,9 @@ public class ActionDto {
 
     private String id;
 
+    @JsonIgnore
+    private Action<?,?> action;
+
     private Object param;
 
     /**
@@ -42,6 +47,11 @@ public class ActionDto {
     public ActionDto(@NotNull @NotEmpty String name, Object param) {
         this.name = name;
         this.param = param;
+    }
+    public ActionDto(@NotNull @NotEmpty String name, String id, Action<?, ?> action) {
+        this.name = name;
+        this.id = id;
+        this.action = action;
     }
 
     public ActionDto(String id) {

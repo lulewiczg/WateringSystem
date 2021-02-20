@@ -36,57 +36,57 @@ class OutputsOpenActionTest {
 
     @Autowired
     private OutputsOpenAction action;
-
-    @Test
-    void testAction() {
-        Valve valve = new Valve("test", "test", ValveType.OUTPUT, true, RaspiPin.GPIO_00);
-        Valve valve2 = new Valve("test2", "test2", ValveType.OUTPUT, true, RaspiPin.GPIO_01);
-        Valve valve3 = new Valve("test3", "test3", ValveType.INPUT, true, RaspiPin.GPIO_03);
-        Valve valve4 = new Valve("test4", "test4", ValveType.INPUT, true, RaspiPin.GPIO_04);
-        List<Valve> valves = List.of(valve, valve2);
-        List<Tank> tanks = List.of(new Tank("tank", 1, null, valve3));
-        List<WaterSource> taps = List.of(new WaterSource("tap", valve4));
-        when(state.getOutputs()).thenReturn(valves);
-        when(state.getTanks()).thenReturn(tanks);
-        when(state.getTaps()).thenReturn(taps);
-        when(openAction.doAction(argThat(i -> i.getId() != null), any())).thenCallRealMethod();
-        ActionDto actionDto = new ActionDto();
-
-        ActionResultDto<Void> result = action.doAction(actionDto, null);
-
-        verify(openAction).doAction(argThat(i -> i.getId() != null), eq(valve));
-        verify(openAction).doAction(argThat(i -> i.getId() != null), eq(valve2));
-        verify(openAction, never()).doAction(argThat(i -> i.getId() != null), eq(valve3));
-        verify(openAction, never()).doAction(argThat(i -> i.getId() != null), eq(valve4));
-        TestUtils.testActionResult(result);
-        assertNull(actionDto.getId());
-    }
-
-    @Test
-    void testActionWithId() {
-        Valve valve = new Valve("test", "test", ValveType.OUTPUT, true, RaspiPin.GPIO_00);
-        Valve valve2 = new Valve("test2", "test2", ValveType.OUTPUT, true, RaspiPin.GPIO_01);
-        Valve valve3 = new Valve("test3", "test3", ValveType.INPUT, true, RaspiPin.GPIO_03);
-        Valve valve4 = new Valve("test4", "test4", ValveType.INPUT, true, RaspiPin.GPIO_04);
-        List<Valve> valves = List.of(valve, valve2);
-        List<Tank> tanks = List.of(new Tank("tank", 1, null, valve3));
-        List<WaterSource> taps = List.of(new WaterSource("tap", valve4));
-        when(state.getOutputs()).thenReturn(valves);
-        when(state.getTanks()).thenReturn(tanks);
-        when(state.getTaps()).thenReturn(taps);
-        ActionDto actionDto = new ActionDto("test");
-        ActionDto nestedDto = new ActionDto("test.");
-        when(openAction.doAction(eq(nestedDto), any())).thenCallRealMethod();
-
-        ActionResultDto<Void> result = action.doAction(actionDto, null);
-
-        verify(openAction).doAction(nestedDto, valve);
-        verify(openAction).doAction(nestedDto, valve2);
-        verify(openAction, never()).doAction(nestedDto, valve3);
-        verify(openAction, never()).doAction(nestedDto, valve4);
-        TestUtils.testActionResult(result);
-        assertEquals("test", actionDto.getId());
-        assertEquals("test", result.getId());
-    }
+//
+//    @Test
+//    void testAction() {
+//        Valve valve = new Valve("test", "test", ValveType.OUTPUT, true, RaspiPin.GPIO_00);
+//        Valve valve2 = new Valve("test2", "test2", ValveType.OUTPUT, true, RaspiPin.GPIO_01);
+//        Valve valve3 = new Valve("test3", "test3", ValveType.INPUT, true, RaspiPin.GPIO_03);
+//        Valve valve4 = new Valve("test4", "test4", ValveType.INPUT, true, RaspiPin.GPIO_04);
+//        List<Valve> valves = List.of(valve, valve2);
+//        List<Tank> tanks = List.of(new Tank("tank", 1, null, valve3));
+//        List<WaterSource> taps = List.of(new WaterSource("tap", valve4));
+//        when(state.getOutputs()).thenReturn(valves);
+//        when(state.getTanks()).thenReturn(tanks);
+//        when(state.getTaps()).thenReturn(taps);
+//        when(openAction.doAction(argThat(i -> i.getId() != null), any())).thenCallRealMethod();
+//        ActionDto actionDto = new ActionDto();
+//
+//        ActionResultDto<Void> result = action.doAction(actionDto, null);
+//
+//        verify(openAction).doAction(argThat(i -> i.getId() != null), eq(valve));
+//        verify(openAction).doAction(argThat(i -> i.getId() != null), eq(valve2));
+//        verify(openAction, never()).doAction(argThat(i -> i.getId() != null), eq(valve3));
+//        verify(openAction, never()).doAction(argThat(i -> i.getId() != null), eq(valve4));
+//        TestUtils.testActionResult(result);
+//        assertNull(actionDto.getId());
+//    }
+//
+//    @Test
+//    void testActionWithId() {
+//        Valve valve = new Valve("test", "test", ValveType.OUTPUT, true, RaspiPin.GPIO_00);
+//        Valve valve2 = new Valve("test2", "test2", ValveType.OUTPUT, true, RaspiPin.GPIO_01);
+//        Valve valve3 = new Valve("test3", "test3", ValveType.INPUT, true, RaspiPin.GPIO_03);
+//        Valve valve4 = new Valve("test4", "test4", ValveType.INPUT, true, RaspiPin.GPIO_04);
+//        List<Valve> valves = List.of(valve, valve2);
+//        List<Tank> tanks = List.of(new Tank("tank", 1, null, valve3));
+//        List<WaterSource> taps = List.of(new WaterSource("tap", valve4));
+//        when(state.getOutputs()).thenReturn(valves);
+//        when(state.getTanks()).thenReturn(tanks);
+//        when(state.getTaps()).thenReturn(taps);
+//        ActionDto actionDto = new ActionDto("test");
+//        ActionDto nestedDto = new ActionDto("test.");
+//        when(openAction.doAction(eq(nestedDto), any())).thenCallRealMethod();
+//
+//        ActionResultDto<Void> result = action.doAction(actionDto, null);
+//
+//        verify(openAction).doAction(nestedDto, valve);
+//        verify(openAction).doAction(nestedDto, valve2);
+//        verify(openAction, never()).doAction(nestedDto, valve3);
+//        verify(openAction, never()).doAction(nestedDto, valve4);
+//        TestUtils.testActionResult(result);
+//        assertEquals("test", actionDto.getId());
+//        assertEquals("test", result.getId());
+//    }
 
 }

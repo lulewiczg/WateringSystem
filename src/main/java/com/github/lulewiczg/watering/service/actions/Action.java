@@ -1,14 +1,10 @@
 package com.github.lulewiczg.watering.service.actions;
 
 import com.github.lulewiczg.watering.service.dto.ActionDto;
-import com.github.lulewiczg.watering.service.dto.ActionResultDto;
-import lombok.Builder;
-import lombok.NonNull;
+import com.github.lulewiczg.watering.service.dto.JobDto;
 import lombok.extern.log4j.Log4j2;
 
-import java.time.LocalDateTime;
 import java.util.List;
-import java.util.UUID;
 
 /**
  * Interface for system action.
@@ -20,54 +16,12 @@ import java.util.UUID;
 public abstract class Action<T, R> {
 
     /**
-     * Runs action.
-     *
-     * @param originalDto action DTO
-     * @param param     parameter
-     * @return action result
-     */
-    public ActionResultDto<R> doAction(@NonNull ActionDto originalDto, T param) {
-        ActionDto actionDto = originalDto.toBuilder().build();
-        generateUuid(actionDto);
-        String id = actionDto.getId();
-        log.debug("Executing {} action with ID {} ...", actionDto.getName(), id);
-        R result;
-        try {
-            result = doActionInternal(actionDto, param);
-        } catch (Exception e) {
-            log.error(String.format("Action %s failed", id), e);
-            String message = e.getMessage();
-            if (message == null) {
-                message = "Unknown error!";
-            }
-            return new ActionResultDto<>(id, LocalDateTime.now(), message);
-        }
-        return new ActionResultDto<>(id, result, LocalDateTime.now());
-    }
-
-    /**
-     * Generates UUID if required
-     *
-     * @param actionDto action
-     */
-    private void generateUuid(ActionDto actionDto) {
-        String id = actionDto.getId();
-        if (id == null) {
-            log.debug("No UUID passed, generating new");
-            actionDto.setId(UUID.randomUUID().toString());
-        } else if (id.endsWith(".")) {
-            log.debug("Nested invocation, appending new id...");
-            actionDto.appendId(UUID.randomUUID().toString());
-        }
-    }
-
-    /**
      * Executes action
      *
      * @param param acton param
      * @return action result
      */
-    protected abstract R doActionInternal(ActionDto actionDto, T param);
+    abstract R run(ActionDto actionDto, T param);
 
     /**
      * Gets action description.
@@ -93,7 +47,6 @@ public abstract class Action<T, R> {
     public Class<?> getParamType() {
         return Void.class;
     }
-
 
     /**
      * Gets destination parameter type.
@@ -131,4 +84,13 @@ public abstract class Action<T, R> {
         return Void.class;
     }
 
+    /**
+     * Returns ID for nested call.
+     *
+     * @param action action
+     * @return ID
+     */
+    protected String getNestedId(ActionDto action) {
+        return action.getId() + ".";
+    }
 }

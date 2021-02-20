@@ -32,7 +32,7 @@ class RestExceptionHandlerTest {
 
     @Test
     void testHandleUnexpected() {
-        ApiError expected = new ApiError(HttpStatus.BAD_REQUEST.value(), HttpStatus.BAD_REQUEST.getReasonPhrase(), "Some err");
+        ApiError expected = new ApiError(HttpStatus.INTERNAL_SERVER_ERROR.value(), HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase(), "Some err");
 
         ResponseEntity<ApiError> response = handler.handle(new IllegalArgumentException("Some err"), req);
 

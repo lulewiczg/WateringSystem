@@ -1,13 +1,9 @@
 package com.github.lulewiczg.watering.service.job;
 
-import com.github.lulewiczg.watering.exception.ActionNotStartedException;
-import com.github.lulewiczg.watering.service.dto.ActionResultDto;
 import com.github.lulewiczg.watering.service.dto.JobDto;
 import com.github.lulewiczg.watering.state.SystemStatus;
-import lombok.NonNull;
 import lombok.extern.log4j.Log4j2;
 
-import java.time.LocalDateTime;
 import java.util.UUID;
 
 /**
@@ -16,7 +12,7 @@ import java.util.UUID;
 @Log4j2
 public abstract class ScheduledJob {
 
-    protected final JobDto job = new JobDto();
+    protected static final String SCHED = "sched.";
 
     /**
      * Action name.
@@ -43,6 +39,16 @@ public abstract class ScheduledJob {
         return null;
     }
 
+
+    /**
+     * Schedules job.
+     *
+     * @param jobRunner job runner
+     */
+    protected void schedule(JobRunner jobRunner) {
+        jobRunner.run(new JobDto(SCHED + getName(), SCHED + UUID.randomUUID().toString(), this));
+    }
+
     /**
      * Action logic.
      *
@@ -57,6 +63,16 @@ public abstract class ScheduledJob {
      */
     protected void doJobRunning(JobDto job) {
         //Do nothing
+    }
+
+    /**
+     * Returns ID for nested call.
+     *
+     * @param job job
+     * @return ID
+     */
+    protected String getNestedId(JobDto job) {
+        return job.getId() + ".";
     }
 
     /**
@@ -81,60 +97,7 @@ public abstract class ScheduledJob {
         //Do nothing
     }
 
-    /**
-     * Runs job.
-     *
-     * @param originalJob job DTO
-     * @return action result
-     */
-    public final ActionResultDto<Void> run(@NonNull JobDto originalJob) {
-        JobDto jobDto = originalJob.toBuilder().build();
-        generateUuid(jobDto);
-        String id = jobDto.getId();
-        log.debug("Staring {} job with ID {} ...", getName(), id);
-        try {
-            tryRun(jobDto);
-        } catch (Exception e) {
-            log.error(String.format("Job %s failed", id), e);
-            String message = e.getMessage();
-            if (message == null) {
-                message = "Unknown error!";
-            }
-            return new ActionResultDto<>(id, LocalDateTime.now(), message);
-        }
-        return new ActionResultDto<>(id, null, LocalDateTime.now());
-    }
-
-    /**
-     * Generates UUID if required
-     *
-     * @param jobDto job DTO
-     */
-    private void generateUuid(JobDto jobDto) {
-        String id = jobDto.getId();
-        if (id == null) {
-            log.debug("No UUID passed, generating new");
-            jobDto.setId(UUID.randomUUID().toString());
-        } else if (id.endsWith(".")) {
-            log.debug("Nested invocation, appending new id...");
-            jobDto.appendId(UUID.randomUUID().toString());
-        }
-    }
-
-    private void tryRun(JobDto job) {
-        if (canBeStarted()) {
-            log.debug("Job {} with ID {} can start!", getName(), job.getId());
-            doJob(job);
-        } else if (isRunning()) {
-            log.debug("Job {} is already running.", getName());
-            doJobRunning(job);
-        } else {
-            throw new ActionNotStartedException(getName());
-        }
-        log.debug("Finishing {} job with ID {}...", getName(), job.getId());
-    }
-
-    protected boolean isRunning() {
+    public boolean isRunning() {
         return getJobStatus() == getState();
     }
 

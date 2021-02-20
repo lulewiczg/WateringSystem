@@ -35,38 +35,38 @@ class WaterLevelReadActionTest {
     @Autowired
     private WaterLevelReadAction action;
 
-    @Test
-    void testAction() {
-        when(service.analogRead(RaspiPin.GPIO_01)).thenReturn(12.34);
-        Sensor sensor = new Sensor("test", null, null, 12, RaspiPin.GPIO_01);
-
-        ActionResultDto<Double> result = action.doAction(new ActionDto(), sensor);
-        assertEquals(12.34, result.getResult());
-        TestUtils.testActionResult(result);
-    }
-
-    @Test
-    void testActionWithId() {
-        when(service.analogRead(RaspiPin.GPIO_01)).thenReturn(12.34);
-        Sensor sensor = new Sensor("test", null, null, 12, RaspiPin.GPIO_01);
-
-        ActionResultDto<Double> result = action.doAction(new ActionDto("test"), sensor);
-        assertEquals(12.34, result.getResult());
-        TestUtils.testActionResult(result);
-        assertEquals("test", result.getId());
-    }
-
-    @Test
-    void testActionEnabled() {
-        when(state.getTanks()).thenReturn(List.of(new Tank(), new Tank(null, null, new Sensor(), null)));
-
-        assertTrue(action.isEnabled());
-    }
-
-    @Test
-    void testActionDisabled() {
-        when(state.getTanks()).thenReturn(List.of(new Tank()));
-
-        assertFalse(action.isEnabled());
-    }
+//    @Test
+//    void testAction() {
+//        when(service.analogRead(RaspiPin.GPIO_01)).thenReturn(12.34);
+//        Sensor sensor = new Sensor("test", null, null, 12, RaspiPin.GPIO_01);
+//
+//        ActionResultDto<Double> result = action.doAction(new ActionDto(), sensor);
+//        assertEquals(12.34, result.getResult());
+//        TestUtils.testActionResult(result);
+//    }
+//
+//    @Test
+//    void testActionWithId() {
+//        when(service.analogRead(RaspiPin.GPIO_01)).thenReturn(12.34);
+//        Sensor sensor = new Sensor("test", null, null, 12, RaspiPin.GPIO_01);
+//
+//        ActionResultDto<Double> result = action.doAction(new ActionDto("test"), sensor);
+//        assertEquals(12.34, result.getResult());
+//        TestUtils.testActionResult(result);
+//        assertEquals("test", result.getId());
+//    }
+//
+//    @Test
+//    void testActionEnabled() {
+//        when(state.getTanks()).thenReturn(List.of(new Tank(), new Tank(null, null, new Sensor(), null)));
+//
+//        assertTrue(action.isEnabled());
+//    }
+//
+//    @Test
+//    void testActionDisabled() {
+//        when(state.getTanks()).thenReturn(List.of(new Tank()));
+//
+//        assertFalse(action.isEnabled());
+//    }
 }

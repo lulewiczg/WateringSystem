@@ -1,5 +1,7 @@
 package com.github.lulewiczg.watering.service.dto;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.github.lulewiczg.watering.service.job.ScheduledJob;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -21,6 +23,9 @@ public class JobDto {
 
     private String id;
 
+    @JsonIgnore
+    private ScheduledJob job;
+
     /**
      * Appends string to ID
      *
@@ -37,12 +42,4 @@ public class JobDto {
         this.name = name;
     }
 
-    /**
-     * Converts to action DTO.
-     *
-     * @return action DTO
-     */
-    public ActionDto toAction() {
-        return new ActionDto(name, id, null);
-    }
 }

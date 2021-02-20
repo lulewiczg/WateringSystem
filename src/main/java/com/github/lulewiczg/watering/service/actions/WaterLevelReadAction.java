@@ -49,7 +49,7 @@ public class WaterLevelReadAction extends Action<Sensor, Double> {
     }
 
     @Override
-    protected Double doActionInternal(ActionDto actionDto, Sensor sensor) {
+    protected Double run(ActionDto actionDto, Sensor sensor) {
         log.info("Reading water level for sensor {}", sensor);
         return service.analogRead(sensor.getPin());
     }

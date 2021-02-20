@@ -26,6 +26,7 @@ import org.springframework.web.client.RestTemplate;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 /**
  * Job for scheduled water tanks filling.
@@ -44,6 +45,8 @@ public class ScheduledMasterSync extends ScheduledJob {
 
     private final ActionService actionService;
 
+    private final JobRunner runner;
+
     private List<ActionResultDto<?>> actionResults = new ArrayList<>();
 
     private List<ActionResultDto<?>> jobResults = new ArrayList<>();
@@ -60,7 +63,7 @@ public class ScheduledMasterSync extends ScheduledJob {
 
     @Scheduled(cron = "${com.github.lulewiczg.watering.schedule.master.sync.cron}")
     void schedule() {
-        run(job);
+        schedule(runner);
     }
 
     @Override
@@ -84,7 +87,7 @@ public class ScheduledMasterSync extends ScheduledJob {
     }
 
     @Override
-    protected void doJob(JobDto job) {
+    public void doJob(JobDto job) {
         MasterResponse response = connect();
         if (response == null) {
             log.error("Sync with master failed");
@@ -125,7 +128,7 @@ public class ScheduledMasterSync extends ScheduledJob {
     }
 
     @Override
-    protected void doJobRunning(JobDto job) {
+    public void doJobRunning(JobDto job) {
         //Do nothing
     }
 

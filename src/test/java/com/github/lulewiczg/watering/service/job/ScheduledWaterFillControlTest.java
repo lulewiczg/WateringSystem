@@ -56,121 +56,121 @@ class ScheduledWaterFillControlTest {
 
     @Autowired
     private ScheduledWaterFillControl job;
-
-    @ParameterizedTest
-    @EnumSource(value = SystemStatus.class, names = {"ERROR", "WATERING", "DRAINING"})
-    void testNotStart(SystemStatus status) {
-        when(state.getState()).thenReturn(status);
-        JobDto jobDto = new JobDto("test");
-
-        ActionResultDto<Void> result = job.run(jobDto);
-
-        TestUtils.testActionResult(result, "Action [Water fill] can not be started!");
-        verify(tanksCloseAction, never()).doAction(any(), any());
-        verify(tapsOpenAction, never()).doAction(any(), any());
-        verify(valveOpenAction, never()).doAction(any(), any());
-        verify(outputsCloseAction, never()).doAction(any(), any());
-        verify(state, never()).setState(any());
-    }
-
-    @ParameterizedTest
-    @EnumSource(value = SystemStatus.class, names = {"ERROR", "WATERING", "DRAINING"})
-    void testWithId(SystemStatus status) {
-        when(state.getState()).thenReturn(status);
-        JobDto jobDto = new JobDto("test", UUID.randomUUID().toString());
-
-        ActionResultDto<Void> result = job.run(jobDto);
-
-        TestUtils.testActionResult(result, "Action [Water fill] can not be started!");
-        assertEquals(jobDto.getId(), result.getId());
-    }
-
-    @ParameterizedTest
-    @CsvFileSource(resources = "/testData/fill-running-finished-test.csv")
-    void testRunningFinished(SystemStatus status, int minLevel, int maxLevel, Integer level) {
-        when(state.getState()).thenReturn(status);
-        Valve valve = new Valve("valve", "valve", ValveType.OUTPUT, true, RaspiPin.GPIO_00);
-        Sensor sensor = new Sensor("sensor", minLevel, maxLevel, level, RaspiPin.GPIO_01);
-        Tank tank = new Tank("tank", 100, sensor, valve);
-        when(state.getTanks()).thenReturn(List.of(tank));
-        JobDto jobDto = new JobDto("test");
-
-        ActionResultDto<Void> result = job.run(jobDto);
-
-        TestUtils.testActionResult(result);
-        verify(tanksCloseAction).doAction(new ActionDto(), null);
-        verify(state).setState(SystemStatus.IDLE);
-        verify(tapsOpenAction, never()).doAction(any(), any());
-        verify(valveOpenAction, never()).doAction(any(), any());
-        verify(outputsCloseAction, never()).doAction(any(), any());
-    }
-
-    @ParameterizedTest
-    @CsvFileSource(resources = "/testData/fill-running-test.csv")
-    void testRunning(SystemStatus status, int minLevel, int maxLevel, Integer level) {
-        when(state.getState()).thenReturn(status);
-        Valve valve = new Valve("valve", "valve", ValveType.OUTPUT, true, RaspiPin.GPIO_00);
-        Sensor sensor = new Sensor("sensor", minLevel, maxLevel, level, RaspiPin.GPIO_01);
-        Tank tank = new Tank("tank", 100, sensor, valve);
-        when(state.getTanks()).thenReturn(List.of(tank));
-        JobDto jobDto = new JobDto("test");
-
-        ActionResultDto<Void> result = job.run(jobDto);
-
-        TestUtils.testActionResult(result);
-        verify(tanksCloseAction).doAction(new ActionDto(), null);
-        verify(state).setState(SystemStatus.IDLE);
-        verify(tapsOpenAction, never()).doAction(any(), any());
-        verify(valveOpenAction, never()).doAction(any(), any());
-        verify(outputsCloseAction, never()).doAction(any(), any());
-    }
-
-    @ParameterizedTest
-    @CsvFileSource(resources = "/testData/fill-ok-test.csv")
-    void testLevelOk(SystemStatus status, int minLevel, int maxLevel, Integer level) {
-        when(state.getState()).thenReturn(status);
-        Valve valve = new Valve("valve", "valve", ValveType.OUTPUT, true, RaspiPin.GPIO_00);
-        Sensor sensor = new Sensor("sensor", minLevel, maxLevel, level, RaspiPin.GPIO_01);
-        Tank tank = new Tank("tank", 100, sensor, valve);
-        when(state.getTanks()).thenReturn(List.of(tank));
-        JobDto jobDto = new JobDto("test");
-
-        ActionResultDto<Void> result = job.run(jobDto);
-
-        TestUtils.testActionResult(result);
-        verify(tanksCloseAction, never()).doAction(any(), any());
-        verify(state, never()).setState(any());
-        verify(tapsOpenAction, never()).doAction(any(), any());
-        verify(valveOpenAction, never()).doAction(any(), any());
-        verify(outputsCloseAction, never()).doAction(any(), any());
-    }
-
-    @ParameterizedTest
-    @CsvFileSource(resources = "/testData/fill-test.csv")
-    void testFill(SystemStatus status, int minLevel, int maxLevel, int level) {
-        when(state.getState()).thenReturn(status);
-        Valve valve = new Valve("valve", "valve", ValveType.OUTPUT, true, RaspiPin.GPIO_00);
-        Sensor sensor = new Sensor("sensor", minLevel, maxLevel, level, RaspiPin.GPIO_01);
-        Tank tank = new Tank("tank", 100, sensor, valve);
-        Valve valve2 = new Valve("valve2", "valve2", ValveType.OUTPUT, true, RaspiPin.GPIO_02);
-        Sensor sensor2 = new Sensor("sensor2", 1, 3, 2, RaspiPin.GPIO_03);
-        Tank tank2 = new Tank("tank2", 100, sensor2, valve2);
-        when(state.getTanks()).thenReturn(List.of(tank, tank2));
-        JobDto jobDto = new JobDto("test");
-        ActionDto actionDto = jobDto.toAction();
-        when(outputsCloseAction.doAction(argThat(i -> i.getId() != null), isNull())).thenCallRealMethod();
-        when(tapsOpenAction.doAction(argThat(i -> i.getId() != null), isNull())).thenCallRealMethod();
-        when(valveOpenAction.doAction(argThat(i -> i.getId() != null), isNull())).thenCallRealMethod();
-        when(tanksCloseAction.doAction(argThat(i -> i.getId() != null), isNull())).thenCallRealMethod();
-
-        ActionResultDto<Void> result = job.run(jobDto);
-
-        TestUtils.testActionResult(result);
-        verify(state).setState(SystemStatus.FILLING);
-        verify(outputsCloseAction).doAction(argThat(i -> i.getId() != null), isNull());
-        verify(tapsOpenAction).doAction(argThat(i -> i.getId() != null), isNull());
-        verify(valveOpenAction).doAction(argThat(i -> i.getId() != null), eq(valve));
-        verify(tanksCloseAction, never()).doAction(any(), any());
-    }
+//
+//    @ParameterizedTest
+//    @EnumSource(value = SystemStatus.class, names = {"ERROR", "WATERING", "DRAINING"})
+//    void testNotStart(SystemStatus status) {
+//        when(state.getState()).thenReturn(status);
+//        JobDto jobDto = new JobDto("test");
+//
+//        ActionResultDto<Void> result = job.run(jobDto);
+//
+//        TestUtils.testActionResult(result, "Action [Water fill] can not be started!");
+//        verify(tanksCloseAction, never()).doAction(any(), any());
+//        verify(tapsOpenAction, never()).doAction(any(), any());
+//        verify(valveOpenAction, never()).doAction(any(), any());
+//        verify(outputsCloseAction, never()).doAction(any(), any());
+//        verify(state, never()).setState(any());
+//    }
+//
+//    @ParameterizedTest
+//    @EnumSource(value = SystemStatus.class, names = {"ERROR", "WATERING", "DRAINING"})
+//    void testWithId(SystemStatus status) {
+//        when(state.getState()).thenReturn(status);
+//        JobDto jobDto = new JobDto("test", UUID.randomUUID().toString());
+//
+//        ActionResultDto<Void> result = job.run(jobDto);
+//
+//        TestUtils.testActionResult(result, "Action [Water fill] can not be started!");
+//        assertEquals(jobDto.getId(), result.getId());
+//    }
+//
+//    @ParameterizedTest
+//    @CsvFileSource(resources = "/testData/fill-running-finished-test.csv")
+//    void testRunningFinished(SystemStatus status, int minLevel, int maxLevel, Integer level) {
+//        when(state.getState()).thenReturn(status);
+//        Valve valve = new Valve("valve", "valve", ValveType.OUTPUT, true, RaspiPin.GPIO_00);
+//        Sensor sensor = new Sensor("sensor", minLevel, maxLevel, level, RaspiPin.GPIO_01);
+//        Tank tank = new Tank("tank", 100, sensor, valve);
+//        when(state.getTanks()).thenReturn(List.of(tank));
+//        JobDto jobDto = new JobDto("test");
+//
+//        ActionResultDto<Void> result = job.run(jobDto);
+//
+//        TestUtils.testActionResult(result);
+//        verify(tanksCloseAction).doAction(new ActionDto(), null);
+//        verify(state).setState(SystemStatus.IDLE);
+//        verify(tapsOpenAction, never()).doAction(any(), any());
+//        verify(valveOpenAction, never()).doAction(any(), any());
+//        verify(outputsCloseAction, never()).doAction(any(), any());
+//    }
+//
+//    @ParameterizedTest
+//    @CsvFileSource(resources = "/testData/fill-running-test.csv")
+//    void testRunning(SystemStatus status, int minLevel, int maxLevel, Integer level) {
+//        when(state.getState()).thenReturn(status);
+//        Valve valve = new Valve("valve", "valve", ValveType.OUTPUT, true, RaspiPin.GPIO_00);
+//        Sensor sensor = new Sensor("sensor", minLevel, maxLevel, level, RaspiPin.GPIO_01);
+//        Tank tank = new Tank("tank", 100, sensor, valve);
+//        when(state.getTanks()).thenReturn(List.of(tank));
+//        JobDto jobDto = new JobDto("test");
+//
+//        ActionResultDto<Void> result = job.run(jobDto);
+//
+//        TestUtils.testActionResult(result);
+//        verify(tanksCloseAction).doAction(new ActionDto(), null);
+//        verify(state).setState(SystemStatus.IDLE);
+//        verify(tapsOpenAction, never()).doAction(any(), any());
+//        verify(valveOpenAction, never()).doAction(any(), any());
+//        verify(outputsCloseAction, never()).doAction(any(), any());
+//    }
+//
+//    @ParameterizedTest
+//    @CsvFileSource(resources = "/testData/fill-ok-test.csv")
+//    void testLevelOk(SystemStatus status, int minLevel, int maxLevel, Integer level) {
+//        when(state.getState()).thenReturn(status);
+//        Valve valve = new Valve("valve", "valve", ValveType.OUTPUT, true, RaspiPin.GPIO_00);
+//        Sensor sensor = new Sensor("sensor", minLevel, maxLevel, level, RaspiPin.GPIO_01);
+//        Tank tank = new Tank("tank", 100, sensor, valve);
+//        when(state.getTanks()).thenReturn(List.of(tank));
+//        JobDto jobDto = new JobDto("test");
+//
+//        ActionResultDto<Void> result = job.run(jobDto);
+//
+//        TestUtils.testActionResult(result);
+//        verify(tanksCloseAction, never()).doAction(any(), any());
+//        verify(state, never()).setState(any());
+//        verify(tapsOpenAction, never()).doAction(any(), any());
+//        verify(valveOpenAction, never()).doAction(any(), any());
+//        verify(outputsCloseAction, never()).doAction(any(), any());
+//    }
+//
+//    @ParameterizedTest
+//    @CsvFileSource(resources = "/testData/fill-test.csv")
+//    void testFill(SystemStatus status, int minLevel, int maxLevel, int level) {
+//        when(state.getState()).thenReturn(status);
+//        Valve valve = new Valve("valve", "valve", ValveType.OUTPUT, true, RaspiPin.GPIO_00);
+//        Sensor sensor = new Sensor("sensor", minLevel, maxLevel, level, RaspiPin.GPIO_01);
+//        Tank tank = new Tank("tank", 100, sensor, valve);
+//        Valve valve2 = new Valve("valve2", "valve2", ValveType.OUTPUT, true, RaspiPin.GPIO_02);
+//        Sensor sensor2 = new Sensor("sensor2", 1, 3, 2, RaspiPin.GPIO_03);
+//        Tank tank2 = new Tank("tank2", 100, sensor2, valve2);
+//        when(state.getTanks()).thenReturn(List.of(tank, tank2));
+//        JobDto jobDto = new JobDto("test");
+//        ActionDto actionDto = jobDto.toAction();
+//        when(outputsCloseAction.doAction(argThat(i -> i.getId() != null), isNull())).thenCallRealMethod();
+//        when(tapsOpenAction.doAction(argThat(i -> i.getId() != null), isNull())).thenCallRealMethod();
+//        when(valveOpenAction.doAction(argThat(i -> i.getId() != null), isNull())).thenCallRealMethod();
+//        when(tanksCloseAction.doAction(argThat(i -> i.getId() != null), isNull())).thenCallRealMethod();
+//
+//        ActionResultDto<Void> result = job.run(jobDto);
+//
+//        TestUtils.testActionResult(result);
+//        verify(state).setState(SystemStatus.FILLING);
+//        verify(outputsCloseAction).doAction(argThat(i -> i.getId() != null), isNull());
+//        verify(tapsOpenAction).doAction(argThat(i -> i.getId() != null), isNull());
+//        verify(valveOpenAction).doAction(argThat(i -> i.getId() != null), eq(valve));
+//        verify(tanksCloseAction, never()).doAction(any(), any());
+//    }
 
 }

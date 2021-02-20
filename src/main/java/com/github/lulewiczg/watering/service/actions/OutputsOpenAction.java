@@ -21,11 +21,15 @@ public class OutputsOpenAction extends Action<Void, Void> {
 
     private final ValveOpenAction openAction;
 
+    private final ActionRunner actionRunner;
+
     @Override
-    protected Void doActionInternal(ActionDto actionDto, Void param) {
+    protected Void run(ActionDto actionDto, Void param) {
         log.info("Opening outputs...");
         actionDto.appendId(".");
-        state.getOutputs().forEach(i -> openAction.doAction(actionDto, i));
+        state.getOutputs().forEach(i -> {
+            actionRunner.run(getNestedId(actionDto), openAction, i);
+        });
         return null;
     }
 

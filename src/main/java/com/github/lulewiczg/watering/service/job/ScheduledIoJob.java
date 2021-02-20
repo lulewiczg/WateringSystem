@@ -11,7 +11,7 @@ public abstract class ScheduledIoJob extends ScheduledJob {
     }
 
     @Override
-    protected boolean isRunning() {
+    public boolean isRunning() {
         return false;
     }
 }

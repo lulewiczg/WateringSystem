@@ -1,11 +1,8 @@
 package com.github.lulewiczg.watering.service.job;
 
 import com.github.lulewiczg.watering.config.MasterConfig;
-import com.github.lulewiczg.watering.service.actions.OutputsCloseAction;
-import com.github.lulewiczg.watering.service.actions.TanksCloseAction;
-import com.github.lulewiczg.watering.service.actions.TapsOpenAction;
-import com.github.lulewiczg.watering.service.actions.ValveOpenAction;
-import com.github.lulewiczg.watering.service.dto.ActionDto;
+import com.github.lulewiczg.watering.service.actions.*;
+import com.github.lulewiczg.watering.service.dto.ActionResultDto;
 import com.github.lulewiczg.watering.service.dto.JobDto;
 import com.github.lulewiczg.watering.state.AppState;
 import com.github.lulewiczg.watering.state.SystemStatus;
@@ -40,9 +37,13 @@ public class ScheduledWaterFillControl extends ScheduledJob {
 
     private final AppState state;
 
+    private final JobRunner jobRunner;
+
+    private final ActionRunner actionRunner;
+
     @Scheduled(cron = "${com.github.lulewiczg.watering.schedule.overflow.cron}")
     void schedule() {
-        run(new JobDto());
+        schedule(jobRunner);
     }
 
     @Override
@@ -61,7 +62,7 @@ public class ScheduledWaterFillControl extends ScheduledJob {
     }
 
     @Override
-    protected void doJob(JobDto job) {
+    public void doJob(JobDto job) {
         List<Tank> tanks = findTanks();
         if (tanks.isEmpty()) {
             log.debug("Water levels are OK");
@@ -69,20 +70,21 @@ public class ScheduledWaterFillControl extends ScheduledJob {
         }
         log.info("Water level too low for {}", tanks);
         state.setState(SystemStatus.FILLING);
-        ActionDto dto = job.toAction();
-        outputsCloseAction.doAction(dto, null);
-        tapsOpenAction.doAction(dto, null);
-        tanks.forEach(i -> valveOpenAction.doAction(dto, i.getValve()));
+        ActionResultDto<Void> result = actionRunner.run(getNestedId(job), outputsCloseAction, null);
+        ActionResultDto<Void> result2 = actionRunner.run(getNestedId(job), tapsOpenAction, null);
+        tanks.forEach(i -> {
+            ActionResultDto<Void> result3 = actionRunner.run(getNestedId(job), valveOpenAction, i.getValve());
+        });
         log.info("Filling tanks started.");
     }
 
 
     @Override
-    protected void doJobRunning(JobDto job) {
+    public void doJobRunning(JobDto job) {
         List<Tank> tanks = findTanks();
         if (tanks.isEmpty()) {
             log.info("Water levels are OK, filling finished");
-            tanksCloseAction.doAction(new ActionDto(), null);
+            ActionResultDto<Void> result = actionRunner.run(getNestedId(job), tanksCloseAction, null);
             state.setState(SystemStatus.IDLE);
         }
     }

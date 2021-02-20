@@ -1,11 +1,8 @@
 package com.github.lulewiczg.watering.service.job;
 
 import com.github.lulewiczg.watering.config.MasterConfig;
-import com.github.lulewiczg.watering.service.actions.OutputsCloseAction;
-import com.github.lulewiczg.watering.service.actions.OutputsOpenAction;
-import com.github.lulewiczg.watering.service.actions.TanksCloseAction;
-import com.github.lulewiczg.watering.service.actions.TanksOpenAction;
-import com.github.lulewiczg.watering.service.dto.ActionDto;
+import com.github.lulewiczg.watering.service.actions.*;
+import com.github.lulewiczg.watering.service.dto.ActionResultDto;
 import com.github.lulewiczg.watering.service.dto.JobDto;
 import com.github.lulewiczg.watering.state.AppState;
 import com.github.lulewiczg.watering.state.SystemStatus;
@@ -44,11 +41,15 @@ public class ScheduledWatering extends ScheduledJob {
 
     private final AppState state;
 
+    private final JobRunner jobRunner;
+
+    private final ActionRunner actionRunner;
+
     private final ScheduledExecutorService exec = Executors.newSingleThreadScheduledExecutor();
 
     @Scheduled(cron = "${com.github.lulewiczg.watering.schedule.watering.cron}")
     void schedule() {
-        run(new JobDto());
+        schedule(jobRunner);
     }
 
     @Override
@@ -67,25 +68,23 @@ public class ScheduledWatering extends ScheduledJob {
     }
 
     @Override
-    protected boolean isRunning() {
+    public boolean isRunning() {
         return false;
     }
 
     @Override
-    protected void doJob(JobDto job) {
+    public void doJob(JobDto job) {
         state.setState(SystemStatus.WATERING);
-        ActionDto dto = job.toAction();
-        tanksOpenAction.doAction(dto, null);
-        outputsOpenAction.doAction(dto, null);
+        ActionResultDto<Void> result = actionRunner.run(getNestedId(job), tanksOpenAction, null);
+        ActionResultDto<Void> result2 = actionRunner.run(getNestedId(job), outputsOpenAction, null);
         log.info("Valves opened");
-        exec.schedule(()->finish(job), wateringLength, TimeUnit.SECONDS);
+        exec.schedule(() -> finish(job), wateringLength, TimeUnit.SECONDS);
     }
 
     private void finish(JobDto job) {
         log.info("Stopping watering job...");
-        ActionDto dto = job.toAction();
-        tanksCloseAction.doAction(dto, null);
-        outputsCloseAction.doAction(dto, null);
+        ActionResultDto<Void> result = actionRunner.run(getNestedId(job), tanksCloseAction, null);
+        ActionResultDto<Void> result2 = actionRunner.run(getNestedId(job), outputsCloseAction, null);
         state.setState(SystemStatus.IDLE);
         log.info("Watering finished!");
     }
