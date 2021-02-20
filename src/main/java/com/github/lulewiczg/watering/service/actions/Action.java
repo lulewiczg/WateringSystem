@@ -1,7 +1,8 @@
 package com.github.lulewiczg.watering.service.actions;
 
+import com.github.lulewiczg.watering.exception.ActionException;
 import com.github.lulewiczg.watering.service.dto.ActionDto;
-import com.github.lulewiczg.watering.service.dto.JobDto;
+import com.github.lulewiczg.watering.service.dto.ActionResultDto;
 import lombok.extern.log4j.Log4j2;
 
 import java.util.List;
@@ -16,12 +17,12 @@ import java.util.List;
 public abstract class Action<T, R> {
 
     /**
-     * Executes action
+     * Executes action.
      *
      * @param param acton param
      * @return action result
      */
-    abstract R run(ActionDto actionDto, T param);
+    abstract R doAction(ActionDto actionDto, T param);
 
     /**
      * Gets action description.
@@ -92,5 +93,16 @@ public abstract class Action<T, R> {
      */
     protected String getNestedId(ActionDto action) {
         return action.getId() + ".";
+    }
+
+    /**
+     * Handles action result and throws exception if failed.
+     *
+     * @param result result
+     */
+    protected void handleResult(ActionResultDto<Void> result) {
+        if (result.getErrorMsg() != null) {
+            throw new ActionException(result.getId(), result.getErrorMsg());
+        }
     }
 }

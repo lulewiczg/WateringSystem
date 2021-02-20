@@ -2,6 +2,7 @@ package com.github.lulewiczg.watering.service.actions;
 
 import com.github.lulewiczg.watering.config.MasterConfig;
 import com.github.lulewiczg.watering.service.dto.ActionDto;
+import com.github.lulewiczg.watering.service.dto.ActionResultDto;
 import com.github.lulewiczg.watering.state.AppState;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
@@ -24,10 +25,11 @@ public class TanksOpenAction extends Action<Void, Void> {
     private final ActionRunner actionRunner;
 
     @Override
-    protected Void run(ActionDto actionDto, Void param) {
+    protected Void doAction(ActionDto actionDto, Void param) {
         log.info("Opening tanks...");
         state.getTanks().forEach(i -> {
-            actionRunner.run(getNestedId(actionDto), openAction, i.getValve());
+            ActionResultDto<Void> result = actionRunner.run(getNestedId(actionDto), openAction, i.getValve());
+            handleResult(result);
         });
         return null;
     }

@@ -34,7 +34,7 @@ class ActionRunnerTest {
 
     @Test
     void testRun() {
-        when(action.run(new ActionDto(action.getClass().getSimpleName(), "id", action, null), "param"))
+        when(action.doAction(new ActionDto(action.getClass().getSimpleName(), "id", action, null), "param"))
                 .thenReturn(12.34);
 
         ActionResultDto<Double> result = runner.run("id", action, "param");
@@ -48,12 +48,12 @@ class ActionRunnerTest {
         ActionResultDto<Void> result = runner.run("id", voidAction, null);
 
         TestUtils.testActionResult(result);
-        verify(voidAction).run(new ActionDto(action.getClass().getSimpleName(), "id", voidAction, null), null);
+        verify(voidAction).doAction(new ActionDto(action.getClass().getSimpleName(), "id", voidAction, null), null);
     }
 
     @Test
     void testRunNested() {
-        when(action.run(argThat(i -> i.getId().startsWith("id.") && i.getAction().equals(action)
+        when(action.doAction(argThat(i -> i.getId().startsWith("id.") && i.getAction().equals(action)
                 && i.getName().equals(action.getClass().getSimpleName())), eq("param")))
                 .thenReturn(12.34);
 
@@ -69,7 +69,7 @@ class ActionRunnerTest {
 
     @Test
     void testRunError() {
-        when(action.run(new ActionDto(action.getClass().getSimpleName(), "id", action, null), "param"))
+        when(action.doAction(new ActionDto(action.getClass().getSimpleName(), "id", action, null), "param"))
                 .thenThrow(new RuntimeException("some error"));
 
         ActionResultDto<Double> result = runner.run("id", action, "param");
@@ -79,7 +79,7 @@ class ActionRunnerTest {
 
     @Test
     void testRunNoId() {
-        when(action.run(argThat(i -> i.getId() != null && i.getAction().equals(action)
+        when(action.doAction(argThat(i -> i.getId() != null && i.getAction().equals(action)
                 && i.getName().equals(action.getClass().getSimpleName())), eq("param")))
                 .thenReturn(12.34);
 
@@ -91,7 +91,7 @@ class ActionRunnerTest {
 
     @Test
     void testRunErrorNoId() {
-        when(action.run(argThat(i -> i.getId() != null && i.getAction().equals(action)
+        when(action.doAction(argThat(i -> i.getId() != null && i.getAction().equals(action)
                 && i.getName().equals(action.getClass().getSimpleName())), eq("param")))
                 .thenThrow(new RuntimeException("some error"));
 
@@ -102,7 +102,7 @@ class ActionRunnerTest {
 
     @Test
     void testRunDto() {
-        when(action.run(new ActionDto(action.getClass().getSimpleName(), "id", action, null), "param"))
+        when(action.doAction(new ActionDto(action.getClass().getSimpleName(), "id", action, null), "param"))
                 .thenReturn(12.34);
 
         ActionResultDto<Double> result = runner.run(
@@ -118,12 +118,12 @@ class ActionRunnerTest {
                 new ActionDto(action.getClass().getSimpleName(), "id", voidAction, null), null);
 
         TestUtils.testActionResult(result);
-        verify(voidAction).run(new ActionDto(action.getClass().getSimpleName(), "id", voidAction, null), null);
+        verify(voidAction).doAction(new ActionDto(action.getClass().getSimpleName(), "id", voidAction, null), null);
     }
 
     @Test
     void testRunNestedDto() {
-        when(action.run(argThat(i -> i.getId().startsWith("id.") && i.getAction().equals(action)
+        when(action.doAction(argThat(i -> i.getId().startsWith("id.") && i.getAction().equals(action)
                 && i.getName().equals(action.getClass().getSimpleName())), eq("param")))
                 .thenReturn(12.34);
 
@@ -140,7 +140,7 @@ class ActionRunnerTest {
 
     @Test
     void testRunErrorDto() {
-        when(action.run(new ActionDto(action.getClass().getSimpleName(), "id", action, null), "param"))
+        when(action.doAction(new ActionDto(action.getClass().getSimpleName(), "id", action, null), "param"))
                 .thenThrow(new RuntimeException("some error"));
 
         ActionResultDto<Double> result = runner.run(
@@ -151,7 +151,7 @@ class ActionRunnerTest {
 
     @Test
     void testRunNoIdDto() {
-        when(action.run(argThat(i -> i.getId() != null && i.getAction().equals(action)
+        when(action.doAction(argThat(i -> i.getId() != null && i.getAction().equals(action)
                 && i.getName().equals(action.getClass().getSimpleName())), eq("param")))
                 .thenReturn(12.34);
 
@@ -164,7 +164,7 @@ class ActionRunnerTest {
 
     @Test
     void testRunErrorNoIdDto() {
-        when(action.run(argThat(i -> i.getId() != null && i.getAction().equals(action)
+        when(action.doAction(argThat(i -> i.getId() != null && i.getAction().equals(action)
                 && i.getName().equals(action.getClass().getSimpleName())), eq("param")))
                 .thenThrow(new RuntimeException("some error"));
 

@@ -45,7 +45,7 @@ public class ActionRunner {
         log.debug("Executing {} action with ID {} ...", actionDto.getName(), id);
         R result;
         try {
-            result = action.run(actionDto, param);
+            result = action.doAction(actionDto, param);
         } catch (Exception e) {
             log.error(String.format("Action %s failed", id), e);
             String message = e.getMessage();

@@ -35,7 +35,7 @@ class ValveCloseActionTest {
     void testClose() {
         Valve valve = new Valve("test", "test", ValveType.OUTPUT, true, RaspiPin.GPIO_00);
 
-        action.run(new ActionDto(), valve);
+        action.doAction(new ActionDto(), valve);
 
         verify(service).toggleOff(valve.getPin());
     }
@@ -44,7 +44,7 @@ class ValveCloseActionTest {
     void testAlreadyClosed() {
         Valve valve = new Valve("test", "test", ValveType.OUTPUT, false, RaspiPin.GPIO_00);
 
-        action.run(new ActionDto(), valve);
+        action.doAction(new ActionDto(), valve);
 
         verify(service).toggleOff(valve.getPin());
         assertFalse(valve.isOpen());

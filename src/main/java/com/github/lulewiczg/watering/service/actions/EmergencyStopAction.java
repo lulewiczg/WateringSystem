@@ -2,6 +2,7 @@ package com.github.lulewiczg.watering.service.actions;
 
 import com.github.lulewiczg.watering.config.MasterConfig;
 import com.github.lulewiczg.watering.service.dto.ActionDto;
+import com.github.lulewiczg.watering.service.dto.ActionResultDto;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
@@ -25,12 +26,17 @@ public class EmergencyStopAction extends Action<Void, Void> {
     private final ActionRunner actionRunner;
 
     @Override
-    protected Void run(ActionDto actionDto, Void param) {
+    protected Void doAction(ActionDto actionDto, Void param) {
         log.info("System emergency stop...");
         String nestedId = getNestedId(actionDto);
-        actionRunner.run(nestedId, tanksCloseAction, null);
-        actionRunner.run(nestedId, tapsCloseAction, null);
-        actionRunner.run(nestedId, outputsCloseAction, null);
+        ActionResultDto<Void> result = actionRunner.run(nestedId, tanksCloseAction, null);
+        ActionResultDto<Void> result2 = actionRunner.run(nestedId, tapsCloseAction, null);
+        ActionResultDto<Void> result3 = actionRunner.run(nestedId, outputsCloseAction, null);
+
+        handleResult(result);
+        handleResult(result2);
+        handleResult(result3);
+
         return null;
     }
 
