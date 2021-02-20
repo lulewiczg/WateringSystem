@@ -1,8 +1,6 @@
 package com.github.lulewiczg.watering.service.job;
 
-import com.github.lulewiczg.watering.TestUtils;
 import com.github.lulewiczg.watering.config.dto.ValveType;
-import com.github.lulewiczg.watering.service.dto.ActionResultDto;
 import com.github.lulewiczg.watering.service.dto.JobDto;
 import com.github.lulewiczg.watering.service.io.IOService;
 import com.github.lulewiczg.watering.state.AppState;
@@ -22,9 +20,7 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.util.List;
-import java.util.UUID;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
@@ -42,66 +38,56 @@ class ScheduledValveReadTest {
 
     @Autowired
     private ScheduledValveRead job;
-//
-//    @ParameterizedTest
-//    @EnumSource(value = SystemStatus.class)
-//    void testOk(SystemStatus status) {
-//        when(state.getState()).thenReturn(status);
-//        Valve valve = new Valve("valve", "valve", ValveType.OUTPUT, true, RaspiPin.GPIO_00);
-//        Sensor sensor = new Sensor("sensor", 10, 90, null, RaspiPin.GPIO_01);
-//        Tank tank = new Tank("tank", 100, sensor, valve);
-//        Valve valve2 = new Valve("valve2", "valve2", ValveType.OUTPUT, false, RaspiPin.GPIO_01);
-//        Sensor sensor2 = new Sensor("sensor2", 10, 90, 10, RaspiPin.GPIO_02);
-//        Tank tank2 = new Tank("tank2", 100, sensor2, valve2);
-//        Valve valve3 = new Valve("valve3", "valve3", ValveType.OUTPUT, false, RaspiPin.GPIO_02);
-//
-//        when(state.getTanks()).thenReturn(List.of(tank, tank2));
-//        when(state.getOutputs()).thenReturn(List.of(valve3));
-//        when(ioService.readPin(valve.getPin())).thenReturn(true);
-//        when(ioService.readPin(valve2.getPin())).thenReturn(false);
-//        JobDto jobDto = new JobDto("test");
-//
-//        ActionResultDto<Void> result = job.run(jobDto);
-//
-//        TestUtils.testActionResult(result);
-//        verify(ioService).readPin(valve.getPin());
-//        verify(ioService).readPin(valve2.getPin());
-//        verify(ioService).readPin(valve3.getPin());
-//        verify(state, never()).setState(any());
-//    }
-//
-//    @ParameterizedTest
-//    @EnumSource(value = SystemStatus.class)
-//    void testNotOk(SystemStatus status) {
-//        when(state.getState()).thenReturn(status);
-//        Valve valve = new Valve("valve", "valve", ValveType.OUTPUT, true, RaspiPin.GPIO_00);
-//        Sensor sensor = new Sensor("sensor", 10, 90, null, RaspiPin.GPIO_01);
-//        Tank tank = new Tank("tank", 100, sensor, valve);
-//        Valve valve2 = new Valve("valve2", "valve2", ValveType.OUTPUT, false, RaspiPin.GPIO_01);
-//        Sensor sensor2 = new Sensor("sensor2", 10, 90, 10, RaspiPin.GPIO_02);
-//        Tank tank2 = new Tank("tank2", 100, sensor2, valve2);
-//        when(state.getTanks()).thenReturn(List.of(tank, tank2));
-//        when(ioService.readPin(valve.getPin())).thenReturn(true);
-//        when(ioService.readPin(valve2.getPin())).thenReturn(true);
-//        JobDto jobDto = new JobDto("test");
-//
-//        ActionResultDto<Void> result = job.run(jobDto);
-//
-//        TestUtils.testActionResult(result);
-//        verify(ioService).readPin(valve.getPin());
-//        verify(ioService).readPin(valve2.getPin());
-//        verify(state).setState(SystemStatus.ERROR);
-//    }
-//
-//    @ParameterizedTest
-//    @EnumSource(value = SystemStatus.class)
-//    void testWithId(SystemStatus status) {
-//        when(state.getState()).thenReturn(status);
-//        JobDto jobDto = new JobDto("test", UUID.randomUUID().toString());
-//
-//        ActionResultDto<Void> result = job.run(jobDto);
-//
-//        TestUtils.testActionResult(result);
-//        assertEquals(jobDto.getId(), result.getId());
-//    }
+
+    @MockBean
+    private JobRunner jobRunner;
+
+    @ParameterizedTest
+    @EnumSource(value = SystemStatus.class)
+    void testOk(SystemStatus status) {
+        when(state.getState()).thenReturn(status);
+        Valve valve = new Valve("valve", "valve", ValveType.OUTPUT, true, RaspiPin.GPIO_00);
+        Sensor sensor = new Sensor("sensor", 10, 90, null, RaspiPin.GPIO_01);
+        Tank tank = new Tank("tank", 100, sensor, valve);
+        Valve valve2 = new Valve("valve2", "valve2", ValveType.OUTPUT, false, RaspiPin.GPIO_01);
+        Sensor sensor2 = new Sensor("sensor2", 10, 90, 10, RaspiPin.GPIO_02);
+        Tank tank2 = new Tank("tank2", 100, sensor2, valve2);
+        Valve valve3 = new Valve("valve3", "valve3", ValveType.OUTPUT, false, RaspiPin.GPIO_02);
+
+        when(state.getTanks()).thenReturn(List.of(tank, tank2));
+        when(state.getOutputs()).thenReturn(List.of(valve3));
+        when(ioService.readPin(valve.getPin())).thenReturn(true);
+        when(ioService.readPin(valve2.getPin())).thenReturn(false);
+        JobDto jobDto = new JobDto("test");
+
+        job.doJob(jobDto);
+
+        verify(ioService).readPin(valve.getPin());
+        verify(ioService).readPin(valve2.getPin());
+        verify(ioService).readPin(valve3.getPin());
+        verify(state, never()).setState(any());
+    }
+
+    @ParameterizedTest
+    @EnumSource(value = SystemStatus.class)
+    void testNotOk(SystemStatus status) {
+        when(state.getState()).thenReturn(status);
+        Valve valve = new Valve("valve", "valve", ValveType.OUTPUT, true, RaspiPin.GPIO_00);
+        Sensor sensor = new Sensor("sensor", 10, 90, null, RaspiPin.GPIO_01);
+        Tank tank = new Tank("tank", 100, sensor, valve);
+        Valve valve2 = new Valve("valve2", "valve2", ValveType.OUTPUT, false, RaspiPin.GPIO_01);
+        Sensor sensor2 = new Sensor("sensor2", 10, 90, 10, RaspiPin.GPIO_02);
+        Tank tank2 = new Tank("tank2", 100, sensor2, valve2);
+        when(state.getTanks()).thenReturn(List.of(tank, tank2));
+        when(ioService.readPin(valve.getPin())).thenReturn(true);
+        when(ioService.readPin(valve2.getPin())).thenReturn(true);
+        JobDto jobDto = new JobDto("test");
+
+        job.doJob(jobDto);
+
+        verify(ioService).readPin(valve.getPin());
+        verify(ioService).readPin(valve2.getPin());
+        verify(state).setState(SystemStatus.ERROR);
+    }
+
 }

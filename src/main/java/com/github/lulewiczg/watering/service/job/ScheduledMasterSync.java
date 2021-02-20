@@ -51,7 +51,6 @@ public class ScheduledMasterSync extends ScheduledJob {
 
     private List<ActionResultDto<?>> jobResults = new ArrayList<>();
 
-
     @Value("${com.github.lulewiczg.watering.master.url}")
     private String url;
 

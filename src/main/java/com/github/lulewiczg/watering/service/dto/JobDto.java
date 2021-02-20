@@ -38,8 +38,12 @@ public class JobDto {
         this.id += id;
     }
 
-    public JobDto(@NotNull String name) {
+    public JobDto(String name) {
         this.name = name;
     }
 
+    public JobDto(@NotNull String name, String id) {
+        this.name = name;
+        this.id = id;
+    }
 }
