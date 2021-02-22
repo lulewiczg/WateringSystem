@@ -1,6 +1,7 @@
 package com.github.lulewiczg.watering.service.job;
 
 import com.github.lulewiczg.watering.config.dto.ValveType;
+import com.github.lulewiczg.watering.exception.ActionException;
 import com.github.lulewiczg.watering.service.actions.ActionRunner;
 import com.github.lulewiczg.watering.service.actions.WaterLevelReadAction;
 import com.github.lulewiczg.watering.service.dto.ActionResultDto;
@@ -11,6 +12,7 @@ import com.github.lulewiczg.watering.state.dto.Sensor;
 import com.github.lulewiczg.watering.state.dto.Tank;
 import com.github.lulewiczg.watering.state.dto.Valve;
 import com.pi4j.io.gpio.RaspiPin;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
@@ -25,7 +27,8 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ActiveProfiles("test")
@@ -49,10 +52,8 @@ class ScheduledSensorReadTest {
     @Autowired
     private ScheduledSensorRead job;
 
-    @ParameterizedTest
-    @EnumSource(value = SystemStatus.class)
-    void testJob(SystemStatus status) {
-        when(state.getState()).thenReturn(status);
+    @Test
+    void testJob() {
         Valve valve = new Valve("valve", "valve", ValveType.OUTPUT, true, RaspiPin.GPIO_00);
         Sensor sensor = new Sensor("sensor", 10, 90, null, RaspiPin.GPIO_01);
         Tank tank = new Tank("tank", 100, sensor, valve);
@@ -70,6 +71,35 @@ class ScheduledSensorReadTest {
 
         assertEquals(11, sensor.getLevel());
         assertEquals(22, sensor2.getLevel());
+    }
+
+    @Test
+    void testJobNestedError() {
+        Valve valve = new Valve("valve", "valve", ValveType.OUTPUT, true, RaspiPin.GPIO_00);
+        Sensor sensor = new Sensor("sensor", 10, 90, null, RaspiPin.GPIO_01);
+        Tank tank = new Tank("tank", 100, sensor, valve);
+        Valve valve2 = new Valve("valve2", "valve2", ValveType.OUTPUT, true, RaspiPin.GPIO_01);
+        Sensor sensor2 = new Sensor("sensor2", 10, 90, 10, RaspiPin.GPIO_02);
+        Tank tank2 = new Tank("tank2", 100, sensor2, valve2);
+        when(state.getTanks()).thenReturn(List.of(tank, tank2));
+        JobDto jobDto = new JobDto(null, "test");
+        when(runner.run("test.", readAction, sensor))
+                .thenReturn(new ActionResultDto<>(UUID.randomUUID().toString(), 11.0, LocalDateTime.now()));
+        when(runner.run("test.", readAction, sensor2)).thenThrow(new ActionException("id", "error"));
+
+        String error = assertThrows(ActionException.class, () -> job.doJob(jobDto)).getLocalizedMessage();
+
+        assertEquals("Action [id] failed: error", error);
+        verify(runner).run("test.", readAction, sensor);
+        verify(runner).run("test.", readAction, sensor2);
+    }
+
+    @ParameterizedTest
+    @EnumSource(value = SystemStatus.class)
+    void testCanBeRun(SystemStatus status) {
+        when(state.getState()).thenReturn(status);
+
+        assertTrue(job.canBeStarted());
     }
 
 }

@@ -4,7 +4,6 @@ import com.github.lulewiczg.watering.config.MasterConfig;
 import com.github.lulewiczg.watering.service.actions.ActionRunner;
 import com.github.lulewiczg.watering.service.actions.TanksCloseAction;
 import com.github.lulewiczg.watering.service.actions.ValveOpenAction;
-import com.github.lulewiczg.watering.service.dto.ActionDto;
 import com.github.lulewiczg.watering.service.dto.ActionResultDto;
 import com.github.lulewiczg.watering.service.dto.JobDto;
 import com.github.lulewiczg.watering.state.AppState;
@@ -72,6 +71,7 @@ public class ScheduledOverflowWaterControl extends ScheduledJob {
 
         tanks.forEach(i -> {
             ActionResultDto<Void> result = actionRunner.run(getNestedId(job), valveOpenAction, i.getValve());
+            handleResult(result);
         });
         log.info("Draining tanks started.");
     }
@@ -81,7 +81,8 @@ public class ScheduledOverflowWaterControl extends ScheduledJob {
         List<Tank> tanks = findOverflowTanks();
         if (tanks.isEmpty()) {
             log.info("Water levels are OK, stopping");
-            actionRunner.run(new ActionDto(null, getNestedId(job), tanksCloseAction, null), null);
+            ActionResultDto<Void> result = actionRunner.run(getNestedId(job), tanksCloseAction, null);
+            handleResult(result);
             state.setState(SystemStatus.IDLE);
         }
     }

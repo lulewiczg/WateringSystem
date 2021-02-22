@@ -9,6 +9,7 @@ import com.github.lulewiczg.watering.state.dto.Sensor;
 import com.github.lulewiczg.watering.state.dto.Tank;
 import com.github.lulewiczg.watering.state.dto.Valve;
 import com.pi4j.io.gpio.RaspiPin;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
@@ -21,6 +22,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.util.List;
 
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
@@ -42,10 +44,8 @@ class ScheduledValveReadTest {
     @MockBean
     private JobRunner jobRunner;
 
-    @ParameterizedTest
-    @EnumSource(value = SystemStatus.class)
-    void testOk(SystemStatus status) {
-        when(state.getState()).thenReturn(status);
+    @Test
+    void testOk() {
         Valve valve = new Valve("valve", "valve", ValveType.OUTPUT, true, RaspiPin.GPIO_00);
         Sensor sensor = new Sensor("sensor", 10, 90, null, RaspiPin.GPIO_01);
         Tank tank = new Tank("tank", 100, sensor, valve);
@@ -68,10 +68,8 @@ class ScheduledValveReadTest {
         verify(state, never()).setState(any());
     }
 
-    @ParameterizedTest
-    @EnumSource(value = SystemStatus.class)
-    void testNotOk(SystemStatus status) {
-        when(state.getState()).thenReturn(status);
+    @Test
+    void testNotOk() {
         Valve valve = new Valve("valve", "valve", ValveType.OUTPUT, true, RaspiPin.GPIO_00);
         Sensor sensor = new Sensor("sensor", 10, 90, null, RaspiPin.GPIO_01);
         Tank tank = new Tank("tank", 100, sensor, valve);
@@ -88,6 +86,14 @@ class ScheduledValveReadTest {
         verify(ioService).readPin(valve.getPin());
         verify(ioService).readPin(valve2.getPin());
         verify(state).setState(SystemStatus.ERROR);
+    }
+
+    @ParameterizedTest
+    @EnumSource(value = SystemStatus.class)
+    void testCanBeRun(SystemStatus status) {
+        when(state.getState()).thenReturn(status);
+
+        assertTrue(job.canBeStarted());
     }
 
 }

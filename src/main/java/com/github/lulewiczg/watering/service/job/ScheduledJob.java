@@ -1,5 +1,7 @@
 package com.github.lulewiczg.watering.service.job;
 
+import com.github.lulewiczg.watering.exception.ActionException;
+import com.github.lulewiczg.watering.service.dto.ActionResultDto;
 import com.github.lulewiczg.watering.service.dto.JobDto;
 import com.github.lulewiczg.watering.state.SystemStatus;
 import lombok.extern.log4j.Log4j2;
@@ -99,6 +101,17 @@ public abstract class ScheduledJob {
 
     public boolean isRunning() {
         return getJobStatus() == getState();
+    }
+
+    /**
+     * Handles action result and throws exception if failed.
+     *
+     * @param result result
+     */
+    protected void handleResult(ActionResultDto<Void> result) {
+        if (result.getErrorMsg() != null) {
+            throw new ActionException(result.getId(), result.getErrorMsg());
+        }
     }
 
 }

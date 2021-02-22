@@ -6,6 +6,7 @@ import com.github.lulewiczg.watering.state.AppState;
 import com.github.lulewiczg.watering.state.SystemStatus;
 import com.github.lulewiczg.watering.state.dto.MasterResponse;
 import org.apache.tomcat.util.codec.binary.Base64;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
 import org.mockito.Mockito;
@@ -25,8 +26,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 @SpringBootTest
@@ -64,10 +64,8 @@ class ScheduledMasterSyncTest {
 
     private final ActionResultDto<String> jobResult = new ActionResultDto<>("test", null, LocalDateTime.now(), "error");
 
-    @ParameterizedTest
-    @EnumSource(value = SystemStatus.class)
-    void testJob(SystemStatus status) {
-        when(state.getState()).thenReturn(status);
+    @Test
+    void testJob() {
         JobDefinitionDto jobDef = new JobDefinitionDto("test", true);
         when(actionService.getActions()).thenReturn(List.of(actionDef));
         when(actionService.getJobs()).thenReturn(List.of(jobDef));
@@ -101,10 +99,8 @@ class ScheduledMasterSyncTest {
         verify(actionService).runAction(action2);
     }
 
-    @ParameterizedTest
-    @EnumSource(value = SystemStatus.class)
-    void testJobNothingToDo(SystemStatus status) {
-        when(state.getState()).thenReturn(status);
+    @Test
+    void testJobNothingToDo() {
         JobDefinitionDto jobDef = new JobDefinitionDto("test", true);
         when(actionService.getActions()).thenReturn(List.of(actionDef));
         when(actionService.getJobs()).thenReturn(List.of(jobDef));
@@ -128,10 +124,8 @@ class ScheduledMasterSyncTest {
         assertEquals(new ArrayList<>(), job.getActionResults());
     }
 
-    @ParameterizedTest
-    @EnumSource(value = SystemStatus.class)
-    void testJobFail(SystemStatus status) {
-        when(state.getState()).thenReturn(status);
+    @Test
+    void testJobFail() {
         JobDefinitionDto jobDef = new JobDefinitionDto("test", true);
         when(actionService.getActions()).thenReturn(List.of(actionDef));
         when(actionService.getJobs()).thenReturn(List.of(jobDef));
@@ -145,9 +139,17 @@ class ScheduledMasterSyncTest {
         when(restTemplate.postForEntity(url, entity, MasterResponse.class)).thenThrow(HttpClientErrorException.BadRequest.class);
         JobDto syncDto = new JobDto("test");
 
-        assertThrows(HttpClientErrorException.BadRequest.class, ()->job.doJob(syncDto));
+        assertThrows(HttpClientErrorException.BadRequest.class, () -> job.doJob(syncDto));
 
         verify(actionService, never()).runJob(any());
         verify(actionService, never()).runAction(any());
+    }
+
+    @ParameterizedTest
+    @EnumSource(value = SystemStatus.class)
+    void testCanBeRun(SystemStatus status) {
+        when(state.getState()).thenReturn(status);
+
+        assertTrue(job.canBeStarted());
     }
 }

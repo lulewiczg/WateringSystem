@@ -76,7 +76,9 @@ public class ScheduledWatering extends ScheduledJob {
     public void doJob(JobDto job) {
         state.setState(SystemStatus.WATERING);
         ActionResultDto<Void> result = actionRunner.run(getNestedId(job), tanksOpenAction, null);
+        handleResult(result);
         ActionResultDto<Void> result2 = actionRunner.run(getNestedId(job), outputsOpenAction, null);
+        handleResult(result2);
         log.info("Valves opened");
         exec.schedule(() -> finish(job), wateringLength, TimeUnit.SECONDS);
     }
@@ -84,7 +86,9 @@ public class ScheduledWatering extends ScheduledJob {
     private void finish(JobDto job) {
         log.info("Stopping watering job...");
         ActionResultDto<Void> result = actionRunner.run(getNestedId(job), tanksCloseAction, null);
+        handleResult(result);
         ActionResultDto<Void> result2 = actionRunner.run(getNestedId(job), outputsCloseAction, null);
+        handleResult(result2);
         state.setState(SystemStatus.IDLE);
         log.info("Watering finished!");
     }

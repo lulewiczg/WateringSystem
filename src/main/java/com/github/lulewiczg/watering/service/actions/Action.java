@@ -61,7 +61,7 @@ public abstract class Action<T, R> {
     /**
      * Gets allowed values for action
      *
-     * @return allowewd values
+     * @return allowed values
      */
     public List<?> getAllowedValues() {
         return null;

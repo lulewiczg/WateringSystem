@@ -81,6 +81,7 @@ public class ScheduledWaterEscapeControl extends ScheduledJob {
             log.error("Water leak in tanks: {}", leaks);
             state.setState(SystemStatus.ERROR);
             ActionResultDto<Void> result = actionRunner.run(getNestedId(job), emergencyStopAction, null);
+            handleResult(result);
         }
         log.debug("Escape control finished.");
         prevLevels = levels;
