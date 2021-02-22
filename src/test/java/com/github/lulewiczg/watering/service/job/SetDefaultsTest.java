@@ -67,9 +67,9 @@ class SetDefaultsTest {
         when(state.getOutputs()).thenReturn(List.of(valve3, valve4));
         when(runner.run(eq("test."), eq(openAction), any())).thenReturn(TestUtils.EMPTY_RESULT);
         when(runner.run(eq("test."), eq(closeAction), any())).thenReturn(TestUtils.EMPTY_RESULT);
-        JobDto syncDto = new JobDto(null, "test");
+        JobDto jobDto = new JobDto("test", null);
 
-        job.doJob(syncDto);
+        job.doJob(jobDto);
 
         verify(runner).run("test.", openAction, valve);
         verify(runner).run("test.", openAction, valve3);
@@ -89,9 +89,9 @@ class SetDefaultsTest {
         when(state.getOutputs()).thenReturn(List.of(valve3, valve4));
         when(runner.run(eq("test."), eq(openAction), any())).thenReturn(TestUtils.ERROR_RESULT);
         when(runner.run(eq("test."), eq(closeAction), any())).thenReturn(TestUtils.EMPTY_RESULT);
-        JobDto syncDto = new JobDto(null, "test");
+        JobDto jobDto = new JobDto("test", null);
 
-        String error = assertThrows(ActionException.class, () -> job.doJob(syncDto)).getLocalizedMessage();
+        String error = assertThrows(ActionException.class, () -> job.doJob(jobDto)).getLocalizedMessage();
 
         assertEquals("Action [id] failed: error", error);
         verify(runner).run("test.", openAction, valve);
@@ -109,9 +109,9 @@ class SetDefaultsTest {
         when(state.getOutputs()).thenReturn(List.of(valve3, valve4));
         when(runner.run(eq("test."), eq(closeAction), any())).thenReturn(TestUtils.ERROR_RESULT);
         when(runner.run(eq("test."), eq(openAction), any())).thenReturn(TestUtils.EMPTY_RESULT);
-        JobDto syncDto = new JobDto(null, "test");
+        JobDto jobDto = new JobDto("test", null);
 
-        String error = assertThrows(ActionException.class, () -> job.doJob(syncDto)).getLocalizedMessage();
+        String error = assertThrows(ActionException.class, () -> job.doJob(jobDto)).getLocalizedMessage();
 
         assertEquals("Action [id] failed: error", error);
         verify(runner).run("test.", openAction, valve);

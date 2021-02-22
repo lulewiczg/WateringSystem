@@ -79,7 +79,7 @@ class ScheduledOverflowWaterControlTest {
         Sensor sensor = new Sensor("sensor", minLevel, maxLevel, level, RaspiPin.GPIO_01);
         Tank tank = new Tank("tank", 100, sensor, valve);
         when(state.getTanks()).thenReturn(List.of(tank));
-        JobDto jobDto = new JobDto(null, "test");
+        JobDto jobDto = new JobDto("test", null);
 
         job.doJobRunning(jobDto);
 
@@ -95,10 +95,10 @@ class ScheduledOverflowWaterControlTest {
         Sensor sensor = new Sensor("sensor", minLevel, maxLevel, level, RaspiPin.GPIO_01);
         Tank tank = new Tank("tank", 100, sensor, valve);
         when(state.getTanks()).thenReturn(List.of(tank));
-        JobDto syncDto = new JobDto(null, "test");
+        JobDto jobDto = new JobDto("test", null);
         when(runner.run("test.", tanksCloseAction, null)).thenReturn(TestUtils.EMPTY_RESULT);
 
-        job.doJobRunning(syncDto);
+        job.doJobRunning(jobDto);
 
         verify(runner).run("test.", tanksCloseAction, null);
         verify(runner, never()).run(any(), eq(valveOpenAction), any());
@@ -112,7 +112,7 @@ class ScheduledOverflowWaterControlTest {
         Sensor sensor = new Sensor("sensor", minLevel, maxLevel, level, RaspiPin.GPIO_01);
         Tank tank = new Tank("tank", 100, sensor, valve);
         when(state.getTanks()).thenReturn(List.of(tank));
-        JobDto jobDto = new JobDto(null, "test");
+        JobDto jobDto = new JobDto("test", null);
 
         job.doJob(jobDto);
 
@@ -131,7 +131,7 @@ class ScheduledOverflowWaterControlTest {
         Sensor sensor2 = new Sensor("sensor", 1, 3, 2, RaspiPin.GPIO_03);
         Tank tank2 = new Tank("tank2", 100, sensor2, valve2);
         when(state.getTanks()).thenReturn(List.of(tank, tank2));
-        JobDto jobDto = new JobDto(null, "test");
+        JobDto jobDto = new JobDto("test", null);
         when(runner.run("test.", valveOpenAction, valve)).thenReturn(TestUtils.EMPTY_RESULT);
 
         job.doJob(jobDto);
@@ -148,7 +148,7 @@ class ScheduledOverflowWaterControlTest {
         Tank tank = new Tank("tank", 100, sensor, valve);
         when(state.getTanks()).thenReturn(List.of(tank));
         when(runner.run("test.", valveOpenAction, valve)).thenReturn(TestUtils.ERROR_RESULT);
-        JobDto jobDto = new JobDto(null, "test");
+        JobDto jobDto = new JobDto("test", null);
 
         String error = assertThrows(ActionException.class, () -> job.doJob(jobDto)).getLocalizedMessage();
 
@@ -161,10 +161,10 @@ class ScheduledOverflowWaterControlTest {
         Sensor sensor = new Sensor("sensor", 1, 90, 89, RaspiPin.GPIO_01);
         Tank tank = new Tank("tank", 100, sensor, valve);
         when(state.getTanks()).thenReturn(List.of(tank));
-        JobDto syncDto = new JobDto(null, "test");
+        JobDto jobDto = new JobDto("test", null);
         when(runner.run("test.", tanksCloseAction, null)).thenReturn(TestUtils.ERROR_RESULT);
 
-        String error = assertThrows(ActionException.class, () -> job.doJobRunning(syncDto)).getLocalizedMessage();
+        String error = assertThrows(ActionException.class, () -> job.doJobRunning(jobDto)).getLocalizedMessage();
         assertEquals("Action [id] failed: error", error);
 
         verify(runner).run("test.", tanksCloseAction, null);

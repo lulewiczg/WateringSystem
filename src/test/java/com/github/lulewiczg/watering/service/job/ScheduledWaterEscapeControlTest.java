@@ -67,7 +67,7 @@ class ScheduledWaterEscapeControlTest {
         Tank tank = new Tank("tank", 100, sensor, valve);
         when(state.getTanks()).thenReturn(List.of(tank));
         when(runner.run("test.", emergencyStopAction, null)).thenReturn(TestUtils.EMPTY_RESULT);
-        JobDto jobDto = new JobDto(null, "test");
+        JobDto jobDto = new JobDto("test", null);
 
         job.doJob(jobDto);
 
@@ -93,7 +93,7 @@ class ScheduledWaterEscapeControlTest {
         Tank tank2 = new Tank("tank2", 100, sensor2, valve2);
         when(state.getTanks()).thenReturn(List.of(tank, tank2));
         when(runner.run("test.", emergencyStopAction, null)).thenReturn(TestUtils.EMPTY_RESULT);
-        JobDto jobDto = new JobDto(null, "test");
+        JobDto jobDto = new JobDto("test", null);
 
         job.doJob(jobDto);
 
@@ -116,7 +116,7 @@ class ScheduledWaterEscapeControlTest {
         Tank tank = new Tank("tank", 100, sensor, valve);
         when(state.getTanks()).thenReturn(List.of(tank));
         when(runner.run("test.", emergencyStopAction, null)).thenReturn(TestUtils.EMPTY_RESULT);
-        JobDto jobDto = new JobDto(null, "test");
+        JobDto jobDto = new JobDto("test", null);
 
         job.doJob(jobDto);
         job.doJob(jobDto);
@@ -136,7 +136,7 @@ class ScheduledWaterEscapeControlTest {
         Tank tank = new Tank("tank", 100, sensor, valve);
         when(state.getTanks()).thenReturn(List.of(tank));
         when(runner.run("test.", emergencyStopAction, null)).thenReturn(TestUtils.ERROR_RESULT);
-        JobDto jobDto = new JobDto(null, "test");
+        JobDto jobDto = new JobDto("test", null);
         sensor.setLevel(90);
         job.doJob(jobDto);
         sensor.setLevel(89);

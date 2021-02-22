@@ -18,10 +18,10 @@ import javax.validation.constraints.NotNull;
 @Builder(toBuilder = true)
 public class JobDto {
 
+    private String id;
+
     @NotNull
     private String name;
-
-    private String id;
 
     @JsonIgnore
     private ScheduledJob job;
@@ -42,7 +42,7 @@ public class JobDto {
         this.name = name;
     }
 
-    public JobDto(@NotNull String name, String id) {
+    public JobDto(String id, String name) {
         this.name = name;
         this.id = id;
     }

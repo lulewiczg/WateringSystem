@@ -114,9 +114,9 @@ class ScheduledMasterSyncTest {
         HttpEntity<SlaveStateDto> entity = new HttpEntity<>(new SlaveStateDto(state, List.of(actionDef), List.of(jobDef), List.of(actionResult), List.of(jobResult)), headers);
 
         when(restTemplate.postForEntity(url, entity, MasterResponse.class)).thenReturn(new ResponseEntity<>(response, HttpStatus.OK));
-        JobDto syncDto = new JobDto("test");
+        JobDto jobDto = new JobDto("test");
 
-        job.doJob(syncDto);
+        job.doJob(jobDto);
 
         verify(actionService, never()).runJob(any());
         verify(actionService, never()).runAction(any());
@@ -137,9 +137,9 @@ class ScheduledMasterSyncTest {
         HttpEntity<SlaveStateDto> entity = new HttpEntity<>(new SlaveStateDto(state, List.of(actionDef), List.of(jobDef), List.of(), List.of()), headers);
 
         when(restTemplate.postForEntity(url, entity, MasterResponse.class)).thenThrow(HttpClientErrorException.BadRequest.class);
-        JobDto syncDto = new JobDto("test");
+        JobDto jobDto = new JobDto("test");
 
-        assertThrows(HttpClientErrorException.BadRequest.class, () -> job.doJob(syncDto));
+        assertThrows(HttpClientErrorException.BadRequest.class, () -> job.doJob(jobDto));
 
         verify(actionService, never()).runJob(any());
         verify(actionService, never()).runAction(any());

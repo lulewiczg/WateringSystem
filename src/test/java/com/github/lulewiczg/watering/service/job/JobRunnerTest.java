@@ -38,7 +38,7 @@ class JobRunnerTest {
     @Test
     void testRunNested() {
         when(scheduledJob.canBeStarted()).thenReturn(true);
-        JobDto job = new JobDto("name", "id.", scheduledJob);
+        JobDto job = new JobDto("id.", "name", scheduledJob);
 
         ActionResultDto<Void> result = runner.run(job);
 
@@ -63,7 +63,7 @@ class JobRunnerTest {
     @Test
     void testRunNoId() {
         when(scheduledJob.canBeStarted()).thenReturn(true);
-        JobDto job = new JobDto("name", null, scheduledJob);
+        JobDto job = new JobDto(null, "name", scheduledJob);
 
         ActionResultDto<Void> result = runner.run(job);
 
@@ -89,7 +89,7 @@ class JobRunnerTest {
     @Test
     void testRunNestedRunning() {
         when(scheduledJob.isRunning()).thenReturn(true);
-        JobDto job = new JobDto("name", "id.", scheduledJob);
+        JobDto job = new JobDto("id.", "name", scheduledJob);
 
         ActionResultDto<Void> result = runner.run(job);
 
@@ -114,7 +114,7 @@ class JobRunnerTest {
     @Test
     void testRunNoIdRunning() {
         when(scheduledJob.isRunning()).thenReturn(true);
-        JobDto job = new JobDto("name", null, scheduledJob);
+        JobDto job = new JobDto(null, "name", scheduledJob);
 
         ActionResultDto<Void> result = runner.run(job);
 

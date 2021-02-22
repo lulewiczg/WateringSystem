@@ -66,7 +66,7 @@ class ScheduledSensorReadTest {
         Sensor sensor2 = new Sensor("sensor2", 10, 90, 10, RaspiPin.GPIO_02);
         Tank tank2 = new Tank("tank2", 100, sensor2, valve2);
         when(state.getTanks()).thenReturn(List.of(tank, tank2));
-        JobDto jobDto = new JobDto(null, "test");
+        JobDto jobDto = new JobDto("test", null);
         when(runner.run("test.", readAction, sensor))
                 .thenReturn(new ActionResultDto<>(UUID.randomUUID().toString(), null, 11.0, LocalDateTime.now(), null));
         when(runner.run("test.", readAction, sensor2))
@@ -87,7 +87,7 @@ class ScheduledSensorReadTest {
         Sensor sensor2 = new Sensor("sensor2", 10, 90, 10, RaspiPin.GPIO_02);
         Tank tank2 = new Tank("tank2", 100, sensor2, valve2);
         when(state.getTanks()).thenReturn(List.of(tank, tank2));
-        JobDto jobDto = new JobDto(null, "test");
+        JobDto jobDto = new JobDto("test", null);
         when(runner.run("test.", readAction, sensor))
                 .thenReturn(new ActionResultDto<>(UUID.randomUUID().toString(), null, 11.0, LocalDateTime.now(), null));
         when(runner.run("test.", readAction, sensor2)).thenReturn(new ActionResultDto<>("id", null, null, LocalDateTime.now(), "error"));

@@ -81,9 +81,9 @@ class ScheduledWateringTest {
         when(runner.run("test.", outputsCloseAction, null)).thenReturn(TestUtils.EMPTY_RESULT);
         when(runner.run("test.", tanksOpenAction, null)).thenReturn(TestUtils.EMPTY_RESULT);
         when(runner.run("test.", tanksCloseAction, null)).thenReturn(TestUtils.EMPTY_RESULT);
-        JobDto syncDto = new JobDto(null, "test");
+        JobDto jobDto = new JobDto("test", null);
 
-        job.doJob(syncDto);
+        job.doJob(jobDto);
 
         verify(state).setState(SystemStatus.WATERING);
         verify(runner, never()).run(any(), eq(tanksCloseAction), any());
@@ -109,9 +109,9 @@ class ScheduledWateringTest {
         when(runner.run("test.", outputsCloseAction, null)).thenReturn(TestUtils.EMPTY_RESULT);
         when(runner.run("test.", tanksCloseAction, null)).thenReturn(TestUtils.EMPTY_RESULT);
         when(runner.run("test.", tanksOpenAction, null)).thenReturn(TestUtils.ERROR_RESULT);
-        JobDto syncDto = new JobDto(null, "test");
+        JobDto jobDto = new JobDto("test", null);
 
-        String error = assertThrows(ActionException.class, () -> job.doJob(syncDto)).getLocalizedMessage();
+        String error = assertThrows(ActionException.class, () -> job.doJob(jobDto)).getLocalizedMessage();
 
         assertEquals("Action [id] failed: error", error);
         verify(state).setState(SystemStatus.WATERING);
@@ -132,9 +132,9 @@ class ScheduledWateringTest {
         when(runner.run("test.", outputsCloseAction, null)).thenReturn(TestUtils.EMPTY_RESULT);
         when(runner.run("test.", tanksCloseAction, null)).thenReturn(TestUtils.EMPTY_RESULT);
         when(runner.run("test.", outputsOpenAction, null)).thenReturn(TestUtils.ERROR_RESULT);
-        JobDto syncDto = new JobDto(null, "test");
+        JobDto jobDto = new JobDto("test", null);
 
-        String error = assertThrows(ActionException.class, () -> job.doJob(syncDto)).getLocalizedMessage();
+        String error = assertThrows(ActionException.class, () -> job.doJob(jobDto)).getLocalizedMessage();
 
         assertEquals("Action [id] failed: error", error);
         verify(state).setState(SystemStatus.WATERING);
@@ -155,9 +155,9 @@ class ScheduledWateringTest {
         when(runner.run("test.", outputsOpenAction, null)).thenReturn(TestUtils.EMPTY_RESULT);
         when(runner.run("test.", outputsCloseAction, null)).thenReturn(TestUtils.EMPTY_RESULT);
         when(runner.run("test.", tanksCloseAction, null)).thenReturn(TestUtils.ERROR_RESULT);
-        JobDto syncDto = new JobDto(null, "test");
+        JobDto jobDto = new JobDto("test", null);
 
-        job.doJob(syncDto);
+        job.doJob(jobDto);
 
         Thread.sleep(1500);
         verify(state).setState(SystemStatus.WATERING);
@@ -178,9 +178,9 @@ class ScheduledWateringTest {
         when(runner.run("test.", outputsOpenAction, null)).thenReturn(TestUtils.EMPTY_RESULT);
         when(runner.run("test.", tanksCloseAction, null)).thenReturn(TestUtils.EMPTY_RESULT);
         when(runner.run("test.", outputsCloseAction, null)).thenReturn(TestUtils.ERROR_RESULT);
-        JobDto syncDto = new JobDto(null, "test");
+        JobDto jobDto = new JobDto("test", null);
 
-        job.doJob(syncDto);
+        job.doJob(jobDto);
 
         Thread.sleep(1500);
         verify(state).setState(SystemStatus.WATERING);
