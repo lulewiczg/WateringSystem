@@ -42,7 +42,7 @@ class OutputsCloseActionTest {
     private OutputsCloseAction action;
 
     @AfterEach
-    void after(){
+    void after() {
         verifyNoInteractions(closeAction);
     }
 

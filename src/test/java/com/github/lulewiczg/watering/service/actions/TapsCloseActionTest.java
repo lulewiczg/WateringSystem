@@ -41,7 +41,7 @@ class TapsCloseActionTest {
     private TapsCloseAction action;
 
     @AfterEach
-    void after(){
+    void after() {
         verifyNoInteractions(closeAction);
     }
 

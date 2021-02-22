@@ -1,6 +1,5 @@
 package com.github.lulewiczg.watering.service;
 
-import com.github.lulewiczg.watering.TestUtils;
 import com.github.lulewiczg.watering.exception.ActionNotFoundException;
 import com.github.lulewiczg.watering.exception.JobNotFoundException;
 import com.github.lulewiczg.watering.exception.TypeMismatchException;

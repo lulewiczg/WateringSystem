@@ -41,7 +41,7 @@ class EmergencyStopActionTest {
     private EmergencyStopAction action;
 
     @AfterEach
-    void after(){
+    void after() {
         verifyNoInteractions(tanksCloseAction);
         verifyNoInteractions(tapsCloseAction);
         verifyNoInteractions(outputsCloseAction);
@@ -71,6 +71,9 @@ class EmergencyStopActionTest {
         String error = assertThrows(ActionException.class, () -> action.doAction(actionDto, null)).getLocalizedMessage();
 
         assertEquals("Action [id] failed: error", error);
+        verify(runner).run("test.", tanksCloseAction, null);
+        verify(runner).run("test.", tapsCloseAction, null);
+        verify(runner).run("test.", outputsCloseAction, null);
     }
 
     @Test
@@ -83,6 +86,9 @@ class EmergencyStopActionTest {
         String error = assertThrows(ActionException.class, () -> action.doAction(actionDto, null)).getLocalizedMessage();
 
         assertEquals("Action [id] failed: error", error);
+        verify(runner).run("test.", tanksCloseAction, null);
+        verify(runner).run("test.", tapsCloseAction, null);
+        verify(runner).run("test.", outputsCloseAction, null);
     }
 
     @Test
@@ -95,5 +101,8 @@ class EmergencyStopActionTest {
         String error = assertThrows(ActionException.class, () -> action.doAction(actionDto, null)).getLocalizedMessage();
 
         assertEquals("Action [id] failed: error", error);
+        verify(runner).run("test.", tanksCloseAction, null);
+        verify(runner).run("test.", tapsCloseAction, null);
+        verify(runner).run("test.", outputsCloseAction, null);
     }
 }

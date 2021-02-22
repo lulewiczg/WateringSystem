@@ -61,7 +61,7 @@ class ScheduledWaterFillControlTest {
     private ScheduledWaterFillControl job;
 
     @AfterEach
-    void after(){
+    void after() {
         verifyNoInteractions(tanksCloseAction);
         verifyNoInteractions(tapsOpenAction);
         verifyNoInteractions(valveOpenAction);
@@ -235,7 +235,7 @@ class ScheduledWaterFillControlTest {
         String error = assertThrows(ActionException.class, () -> job.doJobRunning(jobDto)).getLocalizedMessage();
 
         assertEquals("Action [id] failed: error", error);
-        verify(state,never()).setState(any());
+        verify(state, never()).setState(any());
         verify(runner).run("test.", tanksCloseAction, null);
         verify(runner, never()).run(any(), eq(tapsOpenAction), any());
         verify(runner, never()).run(any(), eq(valveOpenAction), any());

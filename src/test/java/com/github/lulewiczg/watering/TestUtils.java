@@ -36,7 +36,7 @@ public final class TestUtils {
 
     public static final String FORBIDDEN_MSG = "Access is denied";
 
-    public static  final ActionResultDto<Void> EMPTY_RESULT = new ActionResultDto<>("id",null, LocalDateTime.now());
+    public static final ActionResultDto<Void> EMPTY_RESULT = new ActionResultDto<>("id", null, LocalDateTime.now());
 
     /**
      * Reads json from file and maps to object.
@@ -230,6 +230,7 @@ public final class TestUtils {
 
     /**
      * Splits ID into segments.
+     *
      * @param id ID
      * @return segmented ID
      */

@@ -26,7 +26,6 @@ import org.springframework.web.client.RestTemplate;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 
 /**
  * Job for scheduled water tanks filling.
@@ -124,11 +123,6 @@ public class ScheduledMasterSync extends ScheduledJob {
         jobResults = new ArrayList<>();
 
         return response.getBody();
-    }
-
-    @Override
-    public void doJobRunning(JobDto job) {
-        //Do nothing
     }
 
 }

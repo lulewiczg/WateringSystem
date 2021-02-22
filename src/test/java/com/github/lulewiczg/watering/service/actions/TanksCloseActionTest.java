@@ -42,7 +42,7 @@ class TanksCloseActionTest {
     private TanksCloseAction action;
 
     @AfterEach
-    void after(){
+    void after() {
         verifyNoInteractions(closeAction);
     }
 

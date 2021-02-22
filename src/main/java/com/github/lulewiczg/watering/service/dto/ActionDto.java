@@ -28,7 +28,7 @@ public class ActionDto {
     private String id;
 
     @JsonIgnore
-    private Action<?,?> action;
+    private Action<?, ?> action;
 
     private Object param;
 
@@ -48,6 +48,7 @@ public class ActionDto {
         this.name = name;
         this.param = param;
     }
+
     public ActionDto(@NotNull @NotEmpty String name, String id, Action<?, ?> action) {
         this.name = name;
         this.id = id;

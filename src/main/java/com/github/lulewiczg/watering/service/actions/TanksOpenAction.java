@@ -2,7 +2,6 @@ package com.github.lulewiczg.watering.service.actions;
 
 import com.github.lulewiczg.watering.config.MasterConfig;
 import com.github.lulewiczg.watering.service.dto.ActionDto;
-import com.github.lulewiczg.watering.service.dto.ActionResultDto;
 import com.github.lulewiczg.watering.state.AppState;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;

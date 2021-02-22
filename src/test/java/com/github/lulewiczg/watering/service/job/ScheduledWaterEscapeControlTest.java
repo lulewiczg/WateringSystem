@@ -54,7 +54,7 @@ class ScheduledWaterEscapeControlTest {
     private ScheduledWaterEscapeControl job;
 
     @AfterEach
-    void after(){
+    void after() {
         verifyNoInteractions(emergencyStopAction);
     }
 

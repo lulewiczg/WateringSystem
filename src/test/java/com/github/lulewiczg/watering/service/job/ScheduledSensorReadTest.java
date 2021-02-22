@@ -30,7 +30,6 @@ import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
-import static org.mockito.Mockito.verifyNoInteractions;
 
 @ActiveProfiles("test")
 @ExtendWith(SpringExtension.class)
@@ -54,7 +53,7 @@ class ScheduledSensorReadTest {
     private ScheduledSensorRead job;
 
     @AfterEach
-    void after(){
+    void after() {
         verifyNoInteractions(readAction);
     }
 

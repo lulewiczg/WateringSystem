@@ -57,7 +57,7 @@ class ScheduledOverflowWaterControlTest {
     private ScheduledOverflowWaterControl job;
 
     @AfterEach
-    void after(){
+    void after() {
         verifyNoInteractions(tanksCloseAction);
         verifyNoInteractions(valveOpenAction);
     }
@@ -142,7 +142,7 @@ class ScheduledOverflowWaterControlTest {
     }
 
     @Test
-    void testActionFail() {
+    void testActionValveOpenFail() {
         Valve valve = new Valve("valve", "valve", ValveType.OUTPUT, true, RaspiPin.GPIO_00);
         Sensor sensor = new Sensor("sensor", 1, 11, 20, RaspiPin.GPIO_01);
         Tank tank = new Tank("tank", 100, sensor, valve);
@@ -153,6 +153,22 @@ class ScheduledOverflowWaterControlTest {
         String error = assertThrows(ActionException.class, () -> job.doJob(jobDto)).getLocalizedMessage();
 
         assertEquals("Action [id] failed: error", error);
+    }
+
+    @Test
+    void testActionTanksCloseFail() {
+        Valve valve = new Valve("valve", "valve", ValveType.OUTPUT, true, RaspiPin.GPIO_00);
+        Sensor sensor = new Sensor("sensor", 1, 90, 89, RaspiPin.GPIO_01);
+        Tank tank = new Tank("tank", 100, sensor, valve);
+        when(state.getTanks()).thenReturn(List.of(tank));
+        JobDto syncDto = new JobDto(null, "test");
+        when(runner.run("test.", tanksCloseAction, null)).thenThrow(new ActionException("id", "error"));
+
+        job.doJobRunning(syncDto);
+
+        verify(runner).run("test.", tanksCloseAction, null);
+        verify(runner, never()).run(any(), eq(valveOpenAction), any());
+        verify(state, never()).setState(any());
     }
 
     @ParameterizedTest

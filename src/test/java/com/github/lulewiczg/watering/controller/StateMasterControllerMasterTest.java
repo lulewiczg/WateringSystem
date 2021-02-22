@@ -8,7 +8,6 @@ import com.github.lulewiczg.watering.security.AuthProvider;
 import com.github.lulewiczg.watering.service.MasterService;
 import com.github.lulewiczg.watering.service.dto.SlaveStateDto;
 import com.github.lulewiczg.watering.state.AppState;
-import com.github.lulewiczg.watering.state.MasterState;
 import com.github.lulewiczg.watering.state.dto.MasterResponse;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;

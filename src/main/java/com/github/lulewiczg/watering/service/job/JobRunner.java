@@ -54,6 +54,7 @@ public class JobRunner {
         }
         log.debug("Finishing {} job with ID {}...", scheduledJob.getName(), job.getId());
     }
+
     /**
      * Generates UUID if required
      *

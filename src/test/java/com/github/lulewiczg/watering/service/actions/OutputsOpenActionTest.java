@@ -42,7 +42,7 @@ class OutputsOpenActionTest {
     private OutputsOpenAction action;
 
     @AfterEach
-    void after(){
+    void after() {
         verifyNoInteractions(openAction);
     }
 

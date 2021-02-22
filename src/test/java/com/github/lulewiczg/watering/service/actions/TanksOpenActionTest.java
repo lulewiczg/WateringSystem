@@ -42,7 +42,7 @@ class TanksOpenActionTest {
     private TanksOpenAction action;
 
     @AfterEach
-    void after(){
+    void after() {
         verifyNoInteractions(openAction);
     }
 
@@ -62,7 +62,7 @@ class TanksOpenActionTest {
 
         ActionDto actionDto = new ActionDto("test");
 
-         action.doAction(actionDto, null);
+        action.doAction(actionDto, null);
 
         verify(runner).run("test.", openAction, valve3);
         verify(runner, never()).run("test.", openAction, valve);

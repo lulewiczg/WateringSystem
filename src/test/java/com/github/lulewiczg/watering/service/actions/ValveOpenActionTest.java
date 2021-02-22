@@ -14,7 +14,6 @@ import org.springframework.context.annotation.Import;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.verify;
 
@@ -36,7 +35,7 @@ class ValveOpenActionTest {
     void testOpen() {
         Valve valve = new Valve("test", "test", ValveType.OUTPUT, false, RaspiPin.GPIO_00);
 
-       action.doAction(new ActionDto(), valve);
+        action.doAction(new ActionDto(), valve);
 
         verify(service).toggleOn(valve.getPin());
         assertTrue(valve.isOpen());
