@@ -12,6 +12,7 @@ import com.github.lulewiczg.watering.state.dto.Sensor;
 import com.github.lulewiczg.watering.state.dto.Tank;
 import com.github.lulewiczg.watering.state.dto.Valve;
 import com.pi4j.io.gpio.RaspiPin;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -51,6 +52,11 @@ class ScheduledWaterEscapeControlTest {
 
     @Autowired
     private ScheduledWaterEscapeControl job;
+
+    @AfterEach
+    void after(){
+        verifyNoInteractions(emergencyStopAction);
+    }
 
     @DirtiesContext
     @ParameterizedTest

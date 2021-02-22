@@ -66,11 +66,10 @@ public class SetDefaults extends ScheduledJob {
     private void setValveState(Valve i, JobDto jobDto) {
         ActionResultDto<Void> result;
         if (i.isOpen()) {
-            result = actionRunner.run(getNestedId(jobDto), openAction, i);
+            runNested(actionRunner, jobDto, openAction, i);
         } else {
-            result = actionRunner.run(getNestedId(jobDto), closeAction, i);
+            runNested(actionRunner, jobDto, closeAction, i);
         }
-        handleResult(result);
     }
 
 }

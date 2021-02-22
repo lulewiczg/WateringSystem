@@ -1,6 +1,8 @@
 package com.github.lulewiczg.watering.service.job;
 
 import com.github.lulewiczg.watering.exception.ActionException;
+import com.github.lulewiczg.watering.service.actions.Action;
+import com.github.lulewiczg.watering.service.actions.ActionRunner;
 import com.github.lulewiczg.watering.service.dto.ActionResultDto;
 import com.github.lulewiczg.watering.service.dto.JobDto;
 import com.github.lulewiczg.watering.state.SystemStatus;
@@ -108,10 +110,27 @@ public abstract class ScheduledJob {
      *
      * @param result result
      */
-    protected void handleResult(ActionResultDto<Void> result) {
+    protected void handleResult(ActionResultDto<?> result) {
         if (result.getErrorMsg() != null) {
             throw new ActionException(result.getId(), result.getErrorMsg());
         }
+    }
+
+    /**
+     * Runs nested action and checks result.
+     *
+     * @param runner       action runner
+     * @param jobDto       job DTO
+     * @param nestedAction nested action
+     * @param param        nested action param
+     * @param <T2>         nested action param type
+     * @param <R2>         nested action return type
+     * @return nesed action result
+     */
+    protected <T2, R2> ActionResultDto<R2> runNested(ActionRunner runner, JobDto jobDto, Action<T2, R2> nestedAction, T2 param) {
+        ActionResultDto<R2> result = runner.run(getNestedId(jobDto), nestedAction, param);
+        handleResult(result);
+        return result;
     }
 
 }

@@ -4,6 +4,7 @@ import com.github.lulewiczg.watering.TestUtils;
 import com.github.lulewiczg.watering.exception.ActionException;
 import com.github.lulewiczg.watering.service.dto.ActionDto;
 import com.github.lulewiczg.watering.state.AppState;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,8 +15,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 @ActiveProfiles("test")
 @Import(EmergencyStopAction.class)
@@ -39,6 +39,13 @@ class EmergencyStopActionTest {
 
     @Autowired
     private EmergencyStopAction action;
+
+    @AfterEach
+    void after(){
+        verifyNoInteractions(tanksCloseAction);
+        verifyNoInteractions(tapsCloseAction);
+        verifyNoInteractions(outputsCloseAction);
+    }
 
     @Test
     void testAction() {

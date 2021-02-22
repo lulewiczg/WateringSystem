@@ -2,7 +2,6 @@ package com.github.lulewiczg.watering.service.job;
 
 import com.github.lulewiczg.watering.config.MasterConfig;
 import com.github.lulewiczg.watering.service.actions.*;
-import com.github.lulewiczg.watering.service.dto.ActionResultDto;
 import com.github.lulewiczg.watering.service.dto.JobDto;
 import com.github.lulewiczg.watering.state.AppState;
 import com.github.lulewiczg.watering.state.SystemStatus;
@@ -75,20 +74,16 @@ public class ScheduledWatering extends ScheduledJob {
     @Override
     public void doJob(JobDto job) {
         state.setState(SystemStatus.WATERING);
-        ActionResultDto<Void> result = actionRunner.run(getNestedId(job), tanksOpenAction, null);
-        handleResult(result);
-        ActionResultDto<Void> result2 = actionRunner.run(getNestedId(job), outputsOpenAction, null);
-        handleResult(result2);
+        runNested(actionRunner, job, tanksOpenAction, null);
+        runNested(actionRunner, job, outputsOpenAction, null);
         log.info("Valves opened");
         exec.schedule(() -> finish(job), wateringLength, TimeUnit.SECONDS);
     }
 
     private void finish(JobDto job) {
         log.info("Stopping watering job...");
-        ActionResultDto<Void> result = actionRunner.run(getNestedId(job), tanksCloseAction, null);
-        handleResult(result);
-        ActionResultDto<Void> result2 = actionRunner.run(getNestedId(job), outputsCloseAction, null);
-        handleResult(result2);
+        runNested(actionRunner, job, tanksCloseAction, null);
+        runNested(actionRunner, job, outputsCloseAction, null);
         state.setState(SystemStatus.IDLE);
         log.info("Watering finished!");
     }

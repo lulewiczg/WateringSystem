@@ -45,7 +45,7 @@ public class ScheduledSensorRead extends ScheduledIoJob {
     public void doJob(JobDto job) {
         log.debug("Reading sensors...");
         state.getTanks().forEach(i -> {
-            ActionResultDto<Double> result = actionRunner.run(getNestedId(job), readAction, i.getSensor());
+            ActionResultDto<Double> result = runNested(actionRunner, job, readAction, i.getSensor());
             log.debug("Read water level for {}: {}", i.getId(), result);
             i.getSensor().setLevel(result.getResult().intValue());
         });

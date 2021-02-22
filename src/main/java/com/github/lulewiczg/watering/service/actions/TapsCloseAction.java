@@ -27,10 +27,7 @@ public class TapsCloseAction extends Action<Void, Void> {
     @Override
     protected Void doAction(ActionDto actionDto, Void param) {
         log.info("Closing taps...");
-        state.getTaps().forEach(i -> {
-            ActionResultDto<Void> result = actionRunner.run(getNestedId(actionDto), closeAction, i.getValve());
-            handleResult(result);
-        });
+        state.getTaps().forEach(i -> runNested(actionRunner, actionDto, closeAction, i.getValve()));
         return null;
     }
 

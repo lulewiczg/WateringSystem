@@ -27,10 +27,7 @@ public class TanksOpenAction extends Action<Void, Void> {
     @Override
     protected Void doAction(ActionDto actionDto, Void param) {
         log.info("Opening tanks...");
-        state.getTanks().forEach(i -> {
-            ActionResultDto<Void> result = actionRunner.run(getNestedId(actionDto), openAction, i.getValve());
-            handleResult(result);
-        });
+        state.getTanks().forEach(i -> runNested(actionRunner, actionDto, openAction, i.getValve()));
         return null;
     }
 

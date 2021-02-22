@@ -9,6 +9,7 @@ import com.github.lulewiczg.watering.state.dto.Tank;
 import com.github.lulewiczg.watering.state.dto.Valve;
 import com.github.lulewiczg.watering.state.dto.WaterSource;
 import com.pi4j.io.gpio.RaspiPin;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,6 +40,11 @@ class TanksCloseActionTest {
 
     @Autowired
     private TanksCloseAction action;
+
+    @AfterEach
+    void after(){
+        verifyNoInteractions(closeAction);
+    }
 
     @Test
     void testAction() {

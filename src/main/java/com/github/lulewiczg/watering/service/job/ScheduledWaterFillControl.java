@@ -70,14 +70,9 @@ public class ScheduledWaterFillControl extends ScheduledJob {
         }
         log.info("Water level too low for {}", tanks);
         state.setState(SystemStatus.FILLING);
-        ActionResultDto<Void> result = actionRunner.run(getNestedId(job), outputsCloseAction, null);
-        handleResult(result);
-        ActionResultDto<Void> result2 = actionRunner.run(getNestedId(job), tapsOpenAction, null);
-        handleResult(result2);
-        tanks.forEach(i -> {
-            ActionResultDto<Void> result3 = actionRunner.run(getNestedId(job), valveOpenAction, i.getValve());
-            handleResult(result3);
-        });
+        runNested(actionRunner, job, outputsCloseAction, null);
+        runNested(actionRunner, job, tapsOpenAction, null);
+        tanks.forEach(i -> runNested(actionRunner, job, valveOpenAction, i.getValve()));
         log.info("Filling tanks started.");
     }
 
@@ -86,8 +81,7 @@ public class ScheduledWaterFillControl extends ScheduledJob {
         List<Tank> tanks = findTanks();
         if (tanks.isEmpty()) {
             log.info("Water levels are OK, filling finished");
-            ActionResultDto<Void> result = actionRunner.run(getNestedId(job), tanksCloseAction, null);
-            handleResult(result);
+            runNested(actionRunner, job, tanksCloseAction, null);
             state.setState(SystemStatus.IDLE);
         }
     }
