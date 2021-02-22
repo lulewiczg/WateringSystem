@@ -64,6 +64,7 @@ public class WaterLevelReadAction extends Action<Sensor, Double> {
         return "Reads water level from sensor";
     }
 
+    @Override
     public Class<?> getReturnType() {
         return Double.class;
     }

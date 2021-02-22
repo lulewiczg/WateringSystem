@@ -4,7 +4,6 @@ import com.github.lulewiczg.watering.config.MasterConfig;
 import com.github.lulewiczg.watering.service.actions.ActionRunner;
 import com.github.lulewiczg.watering.service.actions.ValveCloseAction;
 import com.github.lulewiczg.watering.service.actions.ValveOpenAction;
-import com.github.lulewiczg.watering.service.dto.ActionResultDto;
 import com.github.lulewiczg.watering.service.dto.JobDto;
 import com.github.lulewiczg.watering.state.AppState;
 import com.github.lulewiczg.watering.state.dto.Tank;
@@ -64,7 +63,6 @@ public class SetDefaults extends ScheduledJob {
     }
 
     private void setValveState(Valve i, JobDto jobDto) {
-        ActionResultDto<Void> result;
         if (i.isOpen()) {
             runNested(actionRunner, jobDto, openAction, i);
         } else {

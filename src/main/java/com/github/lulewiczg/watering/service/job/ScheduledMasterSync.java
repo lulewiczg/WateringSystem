@@ -38,6 +38,8 @@ import java.util.List;
 @ConditionalOnBean(SlaveConfig.class)
 public class ScheduledMasterSync extends ScheduledJob {
 
+    private static final String SYNC_ERROR = "Sync with master failed";
+
     private final AppState state;
 
     private final RestTemplate restTemplate;
@@ -88,8 +90,8 @@ public class ScheduledMasterSync extends ScheduledJob {
     public void doJob(JobDto job) {
         MasterResponse response = connect();
         if (response == null) {
-            log.error("Sync with master failed");
-            throw new IllegalStateException("Sync with master failed");
+            log.error(SYNC_ERROR);
+            throw new IllegalStateException(SYNC_ERROR);
         }
 
         log.debug("Got commands: {}", response);
@@ -116,7 +118,7 @@ public class ScheduledMasterSync extends ScheduledJob {
         try {
             response = restTemplate.postForEntity(url, entity, MasterResponse.class);
         } catch (RestClientException e) {
-            log.error("Sync with master failed", e);
+            log.error(SYNC_ERROR, e);
             throw e;
         }
         actionResults = new ArrayList<>();

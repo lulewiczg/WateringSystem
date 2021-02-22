@@ -94,9 +94,6 @@ public class ActionServiceImpl implements ActionService {
         }
         try {
             Object param = mapParam(actionDto, actionDef);
-//            Method method = action.getClass().getDeclaredMethod("run", ActionDto.class, action.getDestinationParamType());
-//            log.trace("Running action {} with param {}", actionDto.getName(), actionDto.getParam());
-//            return (ActionResultDto<?>) method.invoke(action, actionDto, param);
             actionDto.setAction(action);
             return actionRunner.run(actionDto, param);
         } catch (Exception e) {

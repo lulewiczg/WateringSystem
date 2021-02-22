@@ -150,8 +150,9 @@ class ActionServiceMasterImplTest {
     void testRunJobNotFound() {
         JobDefinitionDto job = new JobDefinitionDto("test", true);
         when(state.getJobDefinitions()).thenReturn(List.of(job));
+        JobDto jobDto = new JobDto("test2");
 
-        String message = assertThrows(JobNotFoundException.class, () -> service.runJob(new JobDto("test2"))).getMessage();
+        String message = assertThrows(JobNotFoundException.class, () -> service.runJob(jobDto)).getMessage();
 
         assertEquals("Job not found: test2", message);
     }
@@ -176,8 +177,9 @@ class ActionServiceMasterImplTest {
     void testRunDisabledJob() {
         JobDefinitionDto job = new JobDefinitionDto("test", false);
         when(state.getJobDefinitions()).thenReturn(List.of(job));
+        JobDto jobDto = new JobDto("test");
 
-        String message = assertThrows(JobNotFoundException.class, () -> service.runJob(new JobDto("test"))).getMessage();
+        String message = assertThrows(JobNotFoundException.class, () -> service.runJob(jobDto)).getMessage();
 
         assertEquals("Job not found: test", message);
     }

@@ -129,7 +129,8 @@ class ActionServiceImplTest {
 
     @Test
     void testRunJobInvalidName() {
-        String message = assertThrows(JobNotFoundException.class, () -> service.runJob(new JobDto("abc"))).getMessage();
+        JobDto jobDto = new JobDto("abc");
+        String message = assertThrows(JobNotFoundException.class, () -> service.runJob(jobDto)).getMessage();
 
         assertEquals("Job not found: abc", message);
     }

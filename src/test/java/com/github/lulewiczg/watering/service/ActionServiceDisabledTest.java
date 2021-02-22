@@ -68,8 +68,9 @@ class ActionServiceDisabledTest {
     @Test
     void testRunJob() {
         String jobName = deCapitalize(ScheduledSensorRead.class.getSimpleName());
+        JobDto jobDto = new JobDto(jobName);
 
-        String message = assertThrows(JobNotFoundException.class, () -> service.runJob(new JobDto(jobName))).getMessage();
+        String message = assertThrows(JobNotFoundException.class, () -> service.runJob(jobDto)).getMessage();
 
         assertEquals("Job not found: scheduledSensorRead", message);
     }
