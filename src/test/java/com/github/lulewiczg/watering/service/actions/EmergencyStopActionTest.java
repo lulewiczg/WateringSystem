@@ -66,7 +66,7 @@ class EmergencyStopActionTest {
         ActionDto actionDto = new ActionDto("test");
         when(runner.run("test.", tapsCloseAction, null)).thenReturn(TestUtils.EMPTY_RESULT);
         when(runner.run("test.", outputsCloseAction, null)).thenReturn(TestUtils.EMPTY_RESULT);
-        when(runner.run("test.", tanksCloseAction, null)).thenThrow(new ActionException("id", "error"));
+        when(runner.run("test.", tanksCloseAction, null)).thenReturn(TestUtils.ERROR_RESULT);
 
         String error = assertThrows(ActionException.class, () -> action.doAction(actionDto, null)).getLocalizedMessage();
 
@@ -81,7 +81,7 @@ class EmergencyStopActionTest {
         ActionDto actionDto = new ActionDto("test");
         when(runner.run("test.", tanksCloseAction, null)).thenReturn(TestUtils.EMPTY_RESULT);
         when(runner.run("test.", outputsCloseAction, null)).thenReturn(TestUtils.EMPTY_RESULT);
-        when(runner.run("test.", tapsCloseAction, null)).thenThrow(new ActionException("id", "error"));
+        when(runner.run("test.", tapsCloseAction, null)).thenReturn(TestUtils.ERROR_RESULT);
 
         String error = assertThrows(ActionException.class, () -> action.doAction(actionDto, null)).getLocalizedMessage();
 
@@ -96,7 +96,7 @@ class EmergencyStopActionTest {
         ActionDto actionDto = new ActionDto("test");
         when(runner.run("test.", tanksCloseAction, null)).thenReturn(TestUtils.EMPTY_RESULT);
         when(runner.run("test.", tapsCloseAction, null)).thenReturn(TestUtils.EMPTY_RESULT);
-        when(runner.run("test.", outputsCloseAction, null)).thenThrow(new ActionException("id", "error"));
+        when(runner.run("test.", outputsCloseAction, null)).thenReturn(TestUtils.ERROR_RESULT);
 
         String error = assertThrows(ActionException.class, () -> action.doAction(actionDto, null)).getLocalizedMessage();
 

@@ -36,9 +36,18 @@ public class JobRunner {
             if (message == null) {
                 message = "Unknown error!";
             }
-            return new ActionResultDto<>(id, LocalDateTime.now(), message);
+            return ActionResultDto.<Void>builder()
+                    .id(id)
+                    .actionName(jobDto.getName())
+                    .execDate(LocalDateTime.now())
+                    .errorMsg(message)
+                    .build();
         }
-        return new ActionResultDto<>(id, null, LocalDateTime.now());
+        return ActionResultDto.<Void>builder()
+                .id(id)
+                .actionName(jobDto.getName())
+                .execDate(LocalDateTime.now())
+                .build();
     }
 
     private void tryRun(JobDto job) {

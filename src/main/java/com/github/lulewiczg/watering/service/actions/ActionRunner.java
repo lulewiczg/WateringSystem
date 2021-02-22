@@ -52,9 +52,19 @@ public class ActionRunner {
             if (message == null) {
                 message = "Unknown error!";
             }
-            return new ActionResultDto<>(id, LocalDateTime.now(), message);
+            return ActionResultDto.<R>builder()
+                    .id(id)
+                    .actionName(originalDto.getName())
+                    .execDate(LocalDateTime.now())
+                    .errorMsg(message)
+                    .build();
         }
-        return new ActionResultDto<>(id, result, LocalDateTime.now());
+        return ActionResultDto.<R>builder()
+                .id(id)
+                .actionName(originalDto.getName())
+                .result(result)
+                .execDate(LocalDateTime.now())
+                .build();
     }
 
     /**

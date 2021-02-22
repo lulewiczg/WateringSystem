@@ -87,7 +87,7 @@ class SetDefaultsTest {
         Valve valve3 = new Valve("valve3", "valve3", ValveType.OUTPUT, true, RaspiPin.GPIO_02);
         Valve valve4 = new Valve("valve4", "valve4", ValveType.OUTPUT, false, RaspiPin.GPIO_03);
         when(state.getOutputs()).thenReturn(List.of(valve3, valve4));
-        when(runner.run(eq("test."), eq(openAction), any())).thenThrow(new ActionException("id", "error"));
+        when(runner.run(eq("test."), eq(openAction), any())).thenReturn(TestUtils.ERROR_RESULT);
         when(runner.run(eq("test."), eq(closeAction), any())).thenReturn(TestUtils.EMPTY_RESULT);
         JobDto syncDto = new JobDto(null, "test");
 
@@ -107,7 +107,7 @@ class SetDefaultsTest {
         Valve valve3 = new Valve("valve3", "valve3", ValveType.OUTPUT, true, RaspiPin.GPIO_02);
         Valve valve4 = new Valve("valve4", "valve4", ValveType.OUTPUT, false, RaspiPin.GPIO_03);
         when(state.getOutputs()).thenReturn(List.of(valve3, valve4));
-        when(runner.run(eq("test."), eq(closeAction), any())).thenThrow(new ActionException("id", "error"));
+        when(runner.run(eq("test."), eq(closeAction), any())).thenReturn(TestUtils.ERROR_RESULT);
         when(runner.run(eq("test."), eq(openAction), any())).thenReturn(TestUtils.EMPTY_RESULT);
         JobDto syncDto = new JobDto(null, "test");
 

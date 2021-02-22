@@ -147,7 +147,7 @@ class ScheduledOverflowWaterControlTest {
         Sensor sensor = new Sensor("sensor", 1, 11, 20, RaspiPin.GPIO_01);
         Tank tank = new Tank("tank", 100, sensor, valve);
         when(state.getTanks()).thenReturn(List.of(tank));
-        when(runner.run("test.", valveOpenAction, valve)).thenThrow(new ActionException("id", "error"));
+        when(runner.run("test.", valveOpenAction, valve)).thenReturn(TestUtils.ERROR_RESULT);
         JobDto jobDto = new JobDto(null, "test");
 
         String error = assertThrows(ActionException.class, () -> job.doJob(jobDto)).getLocalizedMessage();
@@ -162,9 +162,10 @@ class ScheduledOverflowWaterControlTest {
         Tank tank = new Tank("tank", 100, sensor, valve);
         when(state.getTanks()).thenReturn(List.of(tank));
         JobDto syncDto = new JobDto(null, "test");
-        when(runner.run("test.", tanksCloseAction, null)).thenThrow(new ActionException("id", "error"));
+        when(runner.run("test.", tanksCloseAction, null)).thenReturn(TestUtils.ERROR_RESULT);
 
-        job.doJobRunning(syncDto);
+        String error = assertThrows(ActionException.class, () -> job.doJobRunning(syncDto)).getLocalizedMessage();
+        assertEquals("Action [id] failed: error", error);
 
         verify(runner).run("test.", tanksCloseAction, null);
         verify(runner, never()).run(any(), eq(valveOpenAction), any());

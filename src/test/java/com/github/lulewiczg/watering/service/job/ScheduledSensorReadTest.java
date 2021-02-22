@@ -68,9 +68,9 @@ class ScheduledSensorReadTest {
         when(state.getTanks()).thenReturn(List.of(tank, tank2));
         JobDto jobDto = new JobDto(null, "test");
         when(runner.run("test.", readAction, sensor))
-                .thenReturn(new ActionResultDto<>(UUID.randomUUID().toString(), 11.0, LocalDateTime.now()));
+                .thenReturn(new ActionResultDto<>(UUID.randomUUID().toString(), null, 11.0, LocalDateTime.now(), null));
         when(runner.run("test.", readAction, sensor2))
-                .thenReturn(new ActionResultDto<>(UUID.randomUUID().toString(), 22.0, LocalDateTime.now()));
+                .thenReturn(new ActionResultDto<>(UUID.randomUUID().toString(), null, 22.0, LocalDateTime.now(), null));
 
         job.doJob(jobDto);
 
@@ -89,8 +89,8 @@ class ScheduledSensorReadTest {
         when(state.getTanks()).thenReturn(List.of(tank, tank2));
         JobDto jobDto = new JobDto(null, "test");
         when(runner.run("test.", readAction, sensor))
-                .thenReturn(new ActionResultDto<>(UUID.randomUUID().toString(), 11.0, LocalDateTime.now()));
-        when(runner.run("test.", readAction, sensor2)).thenThrow(new ActionException("id", "error"));
+                .thenReturn(new ActionResultDto<>(UUID.randomUUID().toString(), null, 11.0, LocalDateTime.now(), null));
+        when(runner.run("test.", readAction, sensor2)).thenReturn(new ActionResultDto<>("id", null, null, LocalDateTime.now(), "error"));
 
         String error = assertThrows(ActionException.class, () -> job.doJob(jobDto)).getLocalizedMessage();
 

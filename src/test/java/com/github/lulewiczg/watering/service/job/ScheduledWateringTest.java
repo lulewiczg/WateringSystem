@@ -108,7 +108,7 @@ class ScheduledWateringTest {
         when(runner.run("test.", outputsOpenAction, null)).thenReturn(TestUtils.EMPTY_RESULT);
         when(runner.run("test.", outputsCloseAction, null)).thenReturn(TestUtils.EMPTY_RESULT);
         when(runner.run("test.", tanksCloseAction, null)).thenReturn(TestUtils.EMPTY_RESULT);
-        when(runner.run("test.", tanksOpenAction, null)).thenThrow(new ActionException("id", "error"));
+        when(runner.run("test.", tanksOpenAction, null)).thenReturn(TestUtils.ERROR_RESULT);
         JobDto syncDto = new JobDto(null, "test");
 
         String error = assertThrows(ActionException.class, () -> job.doJob(syncDto)).getLocalizedMessage();
@@ -131,7 +131,7 @@ class ScheduledWateringTest {
         when(runner.run("test.", tanksOpenAction, null)).thenReturn(TestUtils.EMPTY_RESULT);
         when(runner.run("test.", outputsCloseAction, null)).thenReturn(TestUtils.EMPTY_RESULT);
         when(runner.run("test.", tanksCloseAction, null)).thenReturn(TestUtils.EMPTY_RESULT);
-        when(runner.run("test.", outputsOpenAction, null)).thenThrow(new ActionException("id", "error"));
+        when(runner.run("test.", outputsOpenAction, null)).thenReturn(TestUtils.ERROR_RESULT);
         JobDto syncDto = new JobDto(null, "test");
 
         String error = assertThrows(ActionException.class, () -> job.doJob(syncDto)).getLocalizedMessage();
@@ -154,7 +154,7 @@ class ScheduledWateringTest {
         when(runner.run("test.", tanksOpenAction, null)).thenReturn(TestUtils.EMPTY_RESULT);
         when(runner.run("test.", outputsOpenAction, null)).thenReturn(TestUtils.EMPTY_RESULT);
         when(runner.run("test.", outputsCloseAction, null)).thenReturn(TestUtils.EMPTY_RESULT);
-        when(runner.run("test.", tanksCloseAction, null)).thenThrow(new ActionException("id", "error"));
+        when(runner.run("test.", tanksCloseAction, null)).thenReturn(TestUtils.ERROR_RESULT);
         JobDto syncDto = new JobDto(null, "test");
 
         job.doJob(syncDto);
@@ -177,7 +177,7 @@ class ScheduledWateringTest {
         when(runner.run("test.", tanksOpenAction, null)).thenReturn(TestUtils.EMPTY_RESULT);
         when(runner.run("test.", outputsOpenAction, null)).thenReturn(TestUtils.EMPTY_RESULT);
         when(runner.run("test.", tanksCloseAction, null)).thenReturn(TestUtils.EMPTY_RESULT);
-        when(runner.run("test.", outputsCloseAction, null)).thenThrow(new ActionException("id", "error"));
+        when(runner.run("test.", outputsCloseAction, null)).thenReturn(TestUtils.ERROR_RESULT);
         JobDto syncDto = new JobDto(null, "test");
 
         job.doJob(syncDto);

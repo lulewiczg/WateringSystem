@@ -160,7 +160,7 @@ class ScheduledWaterFillControlTest {
         when(state.getTanks()).thenReturn(List.of(tank, tank2));
         when(runner.run("test.", tapsOpenAction, null)).thenReturn(TestUtils.EMPTY_RESULT);
         when(runner.run(eq("test."), eq(valveOpenAction), any())).thenReturn(TestUtils.EMPTY_RESULT);
-        when(runner.run("test.", outputsCloseAction, null)).thenThrow(new ActionException("id", "error"));
+        when(runner.run("test.", outputsCloseAction, null)).thenReturn(TestUtils.ERROR_RESULT);
         JobDto jobDto = new JobDto(null, "test");
 
         String error = assertThrows(ActionException.class, () -> job.doJob(jobDto)).getLocalizedMessage();
@@ -184,7 +184,7 @@ class ScheduledWaterFillControlTest {
         when(state.getTanks()).thenReturn(List.of(tank, tank2));
         when(runner.run(eq("test."), eq(valveOpenAction), any())).thenReturn(TestUtils.EMPTY_RESULT);
         when(runner.run("test.", outputsCloseAction, null)).thenReturn(TestUtils.EMPTY_RESULT);
-        when(runner.run("test.", tapsOpenAction, null)).thenThrow(new ActionException("id", "error"));
+        when(runner.run("test.", tapsOpenAction, null)).thenReturn(TestUtils.ERROR_RESULT);
 
         JobDto jobDto = new JobDto(null, "test");
 
@@ -209,7 +209,7 @@ class ScheduledWaterFillControlTest {
         when(state.getTanks()).thenReturn(List.of(tank, tank2));
         when(runner.run("test.", outputsCloseAction, null)).thenReturn(TestUtils.EMPTY_RESULT);
         when(runner.run("test.", tapsOpenAction, null)).thenReturn(TestUtils.EMPTY_RESULT);
-        when(runner.run(eq("test."), eq(valveOpenAction), any())).thenThrow(new ActionException("id", "error"));
+        when(runner.run(eq("test."), eq(valveOpenAction), any())).thenReturn(TestUtils.ERROR_RESULT);
 
         JobDto jobDto = new JobDto(null, "test");
 
@@ -229,7 +229,7 @@ class ScheduledWaterFillControlTest {
         Sensor sensor = new Sensor("sensor", 1, 100, 101, RaspiPin.GPIO_01);
         Tank tank = new Tank("tank", 100, sensor, valve);
         when(state.getTanks()).thenReturn(List.of(tank));
-        when(runner.run("test.", tanksCloseAction, null)).thenThrow(new ActionException("id", "error"));
+        when(runner.run("test.", tanksCloseAction, null)).thenReturn(TestUtils.ERROR_RESULT);
         JobDto jobDto = new JobDto(null, "test");
 
         String error = assertThrows(ActionException.class, () -> job.doJobRunning(jobDto)).getLocalizedMessage();

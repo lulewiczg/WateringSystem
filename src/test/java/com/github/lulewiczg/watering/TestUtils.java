@@ -36,7 +36,9 @@ public final class TestUtils {
 
     public static final String FORBIDDEN_MSG = "Access is denied";
 
-    public static final ActionResultDto<Void> EMPTY_RESULT = new ActionResultDto<>("id", null, LocalDateTime.now());
+    public static final ActionResultDto<Void> EMPTY_RESULT = new ActionResultDto<>("id", null, null, LocalDateTime.now(), null);
+
+    public static final ActionResultDto<Void> ERROR_RESULT = new ActionResultDto<>("id", null, null, LocalDateTime.now(), "error");
 
     /**
      * Reads json from file and maps to object.

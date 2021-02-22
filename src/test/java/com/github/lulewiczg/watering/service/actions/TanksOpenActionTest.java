@@ -82,7 +82,7 @@ class TanksOpenActionTest {
         when(state.getOutputs()).thenReturn(valves);
         when(state.getTanks()).thenReturn(tanks);
         when(state.getTaps()).thenReturn(taps);
-        when(runner.run(eq("test."), eq(openAction), any())).thenThrow(new ActionException("id", "error"));
+        when(runner.run(eq("test."), eq(openAction), any())).thenReturn(TestUtils.ERROR_RESULT);
 
         ActionDto actionDto = new ActionDto("test");
 

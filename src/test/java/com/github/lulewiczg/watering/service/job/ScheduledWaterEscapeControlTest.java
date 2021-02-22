@@ -135,7 +135,7 @@ class ScheduledWaterEscapeControlTest {
         Sensor sensor = new Sensor("sensor", 0, 90, 90, RaspiPin.GPIO_01);
         Tank tank = new Tank("tank", 100, sensor, valve);
         when(state.getTanks()).thenReturn(List.of(tank));
-        when(runner.run("test.", emergencyStopAction, null)).thenThrow(new ActionException("id", "error"));
+        when(runner.run("test.", emergencyStopAction, null)).thenReturn(TestUtils.ERROR_RESULT);
         JobDto jobDto = new JobDto(null, "test");
         sensor.setLevel(90);
         job.doJob(jobDto);

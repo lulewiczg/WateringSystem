@@ -1,6 +1,7 @@
 package com.github.lulewiczg.watering.service.dto;
 
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -10,11 +11,14 @@ import java.time.LocalDateTime;
  * DTO for action result;
  */
 @Data
+@Builder
 @NoArgsConstructor
 @AllArgsConstructor
 public class ActionResultDto<T> {
 
     private String id;
+
+    private String actionName;
 
     private T result;
 
@@ -22,15 +26,4 @@ public class ActionResultDto<T> {
 
     private String errorMsg;
 
-    public ActionResultDto(String id, T result, LocalDateTime execDate) {
-        this.id = id;
-        this.result = result;
-        this.execDate = execDate;
-    }
-
-    public ActionResultDto(String id, LocalDateTime execDate, String errorMsg) {
-        this.id = id;
-        this.execDate = execDate;
-        this.errorMsg = errorMsg;
-    }
 }

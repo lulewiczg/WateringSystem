@@ -50,7 +50,11 @@ class ActionControllerTest {
     @Autowired
     private ObjectMapper mapper;
 
-    private final ActionResultDto<?> result = new ActionResultDto<>(UUID.randomUUID().toString(), "testResult", LocalDateTime.now());
+    private final ActionResultDto<?> result = ActionResultDto.builder()
+            .id(UUID.randomUUID().toString())
+            .result("testResult")
+            .execDate(LocalDateTime.now())
+            .build();
 
     @Test
     @WithMockUser(roles = "USER")

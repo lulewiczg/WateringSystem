@@ -60,9 +60,9 @@ class ScheduledMasterSyncTest {
     private final ActionDefinitionDto actionDef = new ActionDefinitionDto("test", "desc",
             String.class, Object.class, null, "param desc", String.class);
 
-    private final ActionResultDto<String> actionResult = new ActionResultDto<>("test", "result", LocalDateTime.now());
+    private final ActionResultDto<String> actionResult = new ActionResultDto<>("test", null, "result", LocalDateTime.now(), null);
 
-    private final ActionResultDto<String> jobResult = new ActionResultDto<>("test", null, LocalDateTime.now(), "error");
+    private final ActionResultDto<String> jobResult = new ActionResultDto<>("test", null, null, LocalDateTime.now(), "error");
 
     @Test
     void testJob() {
@@ -82,9 +82,9 @@ class ScheduledMasterSyncTest {
         ActionDto action = new ActionDto("name", "param");
         ActionDto action2 = new ActionDto("name2", "param2");
         JobDto jobDto = new JobDto("test");
-        ActionResultDto<?> incomingJobResult = new ActionResultDto<>("result1", null, LocalDateTime.now());
-        ActionResultDto<?> incomingActionResult = new ActionResultDto<>("result2", null, LocalDateTime.now());
-        ActionResultDto<?> incomingActionResult2 = new ActionResultDto<>("result3", null, LocalDateTime.now(), "error");
+        ActionResultDto<?> incomingJobResult = new ActionResultDto<>("result1", null, "result", LocalDateTime.now(), null);
+        ActionResultDto<?> incomingActionResult = new ActionResultDto<>("result2", null, "result", LocalDateTime.now(), null);
+        ActionResultDto<?> incomingActionResult2 = new ActionResultDto<>("result3", null, null, LocalDateTime.now(), "error");
         Mockito.<ActionResultDto<?>>when(actionService.runJob(jobDto)).thenReturn(incomingJobResult);
         Mockito.<ActionResultDto<?>>when(actionService.runAction(action)).thenReturn(incomingActionResult);
         Mockito.<ActionResultDto<?>>when(actionService.runAction(action2)).thenReturn(incomingActionResult2);

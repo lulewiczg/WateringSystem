@@ -33,17 +33,24 @@ public class ActionServiceMasterImpl implements ActionService {
     }
 
     @Override
-    public ActionResultDto<?> runJob(JobDto jobName) {
-        validateJob(jobName);
-        state.getJobs().add(jobName);
-        return new ActionResultDto<>(UUID.randomUUID().toString(), jobName.getName(), null);
+    public ActionResultDto<?> runJob(JobDto job) {
+        validateJob(job);
+        state.getJobs().add(job);
+
+        return ActionResultDto.builder()
+                .id(UUID.randomUUID().toString())
+                .actionName(job.getName())
+                .build();
     }
 
     @Override
     public ActionResultDto<?> runAction(ActionDto actionDto) {
         validateAndGetDefinition(actionDto);
         state.getActions().add(actionDto);
-        return new ActionResultDto<>(UUID.randomUUID().toString(), actionDto.getName(), null);
+        return ActionResultDto.builder()
+                .id(UUID.randomUUID().toString())
+                .actionName(actionDto.getName())
+                .build();
     }
 
 }

@@ -75,7 +75,8 @@ class ActionServiceMasterImplTest {
 
         assertNotNull(result.getId());
         assertNull(result.getErrorMsg());
-        assertEquals("name", result.getResult());
+        assertNull(result.getResult());
+        assertEquals("name", result.getActionName());
     }
 
     @Test
@@ -116,7 +117,8 @@ class ActionServiceMasterImplTest {
 
         assertNotNull(result.getId());
         assertNull(result.getErrorMsg());
-        assertEquals("name", result.getResult());
+        assertNull(result.getResult());
+        assertEquals("name", result.getActionName());
     }
 
     @Test
@@ -148,7 +150,8 @@ class ActionServiceMasterImplTest {
 
         assertNotNull(result.getId());
         assertNull(result.getErrorMsg());
-        assertEquals("test", result.getResult());
+        assertNull(result.getResult());
+        assertEquals("test", result.getActionName());
     }
 
     @Test

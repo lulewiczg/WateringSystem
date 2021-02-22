@@ -81,7 +81,7 @@ class TanksCloseActionTest {
         when(state.getOutputs()).thenReturn(valves);
         when(state.getTanks()).thenReturn(tanks);
         when(state.getTaps()).thenReturn(taps);
-        when(runner.run(eq("test."), eq(closeAction), any())).thenThrow(new ActionException("id", "error"));
+        when(runner.run(eq("test."), eq(closeAction), any())).thenReturn(TestUtils.ERROR_RESULT);
         ActionDto actionDto = new ActionDto("test");
 
         String error = assertThrows(ActionException.class, () -> action.doAction(actionDto, null)).getLocalizedMessage();
