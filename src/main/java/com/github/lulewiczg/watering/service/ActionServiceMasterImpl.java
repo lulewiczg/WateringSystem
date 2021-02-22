@@ -35,10 +35,11 @@ public class ActionServiceMasterImpl implements ActionService {
     @Override
     public ActionResultDto<?> runJob(JobDto job) {
         validateJob(job);
+        job.setId(UUID.randomUUID().toString());
         state.getJobs().add(job);
 
         return ActionResultDto.builder()
-                .id(UUID.randomUUID().toString())
+                .id(job.getId())
                 .actionName(job.getName())
                 .build();
     }
@@ -46,9 +47,10 @@ public class ActionServiceMasterImpl implements ActionService {
     @Override
     public ActionResultDto<?> runAction(ActionDto actionDto) {
         validateAndGetDefinition(actionDto);
+        actionDto.setId(UUID.randomUUID().toString());
         state.getActions().add(actionDto);
         return ActionResultDto.builder()
-                .id(UUID.randomUUID().toString())
+                .id(actionDto.getId())
                 .actionName(actionDto.getName())
                 .build();
     }

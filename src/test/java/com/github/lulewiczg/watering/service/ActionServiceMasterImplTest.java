@@ -6,6 +6,7 @@ import com.github.lulewiczg.watering.exception.TypeMismatchException;
 import com.github.lulewiczg.watering.exception.ValueNotAllowedException;
 import com.github.lulewiczg.watering.service.dto.*;
 import com.github.lulewiczg.watering.state.MasterState;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -13,6 +14,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
 import org.springframework.test.context.ActiveProfiles;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -37,6 +39,16 @@ class ActionServiceMasterImplTest {
 
     private final ActionDefinitionDto actionDefVoid = new ActionDefinitionDto("name", "desc",
             Void.class, Void.class, null, "param desc", String.class);
+
+    private final List<ActionDto> actions = new ArrayList<>();
+
+    private final List<JobDto> jobs = new ArrayList<>();
+
+    @BeforeEach
+    void before() {
+        when(state.getActions()).thenReturn(actions);
+        when(state.getJobs()).thenReturn(jobs);
+    }
 
     @Test
     void testGetActions() {
@@ -77,6 +89,9 @@ class ActionServiceMasterImplTest {
         assertNull(result.getErrorMsg());
         assertNull(result.getResult());
         assertEquals("name", result.getActionName());
+        assertEquals(1, actions.size());
+        assertEquals(result.getId(), actions.get(0).getId());
+        assertEquals(result.getActionName(), actions.get(0).getName());
     }
 
     @Test
@@ -152,6 +167,9 @@ class ActionServiceMasterImplTest {
         assertNull(result.getErrorMsg());
         assertNull(result.getResult());
         assertEquals("test", result.getActionName());
+        assertEquals(1, jobs.size());
+        assertEquals(result.getId(), jobs.get(0).getId());
+        assertEquals(result.getActionName(), jobs.get(0).getName());
     }
 
     @Test
