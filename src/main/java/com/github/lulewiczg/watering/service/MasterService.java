@@ -10,6 +10,7 @@ import lombok.extern.log4j.Log4j2;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 
 /**
@@ -46,6 +47,7 @@ public class MasterService {
         MasterResponse masterResponse = new MasterResponse(new ArrayList<>(masterState.getActions()), new ArrayList<>(masterState.getJobs()));
         masterState.getActions().clear();
         masterState.getJobs().clear();
+        this.state.setLastSync(LocalDateTime.now());
         log.debug("Returning master state: {}", masterResponse);
         return masterResponse;
     }

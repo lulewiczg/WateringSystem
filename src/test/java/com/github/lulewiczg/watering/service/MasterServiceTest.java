@@ -15,6 +15,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.ActiveProfiles;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -39,6 +40,7 @@ class MasterServiceTest {
 
     @Test
     void testUpdate() {
+        LocalDateTime now = LocalDateTime.now();
         SlaveStateDto dto = TestUtils.readJson("slaveState.json", SlaveStateDto.class, mapper);
         ActionDto action = new ActionDto("name", "param");
         JobDto job = new JobDto("test");
@@ -64,7 +66,7 @@ class MasterServiceTest {
         verify(masterState).setJobDefinitions(dto.getJobs());
         verify(actionsList).addAll(dto.getActionResults());
         verify(jobsList).addAll(dto.getJobResults());
-
+        verify(state).setLastSync(argThat(i -> !now.isAfter(i)));
     }
 
 }
