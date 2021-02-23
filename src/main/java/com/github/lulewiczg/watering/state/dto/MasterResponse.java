@@ -2,6 +2,7 @@ package com.github.lulewiczg.watering.state.dto;
 
 import com.github.lulewiczg.watering.config.MasterConfig;
 import com.github.lulewiczg.watering.service.dto.ActionDto;
+import com.github.lulewiczg.watering.service.dto.JobDto;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -20,6 +21,6 @@ public class MasterResponse {
 
     private List<ActionDto> actions;
 
-    private List<String> jobs;
+    private List<JobDto> jobs;
 
 }

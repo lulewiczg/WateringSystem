@@ -1,7 +1,9 @@
 package com.github.lulewiczg.watering.service.actions;
 
 import com.github.lulewiczg.watering.config.dto.ValveType;
+import com.github.lulewiczg.watering.service.dto.ActionDto;
 import com.github.lulewiczg.watering.service.io.IOService;
+import com.github.lulewiczg.watering.state.AppState;
 import com.github.lulewiczg.watering.state.dto.Valve;
 import com.pi4j.io.gpio.RaspiPin;
 import org.junit.jupiter.api.Test;
@@ -23,6 +25,9 @@ class ValveOpenActionTest {
     @MockBean
     private IOService service;
 
+    @MockBean
+    private AppState state;
+
     @Autowired
     private ValveOpenAction action;
 
@@ -30,7 +35,7 @@ class ValveOpenActionTest {
     void testOpen() {
         Valve valve = new Valve("test", "test", ValveType.OUTPUT, false, RaspiPin.GPIO_00);
 
-        action.doAction(valve);
+        action.doAction(new ActionDto(), valve);
 
         verify(service).toggleOn(valve.getPin());
         assertTrue(valve.isOpen());
@@ -40,7 +45,7 @@ class ValveOpenActionTest {
     void testAlreadyOpened() {
         Valve valve = new Valve("test", "test", ValveType.OUTPUT, true, RaspiPin.GPIO_00);
 
-        action.doAction(valve);
+        action.doAction(new ActionDto(), valve);
 
         verify(service).toggleOn(valve.getPin());
         assertTrue(valve.isOpen());

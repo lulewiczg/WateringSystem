@@ -3,6 +3,7 @@ package com.github.lulewiczg.watering;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.lulewiczg.watering.exception.ApiError;
+import com.github.lulewiczg.watering.service.dto.ActionResultDto;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import lombok.SneakyThrows;
@@ -11,7 +12,10 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.time.LocalDateTime;
+import java.util.Arrays;
 import java.util.Date;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -31,6 +35,10 @@ public final class TestUtils {
     public static final String FORBIDDEN = "Forbidden";
 
     public static final String FORBIDDEN_MSG = "Access is denied";
+
+    public static final ActionResultDto<Void> EMPTY_RESULT = new ActionResultDto<>("id", null, null, LocalDateTime.now(), null);
+
+    public static final ActionResultDto<Void> ERROR_RESULT = new ActionResultDto<>("id", null, null, LocalDateTime.now(), "error");
 
     /**
      * Reads json from file and maps to object.
@@ -194,5 +202,41 @@ public final class TestUtils {
                 .content(mapper.writeValueAsString(payload))
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNotFound());
+    }
+
+    /**
+     * Tests successful result of action.
+     *
+     * @param result result.
+     */
+    public static void testActionResult(ActionResultDto<?> result) {
+        assertNotNull(result.getId());
+        assertNull(result.getErrorMsg());
+        LocalDateTime date = LocalDateTime.now().minusMinutes(1);
+        assertTrue(date.isBefore(result.getExecDate()));
+    }
+
+    /**
+     * Tests failed result of action.
+     *
+     * @param result result.
+     * @param error  expected error
+     */
+    public static void testActionResult(ActionResultDto<?> result, String error) {
+        assertNotNull(result.getId());
+        assertNull(result.getResult());
+        assertEquals(error, result.getErrorMsg());
+        LocalDateTime date = LocalDateTime.now().minusMinutes(1);
+        assertTrue(date.isBefore(result.getExecDate()));
+    }
+
+    /**
+     * Splits ID into segments.
+     *
+     * @param id ID
+     * @return segmented ID
+     */
+    public static List<String> splitId(String id) {
+        return Arrays.asList(id.split("\\."));
     }
 }

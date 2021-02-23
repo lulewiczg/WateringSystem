@@ -1,7 +1,9 @@
 package com.github.lulewiczg.watering.service.job;
 
 import com.github.lulewiczg.watering.config.MasterConfig;
+import com.github.lulewiczg.watering.service.actions.ActionRunner;
 import com.github.lulewiczg.watering.service.actions.EmergencyStopAction;
+import com.github.lulewiczg.watering.service.dto.JobDto;
 import com.github.lulewiczg.watering.state.AppState;
 import com.github.lulewiczg.watering.state.SystemStatus;
 import com.github.lulewiczg.watering.state.dto.Tank;
@@ -31,11 +33,15 @@ public class ScheduledWaterEscapeControl extends ScheduledJob {
 
     private final AppState state;
 
+    private final JobRunner jobRunner;
+
+    private final ActionRunner actionRunner;
+
     private Map<String, Integer> prevLevels = new HashMap<>();
 
     @Scheduled(cron = "${com.github.lulewiczg.watering.schedule.escapeControl.cron}")
     void schedule() {
-        run();
+        schedule(jobRunner);
     }
 
     @Override
@@ -54,7 +60,7 @@ public class ScheduledWaterEscapeControl extends ScheduledJob {
     }
 
     @Override
-    protected boolean isRunning() {
+    public boolean isRunning() {
         return false;
     }
 
@@ -64,7 +70,7 @@ public class ScheduledWaterEscapeControl extends ScheduledJob {
     }
 
     @Override
-    protected void doJob() {
+    public void doJob(JobDto job) {
         log.debug("Staring escape control job...");
 
         Map<String, Integer> levels = getLevels();
@@ -73,7 +79,7 @@ public class ScheduledWaterEscapeControl extends ScheduledJob {
         if (!leaks.isEmpty()) {
             log.error("Water leak in tanks: {}", leaks);
             state.setState(SystemStatus.ERROR);
-            emergencyStopAction.doAction(null);
+            runNested(actionRunner, job, emergencyStopAction, null);
         }
         log.debug("Escape control finished.");
         prevLevels = levels;

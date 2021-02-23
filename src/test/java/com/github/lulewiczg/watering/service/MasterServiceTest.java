@@ -3,6 +3,8 @@ package com.github.lulewiczg.watering.service;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.lulewiczg.watering.TestUtils;
 import com.github.lulewiczg.watering.service.dto.ActionDto;
+import com.github.lulewiczg.watering.service.dto.ActionResultDto;
+import com.github.lulewiczg.watering.service.dto.JobDto;
 import com.github.lulewiczg.watering.service.dto.SlaveStateDto;
 import com.github.lulewiczg.watering.state.AppState;
 import com.github.lulewiczg.watering.state.MasterState;
@@ -17,8 +19,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 @SpringBootTest
 @ActiveProfiles({"test", "testMaster"})
@@ -37,15 +38,20 @@ class MasterServiceTest {
     private AppState state;
 
     @Test
-    void test() {
+    void testUpdate() {
         SlaveStateDto dto = TestUtils.readJson("slaveState.json", SlaveStateDto.class, mapper);
-        ActionDto action = new ActionDto("name", "type", "param");
-        when(masterState.getJobs()).thenReturn(new ArrayList<>(List.of("test")));
+        ActionDto action = new ActionDto("name", "param");
+        JobDto job = new JobDto("test");
+        when(masterState.getJobs()).thenReturn(new ArrayList<>(List.of(job)));
         when(masterState.getActions()).thenReturn(new ArrayList<>(List.of(action)));
+        List<ActionResultDto<?>> actionsList = mock(List.class);
+        List<ActionResultDto<?>> jobsList = mock(List.class);
+        when(masterState.getActionResults()).thenReturn(actionsList);
+        when(masterState.getJobResults()).thenReturn(jobsList);
 
         MasterResponse result = service.update(dto);
 
-        assertEquals(List.of("test"), result.getJobs());
+        assertEquals(List.of(job), result.getJobs());
         assertEquals(List.of(action), result.getActions());
         assertEquals(List.of(), masterState.getActions());
         assertEquals(List.of(), masterState.getJobs());
@@ -56,6 +62,9 @@ class MasterServiceTest {
         verify(state).setTaps(dto.getState().getTaps());
         verify(masterState).setActionDefinitions(dto.getActions());
         verify(masterState).setJobDefinitions(dto.getJobs());
+        verify(actionsList).addAll(dto.getActionResults());
+        verify(jobsList).addAll(dto.getJobResults());
+
     }
 
 }

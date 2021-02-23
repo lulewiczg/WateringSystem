@@ -15,6 +15,7 @@ import com.github.lulewiczg.watering.state.mapper.WaterSourceMapper;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -59,6 +60,21 @@ public class AppState {
     public Sensor findSensor(String id) {
         return tanks.stream().map(Tank::getSensor).filter(i -> i != null && i.getId().equals(id)).findFirst()
                 .orElseThrow(() -> new SensorNotFoundException(id));
+    }
+
+    /**
+     * Finds all valves.
+     *
+     * @return valves
+     */
+    @Cacheable
+    public List<Valve> getAllValves() {
+        List<Valve> tankValves = tanks.stream().map(Tank::getValve).collect(Collectors.toList());
+        List<Valve> tapValves = taps.stream().map(WaterSource::getValve).collect(Collectors.toList());
+        tankValves.addAll(tapValves);
+        tankValves.addAll(outputs);
+
+        return tankValves;
     }
 
     @Autowired

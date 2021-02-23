@@ -1,17 +1,15 @@
 package com.github.lulewiczg.watering.service;
 
 import com.github.lulewiczg.watering.config.MasterConfig;
-import com.github.lulewiczg.watering.service.dto.ActionDefinitionDto;
-import com.github.lulewiczg.watering.service.dto.ActionDto;
-import com.github.lulewiczg.watering.service.dto.JobDefinitionDto;
+import com.github.lulewiczg.watering.service.dto.*;
 import com.github.lulewiczg.watering.state.MasterState;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.UUID;
 
 /**
  * Service for handling actions.
@@ -35,18 +33,26 @@ public class ActionServiceMasterImpl implements ActionService {
     }
 
     @Override
-    public void runJob(String jobName) {
-        state.getJobDefinitions().stream().filter(i -> i.getJobName().equals(jobName)).findFirst()
-                .orElseThrow(() -> new IllegalArgumentException("Job not found: " + jobName));
-        state.getJobs().add(jobName);
+    public ActionResultDto<?> runJob(JobDto job) {
+        validateJob(job);
+        job.setId(UUID.randomUUID().toString());
+        state.getJobs().add(job);
+
+        return ActionResultDto.builder()
+                .id(job.getId())
+                .actionName(job.getName())
+                .build();
     }
 
     @Override
-    public Object runAction(ActionDto actionDto) {
-        state.getActionDefinitions().stream().filter(i -> i.getActionName().equals(actionDto.getName()))
-                .findFirst().orElseThrow(() -> new IllegalArgumentException("Job not found: " + actionDto));
+    public ActionResultDto<?> runAction(ActionDto actionDto) {
+        validateAndGetDefinition(actionDto);
+        actionDto.setId(UUID.randomUUID().toString());
         state.getActions().add(actionDto);
-        return null;
+        return ActionResultDto.builder()
+                .id(actionDto.getId())
+                .actionName(actionDto.getName())
+                .build();
     }
 
 }

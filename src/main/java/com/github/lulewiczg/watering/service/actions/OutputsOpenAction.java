@@ -1,6 +1,7 @@
 package com.github.lulewiczg.watering.service.actions;
 
 import com.github.lulewiczg.watering.config.MasterConfig;
+import com.github.lulewiczg.watering.service.dto.ActionDto;
 import com.github.lulewiczg.watering.state.AppState;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
@@ -14,16 +15,23 @@ import org.springframework.stereotype.Component;
 @Component
 @RequiredArgsConstructor
 @ConditionalOnMissingBean(MasterConfig.class)
-public class OutputsOpenAction implements Action<Void, Void> {
+public class OutputsOpenAction extends Action<Void, Void> {
 
     private final AppState state;
 
     private final ValveOpenAction openAction;
 
+    private final ActionRunner actionRunner;
+
     @Override
-    public Void doAction(Void param) {
+    protected Void doAction(ActionDto actionDto, Void param) {
         log.info("Opening outputs...");
-        state.getOutputs().forEach(openAction::doAction);
+        state.getOutputs().forEach(i -> runNested(actionRunner, actionDto, openAction, i));
         return null;
+    }
+
+    @Override
+    public String getDescription() {
+        return "Opens output valves";
     }
 }

@@ -40,6 +40,8 @@ public class MasterService {
         this.state.setTaps(appState.getTaps());
         this.masterState.setActionDefinitions(state.getActions());
         this.masterState.setJobDefinitions(state.getJobs());
+        this.masterState.getActionResults().addAll(state.getActionResults());
+        this.masterState.getJobResults().addAll(state.getJobResults());
 
         MasterResponse masterResponse = new MasterResponse(new ArrayList<>(masterState.getActions()), new ArrayList<>(masterState.getJobs()));
         masterState.getActions().clear();

@@ -1,6 +1,7 @@
 package com.github.lulewiczg.watering.service.job;
 
 import com.github.lulewiczg.watering.config.MasterConfig;
+import com.github.lulewiczg.watering.service.dto.JobDto;
 import com.github.lulewiczg.watering.service.io.IOService;
 import com.github.lulewiczg.watering.state.AppState;
 import com.github.lulewiczg.watering.state.SystemStatus;
@@ -27,9 +28,11 @@ public class ScheduledValveRead extends ScheduledIoJob {
 
     private final IOService ioService;
 
+    private final JobRunner jobRunner;
+
     @Scheduled(cron = "${com.github.lulewiczg.watering.schedule.sensorsRead.cron}")
     void schedule() {
-        run();
+        schedule(jobRunner);
     }
 
     @Override
@@ -38,7 +41,7 @@ public class ScheduledValveRead extends ScheduledIoJob {
     }
 
     @Override
-    protected void doJob() {
+    public void doJob(JobDto job) {
         log.debug("Checking valves...");
         state.getOutputs().forEach(this::readValve);
         state.getTanks().stream().map(Tank::getValve).forEach(this::readValve);

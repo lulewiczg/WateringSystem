@@ -1,11 +1,10 @@
 package com.github.lulewiczg.watering.service;
 
 import com.github.lulewiczg.watering.config.MasterConfig;
-import com.github.lulewiczg.watering.exception.InvalidParamException;
 import com.github.lulewiczg.watering.service.actions.Action;
-import com.github.lulewiczg.watering.service.dto.ActionDefinitionDto;
-import com.github.lulewiczg.watering.service.dto.ActionDto;
-import com.github.lulewiczg.watering.service.dto.JobDefinitionDto;
+import com.github.lulewiczg.watering.service.actions.ActionRunner;
+import com.github.lulewiczg.watering.service.dto.*;
+import com.github.lulewiczg.watering.service.job.JobRunner;
 import com.github.lulewiczg.watering.service.job.ScheduledJob;
 import com.github.lulewiczg.watering.state.AppState;
 import com.github.lulewiczg.watering.state.dto.Sensor;
@@ -19,10 +18,8 @@ import org.springframework.cache.annotation.Cacheable;
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Service;
 
-import java.lang.reflect.Method;
-import java.util.Arrays;
 import java.util.List;
-import java.util.Optional;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
@@ -36,15 +33,32 @@ public class ActionServiceImpl implements ActionService {
 
     private final ApplicationContext applicationContext;
 
+    private final ActionRunner actionRunner;
+
+    private final JobRunner jobRunner;
+
     private final AppState state;
 
     @Override
     @Cacheable
     public List<ActionDefinitionDto> getActions() {
         return applicationContext.getBeansOfType(Action.class).values().stream().filter(Action::isEnabled)
-                .map(i -> new ActionDefinitionDto(fixBeanName(i.getClass().getSimpleName()),
-                        i.getParamType(), i.getParamDescription(), i.getReturnType()))
+                .map(i -> ActionDefinitionDto.builder()
+                        .actionName(fixBeanName(i.getClass().getSimpleName()))
+                        .description(i.getDescription())
+                        .parameterType(i.getParamType())
+                        .parameterDestinationType(i.getDestinationParamType())
+                        .allowedValues(i.getAllowedValues())
+                        .parameterDescription(i.getParamDescription())
+                        .returnType(i.getReturnType())
+                        .build())
                 .collect(Collectors.toList());
+    }
+
+    @Cacheable
+    private Map<String, Action<?, ?>> getActionsMap() {
+        return applicationContext.getBeansOfType(Action.class).values().stream().filter(Action::isEnabled).map(i -> (Action<?, ?>) i)
+                .collect(Collectors.toMap(i -> fixBeanName(i.getClass().getSimpleName()), i -> i));
     }
 
     @Override
@@ -56,56 +70,47 @@ public class ActionServiceImpl implements ActionService {
     }
 
     @Override
-    public void runJob(String jobName) {
+    public ActionResultDto<?> runJob(JobDto jobDto) {
+        validateJob(jobDto);
         ScheduledJob job;
         try {
-            job = applicationContext.getBean(jobName, ScheduledJob.class);
+            job = applicationContext.getBean(jobDto.getName(), ScheduledJob.class);
         } catch (NoSuchBeanDefinitionException e) {
             log.error(e);
-            throw new IllegalArgumentException("Job not found: " + jobName);
+            throw new IllegalArgumentException("Job not found: " + jobDto.getName());
         }
         log.trace("Running job {}", job::getName);
-        job.run();
+        jobDto.setJob(job);
+        return jobRunner.run(jobDto);
     }
 
     @Override
     @SneakyThrows
-    public Object runAction(ActionDto actionDto) {
-        Action<?, ?> action = Optional.of(applicationContext.getBean(actionDto.getName(), Action.class))
-                .filter(Action::isEnabled).orElseThrow(() -> new IllegalArgumentException("Action not found: " + actionDto.getName()));
-        Object param = getParam(actionDto);
-        Method method = getMethod(action, param);
-        log.trace("Running action {} with param {}", actionDto.getName(), actionDto.getParam());
-        return method.invoke(action, param);
+    public ActionResultDto<?> runAction(ActionDto actionDto) {
+        ActionDefinitionDto actionDef = validateAndGetDefinition(actionDto);
+        Action<?, ?> action = getActionsMap().get(actionDef.getActionName());
+        if (action == null) {
+            throw new IllegalArgumentException("Action not found: " + actionDto.getName());
+        }
+        try {
+            Object param = mapParam(actionDto, actionDef);
+            actionDto.setAction(action);
+            return actionRunner.run(actionDto, param);
+        } catch (Exception e) {
+            log.error("Error while running action {}", actionDto.getName());
+            throw e;
+        }
     }
 
-    private Method getMethod(Action<?, ?> action, Object param) {
-        Class<?> paramType = Optional.ofNullable(param).map(Object::getClass).orElse(null);
-        List<Method> methods = Arrays.stream(action.getClass().getMethods())
-                .filter(i -> i.getName().equals("doAction")).collect(Collectors.toList());
-        Method method;
-        if (methods.size() > 1) {
-            method = methods.stream().filter(i -> i.getParameters()[0].getType() != Object.class).findFirst().orElseThrow();
-        } else {
-            method = methods.get(0);
+    private Object mapParam(ActionDto actionDto, ActionDefinitionDto definition) {
+        if (Valve.class.equals(definition.getParameterDestinationType())) {
+            return state.findValve(actionDto.getParam().toString());
+        } else if (Sensor.class.equals(definition.getParameterDestinationType())) {
+            return state.findSensor(actionDto.getParam().toString());
         }
-        log.info(method);
-        Class<?> expectedType = method.getParameters()[0].getType();
-        if (param == null && expectedType != Void.class || paramType != expectedType) {
-            throw new InvalidParamException(expectedType, paramType);
-        }
-        return method;
-    }
-
-    private Object getParam(ActionDto actionDto) {
-        if (Valve.class.getSimpleName().equals(actionDto.getParamType())) {
-            return state.findValve(actionDto.getParam());
-        } else if (Sensor.class.getSimpleName().equals(actionDto.getParamType())) {
-            return state.findSensor(actionDto.getParam());
-        }
+        //Only Valve and Sensor supported for now
         return null;
     }
-
 
     private String fixBeanName(String i) {
         return i.substring(0, 1).toLowerCase() + i.substring(1);

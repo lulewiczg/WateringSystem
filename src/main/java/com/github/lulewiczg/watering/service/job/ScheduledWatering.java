@@ -1,10 +1,8 @@
 package com.github.lulewiczg.watering.service.job;
 
 import com.github.lulewiczg.watering.config.MasterConfig;
-import com.github.lulewiczg.watering.service.actions.OutputsCloseAction;
-import com.github.lulewiczg.watering.service.actions.OutputsOpenAction;
-import com.github.lulewiczg.watering.service.actions.TanksCloseAction;
-import com.github.lulewiczg.watering.service.actions.TanksOpenAction;
+import com.github.lulewiczg.watering.service.actions.*;
+import com.github.lulewiczg.watering.service.dto.JobDto;
 import com.github.lulewiczg.watering.state.AppState;
 import com.github.lulewiczg.watering.state.SystemStatus;
 import lombok.RequiredArgsConstructor;
@@ -42,11 +40,15 @@ public class ScheduledWatering extends ScheduledJob {
 
     private final AppState state;
 
+    private final JobRunner jobRunner;
+
+    private final ActionRunner actionRunner;
+
     private final ScheduledExecutorService exec = Executors.newSingleThreadScheduledExecutor();
 
     @Scheduled(cron = "${com.github.lulewiczg.watering.schedule.watering.cron}")
     void schedule() {
-        run();
+        schedule(jobRunner);
     }
 
     @Override
@@ -65,23 +67,23 @@ public class ScheduledWatering extends ScheduledJob {
     }
 
     @Override
-    protected boolean isRunning() {
+    public boolean isRunning() {
         return false;
     }
 
     @Override
-    protected void doJob() {
+    public void doJob(JobDto job) {
         state.setState(SystemStatus.WATERING);
-        tanksOpenAction.doAction(null);
-        outputsOpenAction.doAction(null);
+        runNested(actionRunner, job, tanksOpenAction, null);
+        runNested(actionRunner, job, outputsOpenAction, null);
         log.info("Valves opened");
-        exec.schedule(this::finish, wateringLength, TimeUnit.SECONDS);
+        exec.schedule(() -> finish(job), wateringLength, TimeUnit.SECONDS);
     }
 
-    private void finish() {
+    private void finish(JobDto job) {
         log.info("Stopping watering job...");
-        tanksCloseAction.doAction(null);
-        outputsCloseAction.doAction(null);
+        runNested(actionRunner, job, tanksCloseAction, null);
+        runNested(actionRunner, job, outputsCloseAction, null);
         state.setState(SystemStatus.IDLE);
         log.info("Watering finished!");
     }

@@ -49,8 +49,8 @@ class StateMasterControllerMasterTest {
     @WithMockUser(roles = "SLAVE")
     void testUpdateStateSlave() throws Exception {
         AppState appState = TestUtils.readJson("state.json", AppState.class, mapper);
-        SlaveStateDto slaveState = new SlaveStateDto(appState, List.of(), List.of());
         MasterResponse response = TestUtils.readJson("masterResponse.json", MasterResponse.class, mapper);
+        SlaveStateDto slaveState = new SlaveStateDto(appState, List.of(), List.of(), List.of(), List.of());
         when(service.update(slaveState)).thenReturn(response);
 
         mvc.perform(post("/rest/state")
@@ -64,7 +64,7 @@ class StateMasterControllerMasterTest {
     @WithMockUser(roles = "USER")
     void testUpdateState() {
         AppState appState = TestUtils.readJson("state.json", AppState.class, mapper);
-        SlaveStateDto slaveState = new SlaveStateDto(appState, List.of(), List.of());
+        SlaveStateDto slaveState = new SlaveStateDto(appState, List.of(), List.of(), List.of(), List.of());
 
         TestUtils.testForbiddenPost(mvc, mapper, "/rest/state", slaveState);
     }
@@ -73,7 +73,7 @@ class StateMasterControllerMasterTest {
     @WithMockUser(roles = "ADMIN")
     void testUpdateStateAdmin() {
         AppState appState = TestUtils.readJson("state.json", AppState.class, mapper);
-        SlaveStateDto slaveState = new SlaveStateDto(appState, List.of(), List.of());
+        SlaveStateDto slaveState = new SlaveStateDto(appState, List.of(), List.of(), List.of(), List.of());
 
         TestUtils.testForbiddenPost(mvc, mapper, "/rest/state", slaveState);
     }
@@ -82,7 +82,7 @@ class StateMasterControllerMasterTest {
     @WithMockUser(roles = "GUEST")
     void testUpdateStateGuest() {
         AppState appState = TestUtils.readJson("state.json", AppState.class, mapper);
-        SlaveStateDto slaveState = new SlaveStateDto(appState, List.of(), List.of());
+        SlaveStateDto slaveState = new SlaveStateDto(appState, List.of(), List.of(), List.of(), List.of());
 
         TestUtils.testForbiddenPost(mvc, mapper, "/rest/state", slaveState);
     }
@@ -90,7 +90,7 @@ class StateMasterControllerMasterTest {
     @Test
     void testUpdateStateAnon() {
         AppState appState = TestUtils.readJson("state.json", AppState.class, mapper);
-        SlaveStateDto slaveState = new SlaveStateDto(appState, List.of(), List.of());
+        SlaveStateDto slaveState = new SlaveStateDto(appState, List.of(), List.of(), List.of(), List.of());
 
         TestUtils.testUnauthorizedPost(mvc, mapper, "/rest/state", slaveState);
     }

@@ -1,17 +1,15 @@
 package com.github.lulewiczg.watering.service.job;
 
 import com.github.lulewiczg.watering.service.ActionService;
-import com.github.lulewiczg.watering.service.dto.ActionDefinitionDto;
-import com.github.lulewiczg.watering.service.dto.ActionDto;
-import com.github.lulewiczg.watering.service.dto.JobDefinitionDto;
-import com.github.lulewiczg.watering.service.dto.SlaveStateDto;
+import com.github.lulewiczg.watering.service.dto.*;
 import com.github.lulewiczg.watering.state.AppState;
 import com.github.lulewiczg.watering.state.SystemStatus;
 import com.github.lulewiczg.watering.state.dto.MasterResponse;
 import org.apache.tomcat.util.codec.binary.Base64;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
-import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -24,8 +22,11 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
+import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 @SpringBootTest
@@ -44,7 +45,7 @@ class ScheduledMasterSyncTest {
     @MockBean
     private ActionService actionService;
 
-    @Mock
+    @MockBean
     private MasterResponse response;
 
     @Value("${com.github.lulewiczg.watering.master.url}")
@@ -56,41 +57,76 @@ class ScheduledMasterSyncTest {
     @Value("${com.github.lulewiczg.watering.master.password}")
     private String password;
 
-    @ParameterizedTest
-    @EnumSource(value = SystemStatus.class)
-    void testJob(SystemStatus status) {
-        when(state.getState()).thenReturn(status);
+    private final ActionDefinitionDto actionDef = new ActionDefinitionDto("test", "desc",
+            String.class, Object.class, null, "param desc", String.class);
+
+    private final ActionResultDto<String> actionResult = new ActionResultDto<>("test", null, "result", LocalDateTime.now(), null);
+
+    private final ActionResultDto<String> jobResult = new ActionResultDto<>("test", null, null, LocalDateTime.now(), "error");
+
+    @Test
+    void testJob() {
         JobDefinitionDto jobDef = new JobDefinitionDto("test", true);
-        ActionDefinitionDto actionDef = new ActionDefinitionDto("test", "type", "desc", "ret type");
         when(actionService.getActions()).thenReturn(List.of(actionDef));
         when(actionService.getJobs()).thenReturn(List.of(jobDef));
+        job.setActionResults(List.of(actionResult));
+        job.setJobResults(List.of(jobResult));
 
         String credentials = login + ":" + password;
         String base64 = Base64.encodeBase64String(credentials.getBytes());
         HttpHeaders headers = new HttpHeaders();
         headers.add("Authorization", "Basic " + base64);
-        HttpEntity<SlaveStateDto> entity = new HttpEntity<>(new SlaveStateDto(state, List.of(actionDef), List.of(jobDef)), headers);
+        HttpEntity<SlaveStateDto> entity = new HttpEntity<>(new SlaveStateDto(state, List.of(actionDef), List.of(jobDef), List.of(actionResult), List.of(jobResult)), headers);
 
         when(restTemplate.postForEntity(url, entity, MasterResponse.class)).thenReturn(new ResponseEntity<>(response, HttpStatus.OK));
-        ActionDto action = new ActionDto("name", "type", "param");
-        ActionDto action2 = new ActionDto("name2", "type2", "param2");
+        ActionDto action = new ActionDto("name", "param");
+        ActionDto action2 = new ActionDto("name2", "param2");
+        JobDto jobDto = new JobDto("test");
+        ActionResultDto<?> incomingJobResult = new ActionResultDto<>("result1", null, "result", LocalDateTime.now(), null);
+        ActionResultDto<?> incomingActionResult = new ActionResultDto<>("result2", null, "result", LocalDateTime.now(), null);
+        ActionResultDto<?> incomingActionResult2 = new ActionResultDto<>("result3", null, null, LocalDateTime.now(), "error");
+        Mockito.<ActionResultDto<?>>when(actionService.runJob(jobDto)).thenReturn(incomingJobResult);
+        Mockito.<ActionResultDto<?>>when(actionService.runAction(action)).thenReturn(incomingActionResult);
+        Mockito.<ActionResultDto<?>>when(actionService.runAction(action2)).thenReturn(incomingActionResult2);
 
         when(response.getActions()).thenReturn(List.of(action, action2));
-        when(response.getJobs()).thenReturn(List.of("test"));
+        when(response.getJobs()).thenReturn(List.of(jobDto));
 
-        job.run();
+        job.doJob(jobDto);
 
-        verify(actionService).runJob("test");
+        verify(actionService).runJob(jobDto);
         verify(actionService).runAction(action);
         verify(actionService).runAction(action2);
     }
 
-    @ParameterizedTest
-    @EnumSource(value = SystemStatus.class)
-    void testJobNothingToDo(SystemStatus status) {
-        when(state.getState()).thenReturn(status);
+    @Test
+    void testJobNothingToDo() {
         JobDefinitionDto jobDef = new JobDefinitionDto("test", true);
-        ActionDefinitionDto actionDef = new ActionDefinitionDto("test", "type", "desc", "ret type");
+        when(actionService.getActions()).thenReturn(List.of(actionDef));
+        when(actionService.getJobs()).thenReturn(List.of(jobDef));
+        job.setActionResults(List.of(actionResult));
+        job.setJobResults(List.of(jobResult));
+
+        String credentials = login + ":" + password;
+        String base64 = Base64.encodeBase64String(credentials.getBytes());
+        HttpHeaders headers = new HttpHeaders();
+        headers.add("Authorization", "Basic " + base64);
+        HttpEntity<SlaveStateDto> entity = new HttpEntity<>(new SlaveStateDto(state, List.of(actionDef), List.of(jobDef), List.of(actionResult), List.of(jobResult)), headers);
+
+        when(restTemplate.postForEntity(url, entity, MasterResponse.class)).thenReturn(new ResponseEntity<>(response, HttpStatus.OK));
+        JobDto jobDto = new JobDto("test");
+
+        job.doJob(jobDto);
+
+        verify(actionService, never()).runJob(any());
+        verify(actionService, never()).runAction(any());
+        assertEquals(new ArrayList<>(), job.getJobResults());
+        assertEquals(new ArrayList<>(), job.getActionResults());
+    }
+
+    @Test
+    void testJobFail() {
+        JobDefinitionDto jobDef = new JobDefinitionDto("test", true);
         when(actionService.getActions()).thenReturn(List.of(actionDef));
         when(actionService.getJobs()).thenReturn(List.of(jobDef));
 
@@ -98,11 +134,12 @@ class ScheduledMasterSyncTest {
         String base64 = Base64.encodeBase64String(credentials.getBytes());
         HttpHeaders headers = new HttpHeaders();
         headers.add("Authorization", "Basic " + base64);
-        HttpEntity<SlaveStateDto> entity = new HttpEntity<>(new SlaveStateDto(state, List.of(actionDef), List.of(jobDef)), headers);
+        HttpEntity<SlaveStateDto> entity = new HttpEntity<>(new SlaveStateDto(state, List.of(actionDef), List.of(jobDef), List.of(), List.of()), headers);
 
-        when(restTemplate.postForEntity(url, entity, MasterResponse.class)).thenReturn(new ResponseEntity<>(response, HttpStatus.OK));
+        when(restTemplate.postForEntity(url, entity, MasterResponse.class)).thenThrow(HttpClientErrorException.BadRequest.class);
+        JobDto jobDto = new JobDto("test");
 
-        job.run();
+        assertThrows(HttpClientErrorException.BadRequest.class, () -> job.doJob(jobDto));
 
         verify(actionService, never()).runJob(any());
         verify(actionService, never()).runAction(any());
@@ -110,24 +147,9 @@ class ScheduledMasterSyncTest {
 
     @ParameterizedTest
     @EnumSource(value = SystemStatus.class)
-    void testJobFail(SystemStatus status) {
+    void testCanBeRun(SystemStatus status) {
         when(state.getState()).thenReturn(status);
-        JobDefinitionDto jobDef = new JobDefinitionDto("test", true);
-        ActionDefinitionDto actionDef = new ActionDefinitionDto("test", "type", "desc", "ret type");
-        when(actionService.getActions()).thenReturn(List.of(actionDef));
-        when(actionService.getJobs()).thenReturn(List.of(jobDef));
 
-        String credentials = login + ":" + password;
-        String base64 = Base64.encodeBase64String(credentials.getBytes());
-        HttpHeaders headers = new HttpHeaders();
-        headers.add("Authorization", "Basic " + base64);
-        HttpEntity<SlaveStateDto> entity = new HttpEntity<>(new SlaveStateDto(state, List.of(actionDef), List.of(jobDef)), headers);
-
-        when(restTemplate.postForEntity(url, entity, MasterResponse.class)).thenThrow(HttpClientErrorException.BadRequest.class);
-
-        job.run();
-
-        verify(actionService, never()).runJob(any());
-        verify(actionService, never()).runAction(any());
+        assertTrue(job.canBeStarted());
     }
 }

@@ -4,6 +4,7 @@ import com.github.lulewiczg.watering.config.MasterConfig;
 import com.github.lulewiczg.watering.service.ActionService;
 import com.github.lulewiczg.watering.service.dto.ActionDefinitionDto;
 import com.github.lulewiczg.watering.service.dto.ActionDto;
+import com.github.lulewiczg.watering.service.dto.ActionResultDto;
 import com.github.lulewiczg.watering.state.MasterState;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
@@ -38,10 +39,16 @@ public class ActionMasterController {
         return masterState.getActions();
     }
 
+    @GetMapping("/results")
+    @Secured({"ROLE_USER", "ROLE_ADMIN"})
+    public List<ActionResultDto<?>> getResults() {
+        return masterState.getActionResults();
+    }
+
     @PostMapping
     @Secured({"ROLE_USER", "ROLE_ADMIN"})
-    public void runAction(@Valid @RequestBody ActionDto actionDto) {
-        actionService.runAction(actionDto);
+    public ActionResultDto<?> runAction(@Valid @RequestBody ActionDto actionDto) {
+        return actionService.runAction(actionDto);
     }
 
 }

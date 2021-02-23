@@ -1,13 +1,22 @@
 package com.github.lulewiczg.watering.service.job;
 
+import com.github.lulewiczg.watering.exception.ActionException;
+import com.github.lulewiczg.watering.service.actions.Action;
+import com.github.lulewiczg.watering.service.actions.ActionRunner;
+import com.github.lulewiczg.watering.service.dto.ActionResultDto;
+import com.github.lulewiczg.watering.service.dto.JobDto;
 import com.github.lulewiczg.watering.state.SystemStatus;
 import lombok.extern.log4j.Log4j2;
+
+import java.util.UUID;
 
 /**
  * Abstract class for scheduled job.
  */
 @Log4j2
 public abstract class ScheduledJob {
+
+    protected static final String SCHED = "sched.";
 
     /**
      * Action name.
@@ -34,16 +43,40 @@ public abstract class ScheduledJob {
         return null;
     }
 
+
+    /**
+     * Schedules job.
+     *
+     * @param jobRunner job runner
+     */
+    protected void schedule(JobRunner jobRunner) {
+        jobRunner.run(new JobDto(SCHED + getName(), SCHED + UUID.randomUUID().toString(), this));
+    }
+
     /**
      * Action logic.
+     *
+     * @param job job DTO
      */
-    protected abstract void doJob();
+    protected abstract void doJob(JobDto job);
 
     /**
      * Action logic when already running.
+     *
+     * @param job job DTO
      */
-    protected void doJobRunning() {
+    protected void doJobRunning(JobDto job) {
         //Do nothing
+    }
+
+    /**
+     * Returns ID for nested call.
+     *
+     * @param job job
+     * @return ID
+     */
+    protected String getNestedId(JobDto job) {
+        return job.getId() + ".";
     }
 
     /**
@@ -68,23 +101,36 @@ public abstract class ScheduledJob {
         //Do nothing
     }
 
-    /**
-     * Runs action.
-     */
-    public final void run() {
-        log.debug("Staring {} job...", getName());
-        if (canBeStarted()) {
-            log.debug("Job {} can start!", getName());
-            doJob();
-        }
-        if (isRunning()) {
-            log.debug("Job {} is already running.", getName());
-            doJobRunning();
-        }
-        log.debug("Finishing {} job...", getName());
-    }
-
-    protected boolean isRunning() {
+    public boolean isRunning() {
         return getJobStatus() == getState();
     }
+
+    /**
+     * Handles action result and throws exception if failed.
+     *
+     * @param result result
+     */
+    protected void handleResult(ActionResultDto<?> result) {
+        if (result.getErrorMsg() != null) {
+            throw new ActionException(result.getId(), result.getErrorMsg());
+        }
+    }
+
+    /**
+     * Runs nested action and checks result.
+     *
+     * @param runner       action runner
+     * @param jobDto       job DTO
+     * @param nestedAction nested action
+     * @param param        nested action param
+     * @param <T2>         nested action param type
+     * @param <R2>         nested action return type
+     * @return nesed action result
+     */
+    protected <T2, R2> ActionResultDto<R2> runNested(ActionRunner runner, JobDto jobDto, Action<T2, R2> nestedAction, T2 param) {
+        ActionResultDto<R2> result = runner.run(getNestedId(jobDto), nestedAction, param);
+        handleResult(result);
+        return result;
+    }
+
 }
