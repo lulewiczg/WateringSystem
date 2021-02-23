@@ -24,6 +24,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -88,6 +89,7 @@ public class ScheduledMasterSync extends ScheduledJob {
 
     @Override
     public void doJob(JobDto job) {
+        log.debug("Starting sync");
         MasterResponse response = connect();
         if (response == null) {
             log.error(SYNC_ERROR);
@@ -103,6 +105,8 @@ public class ScheduledMasterSync extends ScheduledJob {
             log.info("Running action: {}", i);
             jobResults.add(actionService.runJob(i));
         });
+        state.setLastSync(LocalDateTime.now());
+        log.debug("Sync Finished!");
     }
 
     private MasterResponse connect() {

@@ -1,5 +1,6 @@
 package com.github.lulewiczg.watering.state;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.github.lulewiczg.watering.config.AppConfig;
 import com.github.lulewiczg.watering.config.dto.TankType;
 import com.github.lulewiczg.watering.config.dto.ValveType;
@@ -18,6 +19,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -30,13 +32,17 @@ import java.util.stream.Collectors;
 @NoArgsConstructor
 public class AppState {
 
+    private volatile SystemStatus state = SystemStatus.IDLE;
+
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
+    private LocalDateTime lastSync;
+
     private List<Tank> tanks;
 
     private List<WaterSource> taps;
 
     private List<Valve> outputs;
 
-    private volatile SystemStatus state = SystemStatus.IDLE;
 
     /**
      * Finds valve with given ID.

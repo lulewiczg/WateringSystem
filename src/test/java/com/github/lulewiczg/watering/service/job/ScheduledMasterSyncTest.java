@@ -66,6 +66,7 @@ class ScheduledMasterSyncTest {
 
     @Test
     void testJob() {
+        LocalDateTime now = LocalDateTime.now();
         JobDefinitionDto jobDef = new JobDefinitionDto("test", true);
         when(actionService.getActions()).thenReturn(List.of(actionDef));
         when(actionService.getJobs()).thenReturn(List.of(jobDef));
@@ -97,6 +98,7 @@ class ScheduledMasterSyncTest {
         verify(actionService).runJob(jobDto);
         verify(actionService).runAction(action);
         verify(actionService).runAction(action2);
+        verify(state).setLastSync(argThat(i -> !now.isAfter(i)));
     }
 
     @Test
