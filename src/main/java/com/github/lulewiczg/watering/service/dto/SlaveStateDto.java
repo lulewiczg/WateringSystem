@@ -25,5 +25,4 @@ public class SlaveStateDto {
 
     private List<ActionResultDto<?>> jobResults;
 
-
 }

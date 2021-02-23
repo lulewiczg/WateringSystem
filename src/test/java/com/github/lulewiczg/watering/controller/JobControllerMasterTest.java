@@ -14,6 +14,7 @@ import com.github.lulewiczg.watering.service.dto.JobDto;
 import com.github.lulewiczg.watering.state.MasterState;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -25,9 +26,11 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 
+import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
+import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.verify;
@@ -57,6 +60,13 @@ class JobControllerMasterTest {
     private ObjectMapper mapper;
 
     private final JobDto job = new JobDto("test");
+
+    private final ActionResultDto<?> result = ActionResultDto.builder()
+            .id(UUID.randomUUID().toString())
+            .result("result")
+            .execDate(LocalDateTime.now())
+            .build();
+
 
     @Test
     @WithMockUser(roles = "USER")
@@ -205,11 +215,12 @@ class JobControllerMasterTest {
     }
 
     private void testRun() throws Exception {
+        Mockito.<ActionResultDto<?>>when(service.runJob(job)).thenReturn(result);
         mvc.perform(post("/rest/jobs/")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(mapper.writeValueAsString(job)))
                 .andExpect(status().isOk())
-                .andExpect(content().string(""));
+                .andExpect(content().json(mapper.writeValueAsString(result)));
 
         verify(service).runJob(job);
     }

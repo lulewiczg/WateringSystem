@@ -83,7 +83,7 @@ class ActionRunnerTest {
                 && i.getName().equals(action.getClass().getSimpleName())), eq("param")))
                 .thenReturn(12.34);
 
-        ActionResultDto<Double> result = runner.run("id", action, "param");
+        ActionResultDto<Double> result = runner.run(null, action, "param");
 
         assertEquals(12.34, result.getResult());
         TestUtils.testActionResult(result);
