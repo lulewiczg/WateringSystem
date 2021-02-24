@@ -26,8 +26,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -125,4 +124,12 @@ class SetDefaultsTest {
 
         assertTrue(job.canBeStarted());
     }
+
+    @Test
+    void testSchedule() {
+        job.schedule(jobRunner);
+
+        verify(jobRunner).run(argThat(i -> i.getId() != null && i.getName().equals(job.getName()) && i.getJob() == job));
+    }
+
 }

@@ -107,4 +107,11 @@ class ScheduledSensorReadTest {
         assertTrue(job.canBeStarted());
     }
 
+    @Test
+    void testSchedule() {
+        job.schedule(jobRunner);
+
+        verify(jobRunner).run(argThat(i -> i.getId() != null && i.getName().equals(job.getName()) && i.getJob() == job));
+    }
+
 }
