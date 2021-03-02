@@ -1,7 +1,12 @@
 package com.github.lulewiczg.watering.service.io;
 
 import com.github.lulewiczg.watering.config.MasterConfig;
-import com.pi4j.io.gpio.*;
+import com.pi4j.io.gpio.GpioController;
+import com.pi4j.io.gpio.GpioPinDigitalOutput;
+import com.pi4j.io.gpio.Pin;
+import com.pi4j.io.gpio.PinState;
+import lombok.NoArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
@@ -15,11 +20,14 @@ import java.util.Map;
  */
 @Log4j2
 @Service
+@RequiredArgsConstructor
 @ConditionalOnMissingBean(MasterConfig.class)
 @ConditionalOnExpression("!${com.github.lulewiczg.watering.mockedIO:false}")
 public class IOServiceImpl implements IOService {
 
     private static final String ERR = "Not yet implemented!";
+
+    private final GpioController gpioController;
 
     private final Map<Pin, GpioPinDigitalOutput> pins = new HashMap<>();
 
@@ -52,10 +60,10 @@ public class IOServiceImpl implements IOService {
         if (existing != null) {
             return existing;
         }
-        GpioController gpio = GpioFactory.getInstance();
-        GpioPinDigitalOutput gpioPin = gpio.provisionDigitalOutputPin(pin, pin.getName(), PinState.LOW);
+        GpioPinDigitalOutput gpioPin = gpioController.provisionDigitalOutputPin(pin, pin.getName(), PinState.LOW);
         gpioPin.setShutdownOptions(true, PinState.LOW);
         pins.put(pin, gpioPin);
         return gpioPin;
     }
+
 }
