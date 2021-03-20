@@ -14,7 +14,6 @@ public interface IOService {
      */
     void toggleOn(Pin pin);
 
-
     /**
      * Turns pin off.
      *

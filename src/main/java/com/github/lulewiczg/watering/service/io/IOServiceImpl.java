@@ -1,12 +1,16 @@
 package com.github.lulewiczg.watering.service.io;
 
 import com.github.lulewiczg.watering.config.MasterConfig;
+import com.github.lulewiczg.watering.service.ina219.INA219;
+import com.github.lulewiczg.watering.service.ina219.enums.Adc;
+import com.github.lulewiczg.watering.service.ina219.enums.Address;
+import com.github.lulewiczg.watering.service.ina219.enums.Pga;
+import com.github.lulewiczg.watering.service.ina219.enums.VoltageRange;
 import com.pi4j.io.gpio.GpioController;
 import com.pi4j.io.gpio.GpioPinDigitalOutput;
 import com.pi4j.io.gpio.Pin;
 import com.pi4j.io.gpio.PinState;
-import lombok.NoArgsConstructor;
-import lombok.RequiredArgsConstructor;
+import lombok.SneakyThrows;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
@@ -20,7 +24,6 @@ import java.util.Map;
  */
 @Log4j2
 @Service
-@RequiredArgsConstructor
 @ConditionalOnMissingBean(MasterConfig.class)
 @ConditionalOnExpression("!${com.github.lulewiczg.watering.mockedIO:false}")
 public class IOServiceImpl implements IOService {
@@ -29,7 +32,16 @@ public class IOServiceImpl implements IOService {
 
     private final GpioController gpioController;
 
+    private final INA219 ina219;
+
     private final Map<Pin, GpioPinDigitalOutput> pins = new HashMap<>();
+
+    @SneakyThrows
+    public IOServiceImpl(GpioController gpioController) {
+        this.gpioController = gpioController;
+        ina219 = new INA219(Address.ADDR_40, 0.1, 1,
+                VoltageRange.V16, Pga.GAIN_1, Adc.BITS_10, Adc.BITS_10);//TODO
+    }
 
     @Override
     public void toggleOn(Pin pin) {
@@ -52,7 +64,7 @@ public class IOServiceImpl implements IOService {
 
     @Override
     public double analogRead(Pin pin) {
-        throw new IllegalStateException(ERR);
+        return ina219.getBusVoltage();//TOO
     }
 
     private GpioPinDigitalOutput getPin(Pin pin) {
