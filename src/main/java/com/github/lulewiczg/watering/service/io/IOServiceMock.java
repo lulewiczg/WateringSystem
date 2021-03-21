@@ -1,5 +1,6 @@
 package com.github.lulewiczg.watering.service.io;
 
+import com.github.lulewiczg.watering.service.ina219.enums.Address;
 import com.github.lulewiczg.watering.state.AppState;
 import com.github.lulewiczg.watering.state.dto.Tank;
 import com.github.lulewiczg.watering.state.dto.Valve;
@@ -47,8 +48,8 @@ public class IOServiceMock implements IOService {
     }
 
     @Override
-    public double analogRead(Pin pin) {
-        log.info("Analog read for pin {}", pin);
+    public double analogRead(Address address) {
+        log.info("Analog read for address {}", address);
         return 0;
     }
 }

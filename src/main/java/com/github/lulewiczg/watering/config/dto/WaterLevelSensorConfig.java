@@ -1,6 +1,6 @@
 package com.github.lulewiczg.watering.config.dto;
 
-import com.pi4j.io.gpio.Pin;
+import com.github.lulewiczg.watering.service.ina219.enums.Address;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -19,7 +19,7 @@ import javax.validation.constraints.NotEmpty;
 @Validated
 @NoArgsConstructor
 @AllArgsConstructor
-public class WaterLevelSensorConfig implements Steerable {
+public class WaterLevelSensorConfig {
 
     @NotEmpty
     private String id;
@@ -34,22 +34,12 @@ public class WaterLevelSensorConfig implements Steerable {
     @Max(100)
     private Integer maxLevel;
 
-    @NotEmpty
-    private String pinName;
-
     @EqualsAndHashCode.Exclude
-    private Pin pin;
+    private Address address;
 
     public void validate() {
         if (minLevel > maxLevel) {
             throw new IllegalStateException("Min water level can not be higher than max!");
         }
-    }
-
-    public WaterLevelSensorConfig(String id, Integer minLevel, Integer maxLevel, String pinName) {
-        this.id = id;
-        this.minLevel = minLevel;
-        this.maxLevel = maxLevel;
-        this.pinName = pinName;
     }
 }

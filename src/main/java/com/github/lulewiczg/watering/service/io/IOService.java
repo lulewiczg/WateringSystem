@@ -1,5 +1,6 @@
 package com.github.lulewiczg.watering.service.io;
 
+import com.github.lulewiczg.watering.service.ina219.enums.Address;
 import com.pi4j.io.gpio.Pin;
 
 /**
@@ -30,10 +31,10 @@ public interface IOService {
     boolean readPin(Pin pin);
 
     /**
-     * Reads analog value from pin
+     * Reads analog value from address.
      *
-     * @param pin pin
+     * @param address address
      * @return analog value
      */
-    double analogRead(Pin pin);
+    double analogRead(Address address);
 }

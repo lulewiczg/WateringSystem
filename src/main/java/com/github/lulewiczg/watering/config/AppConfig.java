@@ -1,7 +1,6 @@
 package com.github.lulewiczg.watering.config;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.github.lulewiczg.watering.config.dto.Steerable;
 import com.github.lulewiczg.watering.config.dto.TankConfig;
 import com.github.lulewiczg.watering.config.dto.ValveConfig;
 import com.github.lulewiczg.watering.config.dto.WaterLevelSensorConfig;
@@ -62,6 +61,7 @@ public class AppConfig {
     void validate() {
         tanks.forEach(this::validate);
         validatePins();
+        validateAddresses();
     }
 
     private void validate(TankConfig tank) {
@@ -80,10 +80,17 @@ public class AppConfig {
     private void validatePins() {
         List<String> usedPins = new ArrayList<>();
         valves.forEach(i -> validatePin(usedPins, i));
-        sensors.forEach(i -> validatePin(usedPins, i));
     }
 
-    private void validatePin(List<String> usedPins, Steerable i) {
+    private void validateAddresses() {
+        long count = sensors.stream().map(WaterLevelSensorConfig::getAddress).distinct().count();
+        if (count != sensors.size()) {
+            throw new IllegalStateException("Duplicated sensor addresses found!");
+        }
+    }
+
+
+    private void validatePin(List<String> usedPins, ValveConfig i) {
         String name = i.getPinName();
         if (usedPins.contains(name)) {
             throw new IllegalStateException("Pin already in use: " + name);

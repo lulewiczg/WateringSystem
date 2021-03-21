@@ -6,6 +6,7 @@ import com.github.lulewiczg.watering.service.actions.ActionRunner;
 import com.github.lulewiczg.watering.service.actions.WaterLevelReadAction;
 import com.github.lulewiczg.watering.service.dto.ActionResultDto;
 import com.github.lulewiczg.watering.service.dto.JobDto;
+import com.github.lulewiczg.watering.service.ina219.enums.Address;
 import com.github.lulewiczg.watering.state.AppState;
 import com.github.lulewiczg.watering.state.SystemStatus;
 import com.github.lulewiczg.watering.state.dto.Sensor;
@@ -60,10 +61,10 @@ class ScheduledSensorReadTest {
     @Test
     void testJob() {
         Valve valve = new Valve("valve", "valve", ValveType.OUTPUT, true, RaspiPin.GPIO_00);
-        Sensor sensor = new Sensor("sensor", 10, 90, null, RaspiPin.GPIO_01);
+        Sensor sensor = new Sensor("sensor", 10, 90, null, Address.ADDR_40);
         Tank tank = new Tank("tank", 100, sensor, valve);
         Valve valve2 = new Valve("valve2", "valve2", ValveType.OUTPUT, true, RaspiPin.GPIO_01);
-        Sensor sensor2 = new Sensor("sensor2", 10, 90, 10, RaspiPin.GPIO_02);
+        Sensor sensor2 = new Sensor("sensor2", 10, 90, 10, Address.ADDR_40);
         Tank tank2 = new Tank("tank2", 100, sensor2, valve2);
         when(state.getTanks()).thenReturn(List.of(tank, tank2));
         JobDto jobDto = new JobDto("test", null);
@@ -81,10 +82,10 @@ class ScheduledSensorReadTest {
     @Test
     void testJobNestedError() {
         Valve valve = new Valve("valve", "valve", ValveType.OUTPUT, true, RaspiPin.GPIO_00);
-        Sensor sensor = new Sensor("sensor", 10, 90, null, RaspiPin.GPIO_01);
+        Sensor sensor = new Sensor("sensor", 10, 90, null, Address.ADDR_40);
         Tank tank = new Tank("tank", 100, sensor, valve);
         Valve valve2 = new Valve("valve2", "valve2", ValveType.OUTPUT, true, RaspiPin.GPIO_01);
-        Sensor sensor2 = new Sensor("sensor2", 10, 90, 10, RaspiPin.GPIO_02);
+        Sensor sensor2 = new Sensor("sensor2", 10, 90, 10, Address.ADDR_40);
         Tank tank2 = new Tank("tank2", 100, sensor2, valve2);
         when(state.getTanks()).thenReturn(List.of(tank, tank2));
         JobDto jobDto = new JobDto("test", null);

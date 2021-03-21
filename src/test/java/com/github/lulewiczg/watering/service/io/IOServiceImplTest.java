@@ -1,34 +1,48 @@
 package com.github.lulewiczg.watering.service.io;
 
+import com.github.lulewiczg.watering.config.AppConfig;
+import com.github.lulewiczg.watering.config.dto.WaterLevelSensorConfig;
+import com.github.lulewiczg.watering.service.ina219.INA219;
+import com.github.lulewiczg.watering.service.ina219.enums.Address;
 import com.pi4j.io.gpio.GpioController;
 import com.pi4j.io.gpio.GpioPinDigitalOutput;
 import com.pi4j.io.gpio.PinState;
 import com.pi4j.io.gpio.RaspiPin;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import org.mockito.Spy;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.context.annotation.Import;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
+import java.util.List;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.*;
 
 @ActiveProfiles("testIo")
-@Import(IOServiceImpl.class)
 @ExtendWith(SpringExtension.class)
 class IOServiceImplTest {
 
-    @Autowired
     private IOServiceImpl ioService;
 
     @MockBean
     private GpioController gpioController;
+
+    @MockBean
+    private AppConfig config;
+
+    @MockBean
+    private IOServiceImpl.INA219Resolver resolver;
+
+    @Mock
+    private INA219 ina219;
+
+    @Mock
+    private INA219 ina2192;
+
 
     @Mock
     private GpioPinDigitalOutput pin;
@@ -40,6 +54,7 @@ class IOServiceImplTest {
     @DirtiesContext
     void testToggleOn() {
         when(gpioController.provisionDigitalOutputPin(RaspiPin.GPIO_00, RaspiPin.GPIO_00.getName(), PinState.LOW)).thenReturn(pin);
+        ioService = new IOServiceImpl(gpioController, null, config);
 
         ioService.toggleOn(RaspiPin.GPIO_00);
 
@@ -52,6 +67,7 @@ class IOServiceImplTest {
     void testToggleOnMultipleTimes() {
         when(gpioController.provisionDigitalOutputPin(RaspiPin.GPIO_00, RaspiPin.GPIO_00.getName(), PinState.LOW)).thenReturn(pin);
         when(gpioController.provisionDigitalOutputPin(RaspiPin.GPIO_01, RaspiPin.GPIO_01.getName(), PinState.LOW)).thenReturn(pin2);
+        ioService = new IOServiceImpl(gpioController, null, config);
 
         ioService.toggleOn(RaspiPin.GPIO_00);
         ioService.toggleOn(RaspiPin.GPIO_01);
@@ -67,6 +83,7 @@ class IOServiceImplTest {
     @DirtiesContext
     void testToggleOff() {
         when(gpioController.provisionDigitalOutputPin(RaspiPin.GPIO_00, RaspiPin.GPIO_00.getName(), PinState.LOW)).thenReturn(pin);
+        ioService = new IOServiceImpl(gpioController, null, config);
 
         ioService.toggleOff(RaspiPin.GPIO_00);
 
@@ -79,6 +96,7 @@ class IOServiceImplTest {
     void testToggleOffMultipleTimes() {
         when(gpioController.provisionDigitalOutputPin(RaspiPin.GPIO_00, RaspiPin.GPIO_00.getName(), PinState.LOW)).thenReturn(pin);
         when(gpioController.provisionDigitalOutputPin(RaspiPin.GPIO_01, RaspiPin.GPIO_01.getName(), PinState.LOW)).thenReturn(pin2);
+        ioService = new IOServiceImpl(gpioController, null, config);
 
         ioService.toggleOff(RaspiPin.GPIO_00);
         ioService.toggleOff(RaspiPin.GPIO_01);
@@ -92,11 +110,47 @@ class IOServiceImplTest {
 
     @Test
     void testRead() {
+        ioService = new IOServiceImpl(gpioController, null, config);
+
         assertThrows(IllegalStateException.class, () -> ioService.readPin(RaspiPin.GPIO_00));
     }
 
     @Test
     void testAnalogRead() {
-        assertThrows(IllegalStateException.class, () -> ioService.analogRead(RaspiPin.GPIO_00));
+        when(config.getSensors()).thenReturn(List.of(new WaterLevelSensorConfig("test", 1, 10, Address.ADDR_40)));
+        when(resolver.get(Address.ADDR_40)).thenReturn(ina219);
+        when(ina219.getCurrent()).thenReturn(12.34);
+        ioService = new IOServiceImpl(gpioController, resolver, config);
+
+        double result = ioService.analogRead(Address.ADDR_40);
+
+        assertEquals(12.34, result);
+    }
+
+    @Test
+    void testAnalogReadMultipleSensors() {
+        when(config.getSensors()).thenReturn(List.of(new WaterLevelSensorConfig("test", 1, 10, Address.ADDR_40),
+                new WaterLevelSensorConfig("test", 1, 10, Address.ADDR_41)));
+        when(resolver.get(Address.ADDR_40)).thenReturn(ina219);
+        when(resolver.get(Address.ADDR_41)).thenReturn(ina2192);
+        when(ina2192.getCurrent()).thenReturn(43.21);
+        when(ina2192.getCurrent()).thenReturn(12.34);
+        ioService = new IOServiceImpl(gpioController, resolver, config);
+
+        double result = ioService.analogRead(Address.ADDR_41);
+
+        assertEquals(12.34, result);
+    }
+
+    @Test
+    void testAnalogReadInvalidAddress() {
+        when(config.getSensors()).thenReturn(List.of(new WaterLevelSensorConfig("test", 1, 10, Address.ADDR_40)));
+        when(resolver.get(Address.ADDR_40)).thenReturn(ina219);
+        when(ina219.getCurrent()).thenReturn(12.34);
+        ioService = new IOServiceImpl(gpioController, resolver, config);
+
+        String message = assertThrows(IllegalStateException.class, () -> ioService.analogRead(Address.ADDR_44)).getMessage();
+
+        assertEquals("No sensor found for address: ADDR_44", message);
     }
 }
