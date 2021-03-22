@@ -85,7 +85,7 @@ class ScheduledSensorReadTest {
         Sensor sensor = new Sensor("sensor", 10, 90, null, Address.ADDR_40, RaspiPin.GPIO_10);
         Tank tank = new Tank("tank", 100, sensor, valve);
         Valve valve2 = new Valve("valve2", "valve2", ValveType.OUTPUT, true, RaspiPin.GPIO_01);
-        Sensor sensor2 = new Sensor("sensor2", 10, 90, 10, Address.ADDR_40, RaspiPin.GPIO_20);
+        Sensor sensor2 = new Sensor("sensor2", 10, 90, 10, Address.ADDR_40, null);
         Tank tank2 = new Tank("tank2", 100, sensor2, valve2);
         when(state.getTanks()).thenReturn(List.of(tank, tank2));
         JobDto jobDto = new JobDto("test", null);

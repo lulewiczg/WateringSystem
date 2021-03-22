@@ -7,8 +7,11 @@ import com.github.lulewiczg.watering.service.actions.ActionRunner;
 import com.github.lulewiczg.watering.service.actions.ValveCloseAction;
 import com.github.lulewiczg.watering.service.actions.ValveOpenAction;
 import com.github.lulewiczg.watering.service.dto.JobDto;
+import com.github.lulewiczg.watering.service.ina219.enums.Address;
+import com.github.lulewiczg.watering.service.io.IOService;
 import com.github.lulewiczg.watering.state.AppState;
 import com.github.lulewiczg.watering.state.SystemStatus;
+import com.github.lulewiczg.watering.state.dto.Sensor;
 import com.github.lulewiczg.watering.state.dto.Tank;
 import com.github.lulewiczg.watering.state.dto.Valve;
 import com.pi4j.io.gpio.RaspiPin;
@@ -27,8 +30,7 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.*;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 @ActiveProfiles("test")
 @ExtendWith(SpringExtension.class)
@@ -51,15 +53,20 @@ class SetDefaultsTest {
     @MockBean
     private JobRunner jobRunner;
 
+    @MockBean
+    private IOService ioService;
+
     @Autowired
     private SetDefaults job;
 
     @Test
     void testJob() {
         Valve valve = new Valve("valve", "valve", ValveType.OUTPUT, true, RaspiPin.GPIO_00);
-        Tank tank = new Tank("tank", 10, null, valve);
+        Sensor sensor = new Sensor("sensor", 10, 90, null, Address.ADDR_40, RaspiPin.GPIO_10);
+        Tank tank = new Tank("tank", 10, sensor, valve);
         Valve valve2 = new Valve("valve2", "valve2", ValveType.OUTPUT, false, RaspiPin.GPIO_01);
-        Tank tank2 = new Tank("tank2", 100, null, valve2);
+        Sensor sensor2 = new Sensor("sensor2", 10, 90, null, Address.ADDR_41, RaspiPin.GPIO_10);
+        Tank tank2 = new Tank("tank2", 100, sensor2, valve2);
         when(state.getTanks()).thenReturn(List.of(tank, tank2));
         Valve valve3 = new Valve("valve3", "valve3", ValveType.OUTPUT, true, RaspiPin.GPIO_02);
         Valve valve4 = new Valve("valve4", "valve4", ValveType.OUTPUT, false, RaspiPin.GPIO_03);
@@ -74,6 +81,7 @@ class SetDefaultsTest {
         verify(runner).run("test.", openAction, valve3);
         verify(runner).run("test.", closeAction, valve2);
         verify(runner).run("test.", closeAction, valve4);
+        verify(ioService, times(1)).toggleOff(RaspiPin.GPIO_10);
     }
 
     @Test
