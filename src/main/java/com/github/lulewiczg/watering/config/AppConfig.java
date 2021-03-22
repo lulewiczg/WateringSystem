@@ -80,6 +80,7 @@ public class AppConfig {
     private void validatePins() {
         List<String> usedPins = new ArrayList<>();
         valves.forEach(i -> validatePin(usedPins, i));
+        sensors.forEach(i -> validateSensorPin(usedPins, i));
     }
 
     private void validateAddresses() {
@@ -90,8 +91,8 @@ public class AppConfig {
     }
 
 
-    private void validatePin(List<String> usedPins, ValveConfig i) {
-        String name = i.getPinName();
+    private void validatePin(List<String> usedPins, ValveConfig valve) {
+        String name = valve.getPinName();
         if (usedPins.contains(name)) {
             throw new IllegalStateException("Pin already in use: " + name);
         }
@@ -99,8 +100,24 @@ public class AppConfig {
         if (pin == null) {
             throw new IllegalStateException("Could not find pin: " + name);
         }
-        i.setPin(pin);
+        valve.setPin(pin);
         usedPins.add(name);
     }
+
+    private void validateSensorPin(List<String> usedPins, WaterLevelSensorConfig sensor) {
+        String name = sensor.getPowerControlPinName();
+        if (name == null || name.isEmpty()) {
+            return;
+        }
+        if (usedPins.contains(name)) {
+            throw new IllegalStateException("Pin already in use: " + name);
+        }
+        Pin pin = RaspiPin.getPinByName(name);
+        if (pin == null) {
+            throw new IllegalStateException("Could not find pin: " + name);
+        }
+        sensor.setPowerControlPin(pin);
+    }
+
 
 }

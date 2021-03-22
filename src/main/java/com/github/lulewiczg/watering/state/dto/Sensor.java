@@ -28,4 +28,8 @@ public class Sensor {
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private Address address;
 
+    @EqualsAndHashCode.Exclude
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
+    private Pin powerControlPin;
+
 }

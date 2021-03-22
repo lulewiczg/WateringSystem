@@ -34,7 +34,8 @@ public interface IOService {
      * Reads analog value from address.
      *
      * @param address address
+     * @param pin     power steering pin
      * @return analog value
      */
-    double analogRead(Address address);
+    double analogRead(Address address, Pin pin);
 }

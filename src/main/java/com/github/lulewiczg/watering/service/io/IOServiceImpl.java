@@ -65,12 +65,19 @@ public class IOServiceImpl implements IOService {
     }
 
     @Override
-    public double analogRead(Address address) {
+    public double analogRead(Address address, Pin pin) {
         INA219 ina219 = sensors.get(address);
         if (ina219 == null) {
             throw new IllegalStateException("No sensor found for address: " + address);
         }
-        return ina219.getCurrent();
+        if (pin != null) {
+            toggleOn(pin);
+            double current = readCurrent(address, ina219);
+            toggleOff(pin);
+            return current;
+        }
+        return readCurrent(address, ina219);
+
     }
 
     private GpioPinDigitalOutput getPin(Pin pin) {
@@ -82,6 +89,12 @@ public class IOServiceImpl implements IOService {
         gpioPin.setShutdownOptions(true, PinState.LOW);
         pins.put(pin, gpioPin);
         return gpioPin;
+    }
+
+    private double readCurrent(Address address, INA219 ina219) {
+        double current = ina219.getCurrent();
+        log.debug("Read current {} for address {}", current, address);
+        return current;
     }
 
     /**

@@ -10,6 +10,7 @@ import com.pi4j.io.gpio.PinState;
 import com.pi4j.io.gpio.RaspiPin;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InOrder;
 import org.mockito.Mock;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.annotation.DirtiesContext;
@@ -117,39 +118,57 @@ class IOServiceImplTest {
 
     @Test
     void testAnalogRead() {
-        when(config.getSensors()).thenReturn(List.of(new WaterLevelSensorConfig("test", 1, 10, Address.ADDR_40)));
+        when(config.getSensors()).thenReturn(List.of(new WaterLevelSensorConfig("test", 1, 10, Address.ADDR_40, null)));
         when(resolver.get(Address.ADDR_40)).thenReturn(ina219);
         when(ina219.getCurrent()).thenReturn(12.34);
         ioService = new IOServiceImpl(gpioController, resolver, config);
 
-        double result = ioService.analogRead(Address.ADDR_40);
+        double result = ioService.analogRead(Address.ADDR_40, null);
 
         assertEquals(12.34, result);
     }
 
     @Test
+    void testAnalogReadWithPowerControl() {
+        when(gpioController.provisionDigitalOutputPin(RaspiPin.GPIO_10, RaspiPin.GPIO_10.getName(), PinState.LOW)).thenReturn(pin);
+        when(config.getSensors()).thenReturn(List.of(new WaterLevelSensorConfig("test", 1, 10, Address.ADDR_40, null)));
+        when(resolver.get(Address.ADDR_40)).thenReturn(ina219);
+        when(ina219.getCurrent()).thenReturn(12.34);
+        ioService = new IOServiceImpl(gpioController, resolver, config);
+
+        double result = ioService.analogRead(Address.ADDR_40, RaspiPin.GPIO_10);
+
+        assertEquals(12.34, result);
+        InOrder inOrder = inOrder(pin, ina219);
+        inOrder.verify(pin).high();
+        inOrder.verify(ina219).getCurrent();
+        inOrder.verify(pin).low();
+    }
+
+    @Test
     void testAnalogReadMultipleSensors() {
-        when(config.getSensors()).thenReturn(List.of(new WaterLevelSensorConfig("test", 1, 10, Address.ADDR_40),
-                new WaterLevelSensorConfig("test", 1, 10, Address.ADDR_41)));
+        when(gpioController.provisionDigitalOutputPin(RaspiPin.GPIO_10, RaspiPin.GPIO_10.getName(), PinState.LOW)).thenReturn(pin);
+        when(config.getSensors()).thenReturn(List.of(new WaterLevelSensorConfig("test", 1, 10, Address.ADDR_40, null),
+                new WaterLevelSensorConfig("test", 1, 10, Address.ADDR_41, null)));
         when(resolver.get(Address.ADDR_40)).thenReturn(ina219);
         when(resolver.get(Address.ADDR_41)).thenReturn(ina2192);
         when(ina2192.getCurrent()).thenReturn(43.21);
         when(ina2192.getCurrent()).thenReturn(12.34);
         ioService = new IOServiceImpl(gpioController, resolver, config);
 
-        double result = ioService.analogRead(Address.ADDR_41);
+        double result = ioService.analogRead(Address.ADDR_41, RaspiPin.GPIO_10);
 
         assertEquals(12.34, result);
     }
 
     @Test
     void testAnalogReadInvalidAddress() {
-        when(config.getSensors()).thenReturn(List.of(new WaterLevelSensorConfig("test", 1, 10, Address.ADDR_40)));
+        when(config.getSensors()).thenReturn(List.of(new WaterLevelSensorConfig("test", 1, 10, Address.ADDR_40, null)));
         when(resolver.get(Address.ADDR_40)).thenReturn(ina219);
         when(ina219.getCurrent()).thenReturn(12.34);
         ioService = new IOServiceImpl(gpioController, resolver, config);
 
-        String message = assertThrows(IllegalStateException.class, () -> ioService.analogRead(Address.ADDR_44)).getMessage();
+        String message = assertThrows(IllegalStateException.class, () -> ioService.analogRead(Address.ADDR_44, null)).getMessage();
 
         assertEquals("No sensor found for address: ADDR_44", message);
     }

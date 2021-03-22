@@ -48,8 +48,8 @@ public class IOServiceMock implements IOService {
     }
 
     @Override
-    public double analogRead(Address address) {
-        log.info("Analog read for address {}", address);
+    public double analogRead(Address address, Pin pin) {
+        log.info("Analog read for address {} and power pin {}", address, pin);
         return 0;
     }
 }
