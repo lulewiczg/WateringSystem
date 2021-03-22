@@ -50,7 +50,7 @@ public abstract class ScheduledJob {
      * @param jobRunner job runner
      */
     protected void schedule(JobRunner jobRunner) {
-        jobRunner.run(new JobDto(SCHED + getName(), SCHED + UUID.randomUUID().toString(), this));
+        jobRunner.run(new JobDto(SCHED + UUID.randomUUID().toString(), getName(), this));
     }
 
     /**

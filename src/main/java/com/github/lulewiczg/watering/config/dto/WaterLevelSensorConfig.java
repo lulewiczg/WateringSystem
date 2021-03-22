@@ -1,5 +1,6 @@
 package com.github.lulewiczg.watering.config.dto;
 
+import com.github.lulewiczg.watering.service.ina219.enums.Address;
 import com.pi4j.io.gpio.Pin;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -11,6 +12,7 @@ import javax.validation.Valid;
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
 
 /**
  * Water level sensor config.
@@ -19,7 +21,7 @@ import javax.validation.constraints.NotEmpty;
 @Validated
 @NoArgsConstructor
 @AllArgsConstructor
-public class WaterLevelSensorConfig implements Steerable {
+public class WaterLevelSensorConfig {
 
     @NotEmpty
     private String id;
@@ -34,11 +36,14 @@ public class WaterLevelSensorConfig implements Steerable {
     @Max(100)
     private Integer maxLevel;
 
-    @NotEmpty
-    private String pinName;
+    @NotNull
+    @EqualsAndHashCode.Exclude
+    private Address address;
+
+    private String powerControlPinName;
 
     @EqualsAndHashCode.Exclude
-    private Pin pin;
+    private Pin powerControlPin;
 
     public void validate() {
         if (minLevel > maxLevel) {
@@ -46,10 +51,11 @@ public class WaterLevelSensorConfig implements Steerable {
         }
     }
 
-    public WaterLevelSensorConfig(String id, Integer minLevel, Integer maxLevel, String pinName) {
+    public WaterLevelSensorConfig(String id, Integer minLevel, Integer maxLevel, Address address, String powerControlPinName) {
         this.id = id;
         this.minLevel = minLevel;
         this.maxLevel = maxLevel;
-        this.pinName = pinName;
+        this.address = address;
+        this.powerControlPinName = powerControlPinName;
     }
 }

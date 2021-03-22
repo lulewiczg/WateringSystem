@@ -23,7 +23,7 @@ public class JobRunner {
      * @param originalJobDto job DTO
      * @return action result
      */
-    public final ActionResultDto<Void> run(@NonNull JobDto originalJobDto) {
+    public ActionResultDto<Void> run(@NonNull JobDto originalJobDto) {
         JobDto jobDto = originalJobDto.toBuilder().build();
         generateUuid(jobDto);
         String id = jobDto.getId();

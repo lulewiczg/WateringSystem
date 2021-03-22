@@ -1,8 +1,7 @@
 package com.github.lulewiczg.watering.controller;
 
 import com.github.lulewiczg.watering.TestUtils;
-import com.github.lulewiczg.watering.exception.ApiError;
-import com.github.lulewiczg.watering.exception.RestExceptionHandler;
+import com.github.lulewiczg.watering.exception.*;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
@@ -17,6 +16,7 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.web.context.request.WebRequest;
 
+import java.util.List;
 import java.util.Objects;
 
 @ActiveProfiles("test")
@@ -65,5 +65,78 @@ class RestExceptionHandlerTest {
 
         TestUtils.testError(Objects.requireNonNull(response.getBody()), expected);
     }
+
+    @Test
+    void testHandleActionNotFound() {
+        ApiError expected = new ApiError(HttpStatus.BAD_REQUEST.value(), HttpStatus.BAD_REQUEST.getReasonPhrase(), "Action not found: Some err");
+
+        ResponseEntity<ApiError> response = handler.handle(new ActionNotFoundException("Some err"), req);
+
+        TestUtils.testError(Objects.requireNonNull(response.getBody()), expected);
+    }
+
+    @Test
+    void testHandleActionError() {
+        ApiError expected = new ApiError(HttpStatus.BAD_REQUEST.value(), HttpStatus.BAD_REQUEST.getReasonPhrase(), "Action [id] failed: Some err");
+
+        ResponseEntity<ApiError> response = handler.handle(new ActionException("id", "Some err"), req);
+
+        TestUtils.testError(Objects.requireNonNull(response.getBody()), expected);
+    }
+
+    @Test
+    void testHandleValueNotAllowed() {
+        ApiError expected = new ApiError(HttpStatus.BAD_REQUEST.value(), HttpStatus.BAD_REQUEST.getReasonPhrase(), "Value [Some err] does not match [1, 2]!");
+
+        ResponseEntity<ApiError> response = handler.handle(new ValueNotAllowedException("Some err", List.of("1", "2")), req);
+
+        TestUtils.testError(Objects.requireNonNull(response.getBody()), expected);
+    }
+
+    @Test
+    void testHandleActionNotStarted() {
+        ApiError expected = new ApiError(HttpStatus.BAD_REQUEST.value(), HttpStatus.BAD_REQUEST.getReasonPhrase(), "Action [Some err] can not be started!");
+
+        ResponseEntity<ApiError> response = handler.handle(new ActionNotStartedException("Some err"), req);
+
+        TestUtils.testError(Objects.requireNonNull(response.getBody()), expected);
+    }
+
+    @Test
+    void testHandleJobNotFound() {
+        ApiError expected = new ApiError(HttpStatus.BAD_REQUEST.value(), HttpStatus.BAD_REQUEST.getReasonPhrase(), "Job not found: Some err");
+
+        ResponseEntity<ApiError> response = handler.handle(new JobNotFoundException("Some err"), req);
+
+        TestUtils.testError(Objects.requireNonNull(response.getBody()), expected);
+    }
+
+    @Test
+    void testHandleValveNotFound() {
+        ApiError expected = new ApiError(HttpStatus.BAD_REQUEST.value(), HttpStatus.BAD_REQUEST.getReasonPhrase(), "Valve not found: Some err");
+
+        ResponseEntity<ApiError> response = handler.handle(new ValveNotFoundException("Some err"), req);
+
+        TestUtils.testError(Objects.requireNonNull(response.getBody()), expected);
+    }
+
+    @Test
+    void testHandleTypeMismatch() {
+        ApiError expected = new ApiError(HttpStatus.BAD_REQUEST.value(), HttpStatus.BAD_REQUEST.getReasonPhrase(), "[Some err] is not valid value for class java.lang.Double type!");
+
+        ResponseEntity<ApiError> response = handler.handle(new TypeMismatchException("Some err", Double.class), req);
+
+        TestUtils.testError(Objects.requireNonNull(response.getBody()), expected);
+    }
+
+    @Test
+    void testHandleSensorNotFound() {
+        ApiError expected = new ApiError(HttpStatus.BAD_REQUEST.value(), HttpStatus.BAD_REQUEST.getReasonPhrase(), "Sensor not found: Some err");
+
+        ResponseEntity<ApiError> response = handler.handle(new SensorNotFoundException("Some err"), req);
+
+        TestUtils.testError(Objects.requireNonNull(response.getBody()), expected);
+    }
+
 
 }

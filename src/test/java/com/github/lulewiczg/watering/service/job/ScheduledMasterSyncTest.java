@@ -48,6 +48,9 @@ class ScheduledMasterSyncTest {
     @MockBean
     private MasterResponse response;
 
+    @MockBean
+    private JobRunner jobRunner;
+
     @Value("${com.github.lulewiczg.watering.master.url}")
     private String url;
 
@@ -153,5 +156,12 @@ class ScheduledMasterSyncTest {
         when(state.getState()).thenReturn(status);
 
         assertTrue(job.canBeStarted());
+    }
+
+    @Test
+    void testSchedule() {
+        job.schedule(jobRunner);
+
+        verify(jobRunner).run(argThat(i -> i.getId() != null && i.getName().equals(job.getName()) && i.getJob() == job));
     }
 }

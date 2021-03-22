@@ -9,4 +9,5 @@ import org.springframework.stereotype.Component;
 @Component
 @ConditionalOnProperty(name = "com.github.lulewiczg.watering.role", havingValue = "slave")
 public class SlaveConfig {
+
 }

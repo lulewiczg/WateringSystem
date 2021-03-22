@@ -38,6 +38,36 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
         return getGenericError(e, HttpStatus.INTERNAL_SERVER_ERROR, request);
     }
 
+    @ExceptionHandler(SensorNotFoundException.class)
+    public ResponseEntity<ApiError> handle(SensorNotFoundException e, WebRequest request) {
+        return getGenericError(e, HttpStatus.BAD_REQUEST, request);
+    }
+
+    @ExceptionHandler(com.github.lulewiczg.watering.exception.TypeMismatchException.class)
+    public ResponseEntity<ApiError> handle(com.github.lulewiczg.watering.exception.TypeMismatchException e, WebRequest request) {
+        return getGenericError(e, HttpStatus.BAD_REQUEST, request);
+    }
+
+    @ExceptionHandler(ValveNotFoundException.class)
+    public ResponseEntity<ApiError> handle(ValveNotFoundException e, WebRequest request) {
+        return getGenericError(e, HttpStatus.BAD_REQUEST, request);
+    }
+
+    @ExceptionHandler(JobNotFoundException.class)
+    public ResponseEntity<ApiError> handle(JobNotFoundException e, WebRequest request) {
+        return getGenericError(e, HttpStatus.BAD_REQUEST, request);
+    }
+
+    @ExceptionHandler(ActionNotStartedException.class)
+    public ResponseEntity<ApiError> handle(ActionNotStartedException e, WebRequest request) {
+        return getGenericError(e, HttpStatus.BAD_REQUEST, request);
+    }
+
+    @ExceptionHandler(ValueNotAllowedException.class)
+    public ResponseEntity<ApiError> handle(ValueNotAllowedException e, WebRequest request) {
+        return getGenericError(e, HttpStatus.BAD_REQUEST, request);
+    }
+
     @ExceptionHandler(ActionException.class)
     public ResponseEntity<ApiError> handle(ActionException e, WebRequest request) {
         return getGenericError(e, HttpStatus.BAD_REQUEST, request);

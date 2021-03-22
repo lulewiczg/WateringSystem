@@ -12,6 +12,7 @@ import com.github.lulewiczg.watering.service.dto.ActionDefinitionDto;
 import com.github.lulewiczg.watering.service.dto.ActionDto;
 import com.github.lulewiczg.watering.service.dto.JobDefinitionDto;
 import com.github.lulewiczg.watering.service.dto.JobDto;
+import com.github.lulewiczg.watering.service.ina219.enums.Address;
 import com.github.lulewiczg.watering.service.io.IOService;
 import com.github.lulewiczg.watering.service.job.*;
 import com.pi4j.io.gpio.RaspiPin;
@@ -63,10 +64,11 @@ class ActionServiceImplTest {
 
     @Test
     void testRunAction() {
-        service.runAction(new ActionDto(deCapitalize(WaterLevelReadAction.class.getSimpleName()), "sensor2"));
+        service.runAction(new ActionDto(deCapitalize(WaterLevelReadAction.class.getSimpleName()), "sensor1"));
 
-        verify(ioService, atLeast(1)).analogRead(RaspiPin.GPIO_02);
+        verify(ioService, atLeast(1)).analogRead(Address.ADDR_40, RaspiPin.GPIO_10);
     }
+
 
     @Test
     void testRunInvalidAction() {
@@ -124,7 +126,7 @@ class ActionServiceImplTest {
     void testRunJob() {
         service.runJob(new JobDto(deCapitalize(ScheduledSensorRead.class.getSimpleName())));
 
-        verify(ioService, atLeast(1)).analogRead(RaspiPin.GPIO_01);
+        verify(ioService, atLeast(1)).analogRead(Address.ADDR_41, null);
     }
 
     @Test
