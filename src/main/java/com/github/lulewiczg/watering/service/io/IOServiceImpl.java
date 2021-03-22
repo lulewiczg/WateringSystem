@@ -66,6 +66,7 @@ public class IOServiceImpl implements IOService {
         throw new IllegalStateException(ERR);
     }
 
+    @SneakyThrows
     @Override
     public double analogRead(Address address, Pin pin) {
         INA219 ina219 = sensors.get(address);
@@ -74,7 +75,9 @@ public class IOServiceImpl implements IOService {
         }
         if (pin != null) {
             toggleOn(pin);
+            Thread.sleep(100);
             double current = readCurrent(address, ina219);
+            Thread.sleep(100);
             toggleOff(pin);
             return current;
         }
