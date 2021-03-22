@@ -16,7 +16,7 @@ public enum Address {
 
     private final int value;
 
-    static public Address getAddress(int addr) {
+    public static Address getAddress(int addr) {
         switch (addr) {
             case 0x40:
                 return ADDR_40;

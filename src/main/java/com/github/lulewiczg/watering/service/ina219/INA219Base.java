@@ -49,7 +49,7 @@ class INA219Base {
         register = reg;
 
         currentLSB = (maxExpectedCurrent / 32768);
-        int cal = (int) (((0.04096 * 32768) / (maxExpectedCurrent * shuntResistance)));
+        int cal = (int) ((0.04096 * 32768) / (maxExpectedCurrent * shuntResistance));
 
         configure(busVoltageRange, pga, badc, sadc);
         register.writeRegister(RegisterAddress.CALIBRATION, cal);

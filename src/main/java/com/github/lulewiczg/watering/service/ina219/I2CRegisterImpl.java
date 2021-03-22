@@ -14,12 +14,12 @@ package com.github.lulewiczg.watering.service.ina219;
  *
  */
 
+import com.github.lulewiczg.watering.service.ina219.enums.Address;
+import com.github.lulewiczg.watering.service.ina219.enums.RegisterAddress;
 import com.pi4j.io.i2c.I2CBus;
 import com.pi4j.io.i2c.I2CDevice;
 import com.pi4j.io.i2c.I2CFactory;
 import com.pi4j.io.i2c.I2CFactory.UnsupportedBusNumberException;
-import com.github.lulewiczg.watering.service.ina219.enums.Address;
-import com.github.lulewiczg.watering.service.ina219.enums.RegisterAddress;
 import lombok.extern.log4j.Log4j2;
 
 import java.io.IOException;

@@ -17,22 +17,18 @@ package com.github.lulewiczg.watering.service.ina219;
 import com.github.lulewiczg.watering.service.ina219.enums.RegisterAddress;
 import org.junit.jupiter.api.Test;
 
-import java.io.IOException;
-
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * Class to test the INA219Simulator.
  */
-public class INA219SimulatorTest {
+class INA219SimulatorTest {
 
     /**
      * This tests the INA219Simulator using the example application in TI's INA219 data sheet.
-     *
-     * @throws java.io.IOException Not thrown due to use of the simulator.
      */
     @Test
-    public void testSimulatorExampleApplication() throws IOException {
+    void testSimulatorExampleApplication() {
         INA219Simulator s = new INA219Simulator(20e-3, 11.98);
         s.writeRegister(RegisterAddress.CONFIGURATION, 0x019F);
         s.writeRegister(RegisterAddress.CALIBRATION, 20480);
@@ -47,11 +43,9 @@ public class INA219SimulatorTest {
 
     /**
      * This tests proper read and conversion of negative current values from the INA219Simulator.
-     *
-     * @throws java.io.IOException Not thrown due to use of the simulator.
      */
     @Test
-    public void testNegativeCurrent() throws IOException {
+    void testNegativeCurrent() {
         INA219Simulator s = new INA219Simulator(-320e-3, 11.98);
         s.writeRegister(RegisterAddress.CONFIGURATION, 0x019F);
         s.writeRegister(RegisterAddress.CALIBRATION, 20480);

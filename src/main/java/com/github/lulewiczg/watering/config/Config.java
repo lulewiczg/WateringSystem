@@ -24,4 +24,5 @@ public class Config {
     @ConditionalOnExpression("!${com.github.lulewiczg.watering.mockedIO:false}")
     public GpioController gpioController() {
         return GpioFactory.getInstance();
-    }}
+    }
+}

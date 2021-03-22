@@ -19,22 +19,18 @@ import com.github.lulewiczg.watering.service.ina219.enums.Pga;
 import com.github.lulewiczg.watering.service.ina219.enums.VoltageRange;
 import org.junit.jupiter.api.Test;
 
-import java.io.IOException;
-
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * Test of the INA219Base class using an INA219 Simulator.
  */
-public class INA219BaseTest {
+class INA219BaseTest {
 
     /**
      * Performs a very basic test of the INA219Base class using the simulator.
-     *
-     * @throws java.io.IOException Not thrown due to use of the simulator.
      */
     @Test
-    public void basic() throws IOException {
+    void basic() {
         INA219Simulator s = new INA219Simulator(20e-3, 12.0);
         INA219Base i = new INA219Base(s, 0.1, 3.0, VoltageRange.V32, Pga.GAIN_8, Adc.BITS_12,
                 Adc.BITS_12);

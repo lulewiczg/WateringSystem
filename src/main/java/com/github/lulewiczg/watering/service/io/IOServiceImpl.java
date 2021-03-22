@@ -19,6 +19,7 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 
+import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -37,7 +38,7 @@ public class IOServiceImpl implements IOService {
 
     private final Map<Pin, GpioPinDigitalOutput> pins = new HashMap<>();
 
-    private final Map<Address, INA219> sensors = new HashMap<>();
+    private final Map<Address, INA219> sensors = new EnumMap<>(Address.class);
 
     @SneakyThrows
     public IOServiceImpl(GpioController gpioController, INA219Resolver resolver, AppConfig config) {
