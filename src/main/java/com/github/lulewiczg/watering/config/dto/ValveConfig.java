@@ -18,7 +18,7 @@ import javax.validation.constraints.NotNull;
 @Validated
 @NoArgsConstructor
 @AllArgsConstructor
-public class ValveConfig implements Steerable {
+public class ValveConfig {
 
     @NotEmpty
     private String id;

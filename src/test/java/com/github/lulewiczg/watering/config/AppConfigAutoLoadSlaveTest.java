@@ -1,6 +1,7 @@
 package com.github.lulewiczg.watering.config;
 
 import com.github.lulewiczg.watering.config.dto.*;
+import com.github.lulewiczg.watering.service.ina219.enums.Address;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -28,8 +29,8 @@ class AppConfigAutoLoadSlaveTest {
         List<ValveConfig> valves = List.of(valve, valve2, valve3, valve4);
         assertEquals(valves, config.getValves());
 
-        WaterLevelSensorConfig sensor = new WaterLevelSensorConfig("sensor1", 12, 21, "GPIO 1");
-        WaterLevelSensorConfig sensor2 = new WaterLevelSensorConfig("sensor2", 99, 100, "GPIO 2");
+        WaterLevelSensorConfig sensor = new WaterLevelSensorConfig("sensor1", 12, 21, Address.ADDR_40, "GPIO 10");
+        WaterLevelSensorConfig sensor2 = new WaterLevelSensorConfig("sensor2", 99, 100, Address.ADDR_41, "");
         List<WaterLevelSensorConfig> sensors = List.of(sensor, sensor2);
         assertEquals(sensors, config.getSensors());
 

@@ -5,7 +5,9 @@ import com.github.lulewiczg.watering.service.actions.ActionRunner;
 import com.github.lulewiczg.watering.service.actions.ValveCloseAction;
 import com.github.lulewiczg.watering.service.actions.ValveOpenAction;
 import com.github.lulewiczg.watering.service.dto.JobDto;
+import com.github.lulewiczg.watering.service.io.IOService;
 import com.github.lulewiczg.watering.state.AppState;
+import com.github.lulewiczg.watering.state.dto.Sensor;
 import com.github.lulewiczg.watering.state.dto.Tank;
 import com.github.lulewiczg.watering.state.dto.Valve;
 import lombok.RequiredArgsConstructor;
@@ -35,6 +37,8 @@ public class SetDefaults extends ScheduledJob {
 
     private final ActionRunner actionRunner;
 
+    private final IOService ioService;
+
     @Value("${com.github.lulewiczg.watering.schedule.setDefaults.enabled}")
     private boolean enabled;
 
@@ -60,6 +64,7 @@ public class SetDefaults extends ScheduledJob {
         log.info("Settings defaults...");
         state.getTanks().stream().map(Tank::getValve).forEach(i -> setValveState(i, job));
         state.getOutputs().forEach(i -> setValveState(i, job));
+        state.getTanks().stream().map(Tank::getSensor).map(Sensor::getPowerControlPin).distinct().forEach(ioService::toggleOff);
     }
 
     private void setValveState(Valve i, JobDto jobDto) {
