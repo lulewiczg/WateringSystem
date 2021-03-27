@@ -49,14 +49,14 @@ public class IOServiceImpl implements IOService {
     @Override
     public void toggleOn(Pin pin) {
         GpioPinDigitalOutput gpioPin = getPin(pin);
-        gpioPin.high();
+        gpioPin.low();
         log.trace("Pin {} is set to ON", pin);
     }
 
     @Override
     public void toggleOff(Pin pin) {
         GpioPinDigitalOutput gpioPin = getPin(pin);
-        gpioPin.low();
+        gpioPin.high();
         log.trace("Pin {} is set to OFF", pin);
     }
 

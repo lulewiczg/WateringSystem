@@ -60,7 +60,7 @@ class IOServiceImplTest {
         ioService.toggleOn(RaspiPin.GPIO_00);
 
         verify(pin).setShutdownOptions(true, PinState.LOW);
-        verify(pin).high();
+        verify(pin).low();
     }
 
     @Test
@@ -75,9 +75,9 @@ class IOServiceImplTest {
         ioService.toggleOn(RaspiPin.GPIO_00);
 
         verify(pin).setShutdownOptions(true, PinState.LOW);
-        verify(pin, times(2)).high();
+        verify(pin, times(2)).low();
         verify(pin2).setShutdownOptions(true, PinState.LOW);
-        verify(pin2).high();
+        verify(pin2).low();
     }
 
     @Test
@@ -89,7 +89,7 @@ class IOServiceImplTest {
         ioService.toggleOff(RaspiPin.GPIO_00);
 
         verify(pin).setShutdownOptions(true, PinState.LOW);
-        verify(pin).low();
+        verify(pin).high();
     }
 
     @Test
@@ -104,9 +104,9 @@ class IOServiceImplTest {
         ioService.toggleOff(RaspiPin.GPIO_00);
 
         verify(pin).setShutdownOptions(true, PinState.LOW);
-        verify(pin, times(2)).low();
+        verify(pin, times(2)).high();
         verify(pin2).setShutdownOptions(true, PinState.LOW);
-        verify(pin2).low();
+        verify(pin2).high();
     }
 
     @Test
@@ -140,9 +140,9 @@ class IOServiceImplTest {
 
         assertEquals(12.34, result);
         InOrder inOrder = inOrder(pin, ina219);
-        inOrder.verify(pin).high();
-        inOrder.verify(ina219).getCurrent();
         inOrder.verify(pin).low();
+        inOrder.verify(ina219).getCurrent();
+        inOrder.verify(pin).high();
     }
 
     @Test
