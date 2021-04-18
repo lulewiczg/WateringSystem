@@ -118,7 +118,7 @@ class IOServiceImplTest {
 
     @Test
     void testAnalogRead() {
-        when(config.getSensors()).thenReturn(List.of(new WaterLevelSensorConfig("test", 1, 10, Address.ADDR_40, null)));
+        when(config.getSensors()).thenReturn(List.of(new WaterLevelSensorConfig("test", 1, 10, Address.ADDR_40, null, 10, 100, 200, 12)));
         when(resolver.get(Address.ADDR_40)).thenReturn(ina219);
         when(ina219.getCurrent()).thenReturn(12.34);
         ioService = new IOServiceImpl(gpioController, resolver, config);
@@ -131,7 +131,7 @@ class IOServiceImplTest {
     @Test
     void testAnalogReadWithPowerControl() {
         when(gpioController.provisionDigitalOutputPin(RaspiPin.GPIO_10, RaspiPin.GPIO_10.getName(), PinState.LOW)).thenReturn(pin);
-        when(config.getSensors()).thenReturn(List.of(new WaterLevelSensorConfig("test", 1, 10, Address.ADDR_40, null)));
+        when(config.getSensors()).thenReturn(List.of(new WaterLevelSensorConfig("test", 1, 10, Address.ADDR_40, null, 10, 100, 200, 12)));
         when(resolver.get(Address.ADDR_40)).thenReturn(ina219);
         when(ina219.getCurrent()).thenReturn(12.34);
         ioService = new IOServiceImpl(gpioController, resolver, config);
@@ -148,8 +148,8 @@ class IOServiceImplTest {
     @Test
     void testAnalogReadMultipleSensors() {
         when(gpioController.provisionDigitalOutputPin(RaspiPin.GPIO_10, RaspiPin.GPIO_10.getName(), PinState.LOW)).thenReturn(pin);
-        when(config.getSensors()).thenReturn(List.of(new WaterLevelSensorConfig("test", 1, 10, Address.ADDR_40, null),
-                new WaterLevelSensorConfig("test", 1, 10, Address.ADDR_41, null)));
+        when(config.getSensors()).thenReturn(List.of(new WaterLevelSensorConfig("test", 1, 10, Address.ADDR_40, null, 10, 100, 200, 12),
+                new WaterLevelSensorConfig("test", 1, 10, Address.ADDR_41, null, 10, 100, 200, 12)));
         when(resolver.get(Address.ADDR_40)).thenReturn(ina219);
         when(resolver.get(Address.ADDR_41)).thenReturn(ina2192);
         when(ina2192.getCurrent()).thenReturn(43.21);
@@ -163,7 +163,7 @@ class IOServiceImplTest {
 
     @Test
     void testAnalogReadInvalidAddress() {
-        when(config.getSensors()).thenReturn(List.of(new WaterLevelSensorConfig("test", 1, 10, Address.ADDR_40, null)));
+        when(config.getSensors()).thenReturn(List.of(new WaterLevelSensorConfig("test", 1, 10, Address.ADDR_40, null, 10, 100, 200, 12)));
         when(resolver.get(Address.ADDR_40)).thenReturn(ina219);
         when(ina219.getCurrent()).thenReturn(12.34);
         ioService = new IOServiceImpl(gpioController, resolver, config);

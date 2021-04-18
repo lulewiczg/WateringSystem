@@ -62,10 +62,10 @@ class SetDefaultsTest {
     @Test
     void testJob() {
         Valve valve = new Valve("valve", "valve", ValveType.OUTPUT, true, RaspiPin.GPIO_00);
-        Sensor sensor = new Sensor("sensor", 10, 90, null, Address.ADDR_40, RaspiPin.GPIO_10);
+        Sensor sensor = new Sensor("sensor", 10, 90, null, Address.ADDR_40, RaspiPin.GPIO_10, 10, 12, 100, 200);
         Tank tank = new Tank("tank", 10, sensor, valve);
         Valve valve2 = new Valve("valve2", "valve2", ValveType.OUTPUT, false, RaspiPin.GPIO_01);
-        Sensor sensor2 = new Sensor("sensor2", 10, 90, null, Address.ADDR_41, RaspiPin.GPIO_10);
+        Sensor sensor2 = new Sensor("sensor2", 10, 90, null, Address.ADDR_41, RaspiPin.GPIO_10, 10, 12, 100, 200);
         Tank tank2 = new Tank("tank2", 100, sensor2, valve2);
         when(state.getTanks()).thenReturn(List.of(tank, tank2));
         Valve valve3 = new Valve("valve3", "valve3", ValveType.OUTPUT, true, RaspiPin.GPIO_02);
