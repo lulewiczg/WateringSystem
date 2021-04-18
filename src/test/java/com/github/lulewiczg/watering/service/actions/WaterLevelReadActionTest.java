@@ -3,6 +3,7 @@ package com.github.lulewiczg.watering.service.actions;
 import com.github.lulewiczg.watering.service.dto.ActionDto;
 import com.github.lulewiczg.watering.service.ina219.enums.Address;
 import com.github.lulewiczg.watering.service.io.IOService;
+import com.github.lulewiczg.watering.service.io.SensorService;
 import com.github.lulewiczg.watering.state.AppState;
 import com.github.lulewiczg.watering.state.dto.Sensor;
 import com.github.lulewiczg.watering.state.dto.Tank;
@@ -31,16 +32,21 @@ class WaterLevelReadActionTest {
     @MockBean
     private AppState state;
 
+    @MockBean
+    private SensorService sensorService;
+
     @Autowired
     private WaterLevelReadAction action;
 
     @Test
     void testAction() {
-        when(service.analogRead(Address.ADDR_40, RaspiPin.GPIO_10)).thenReturn(12.34);
-        Sensor sensor = new Sensor("test", null, null, 12, Address.ADDR_40, RaspiPin.GPIO_10, 10, 100, 200, 12);
+        Sensor sensor = new Sensor("id", 0, 100, null, Address.ADDR_40, RaspiPin.GPIO_10, 10, 11, 12, 13);
+
+        when(service.analogRead(sensor)).thenReturn(12.34);
+        when(sensorService.calculateWaterLevel(12.34, sensor)).thenReturn(43.21);
 
         Double result = action.doAction(new ActionDto(), sensor);
-        assertEquals(12.34, result);
+        assertEquals(43.21, result);
     }
 
     @Test

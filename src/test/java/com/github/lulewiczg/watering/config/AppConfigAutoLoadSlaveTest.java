@@ -29,7 +29,7 @@ class AppConfigAutoLoadSlaveTest {
         List<ValveConfig> valves = List.of(valve, valve2, valve3, valve4);
         assertEquals(valves, config.getValves());
 
-        WaterLevelSensorConfig sensor = new WaterLevelSensorConfig("sensor1", 12, 21, Address.ADDR_40, "GPIO 10", 10, 100, 200, 12);
+        WaterLevelSensorConfig sensor = new WaterLevelSensorConfig("sensor1", 12, 21, Address.ADDR_40, "GPIO 10", 10, 1000, 100, 12);
         WaterLevelSensorConfig sensor2 = new WaterLevelSensorConfig("sensor2", 99, 100, Address.ADDR_41, "", 20, 50, 60, 5);
         List<WaterLevelSensorConfig> sensors = List.of(sensor, sensor2);
         assertEquals(sensors, config.getSensors());

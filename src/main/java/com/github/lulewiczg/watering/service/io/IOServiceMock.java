@@ -1,7 +1,7 @@
 package com.github.lulewiczg.watering.service.io;
 
-import com.github.lulewiczg.watering.service.ina219.enums.Address;
 import com.github.lulewiczg.watering.state.AppState;
+import com.github.lulewiczg.watering.state.dto.Sensor;
 import com.github.lulewiczg.watering.state.dto.Tank;
 import com.github.lulewiczg.watering.state.dto.Valve;
 import com.pi4j.io.gpio.Pin;
@@ -48,8 +48,8 @@ public class IOServiceMock implements IOService {
     }
 
     @Override
-    public double analogRead(Address address, Pin pin) {
-        log.info("Analog read for address {} and power pin {}", address, pin);
+    public double analogRead(Sensor sensor) {
+        log.info("Analog raw read for sensor {}", sensor);
         return 0;
     }
 }

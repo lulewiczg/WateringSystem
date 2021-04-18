@@ -8,6 +8,7 @@ import com.github.lulewiczg.watering.service.ina219.enums.Adc;
 import com.github.lulewiczg.watering.service.ina219.enums.Address;
 import com.github.lulewiczg.watering.service.ina219.enums.Pga;
 import com.github.lulewiczg.watering.service.ina219.enums.VoltageRange;
+import com.github.lulewiczg.watering.state.dto.Sensor;
 import com.pi4j.io.gpio.GpioController;
 import com.pi4j.io.gpio.GpioPinDigitalOutput;
 import com.pi4j.io.gpio.Pin;
@@ -67,21 +68,22 @@ public class IOServiceImpl implements IOService {
 
     @SneakyThrows
     @Override
-    public double analogRead(Address address, Pin pin) {
+    public double analogRead(Sensor sensor) {
+        Address address = sensor.getAddress();
         INA219 ina219 = sensors.get(address);
         if (ina219 == null) {
             throw new IllegalStateException("No sensor found for address: " + address);
         }
-        if (pin != null) {
-            toggleOn(pin);
+        Pin powerControlPin = sensor.getPowerControlPin();
+        if (powerControlPin != null) {
+            toggleOn(powerControlPin);
             Thread.sleep(100);
             double current = readCurrent(address, ina219);
             Thread.sleep(100);
-            toggleOff(pin);
+            toggleOff(powerControlPin);
             return current;
         }
         return readCurrent(address, ina219);
-
     }
 
     private GpioPinDigitalOutput getPin(Pin pin) {

@@ -15,6 +15,8 @@ import com.github.lulewiczg.watering.service.dto.JobDto;
 import com.github.lulewiczg.watering.service.ina219.enums.Address;
 import com.github.lulewiczg.watering.service.io.IOService;
 import com.github.lulewiczg.watering.service.job.*;
+import com.github.lulewiczg.watering.state.AppState;
+import com.github.lulewiczg.watering.state.dto.Sensor;
 import com.pi4j.io.gpio.RaspiPin;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,8 +30,7 @@ import java.util.stream.Collectors;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.Mockito.atLeast;
-import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.*;
 
 @SpringBootTest
 @ActiveProfiles({"test", "testJobs"})
@@ -37,6 +38,9 @@ class ActionServiceImplTest {
 
     @Autowired
     private ActionServiceImpl service;
+
+    @Autowired
+    private AppState state;
 
     @MockBean
     private IOService ioService;
@@ -66,7 +70,8 @@ class ActionServiceImplTest {
     void testRunAction() {
         service.runAction(new ActionDto(deCapitalize(WaterLevelReadAction.class.getSimpleName()), "sensor1"));
 
-        verify(ioService, atLeast(1)).analogRead(Address.ADDR_40, RaspiPin.GPIO_10);
+        Sensor sensor = new Sensor("sensor1", 12, 21, null, Address.ADDR_40, RaspiPin.GPIO_10, 10, 1000, 100, 12d);
+        verify(ioService, atLeast(1)).analogRead(sensor);
     }
 
 
@@ -124,9 +129,17 @@ class ActionServiceImplTest {
 
     @Test
     void testRunJob() {
+        Sensor sensor = new Sensor("sensor1", 12, 21, null, Address.ADDR_40, RaspiPin.GPIO_10, 10, 1000, 100, 12d);
+        Sensor sensor2 = new Sensor("sensor2", 99, 100, null, Address.ADDR_41, null, 20, 50, 60, 5);
+
+        when(ioService.analogRead(sensor)).thenReturn(0.008);
+        when(ioService.analogRead(sensor2)).thenReturn(0.004201680672269);
+
         service.runJob(new JobDto(deCapitalize(ScheduledSensorRead.class.getSimpleName())));
 
-        verify(ioService, atLeast(1)).analogRead(Address.ADDR_41, null);
+        assertEquals(50, state.getTanks().get(0).getSensor().getLevel());
+        assertEquals(5, state.getTanks().get(1).getSensor().getLevel());
+
     }
 
     @Test
@@ -136,7 +149,6 @@ class ActionServiceImplTest {
 
         assertEquals("Job not found: abc", message);
     }
-
 
     private String deCapitalize(String str) {
         return str.substring(0, 1).toLowerCase() + str.substring(1);
