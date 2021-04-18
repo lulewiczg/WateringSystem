@@ -65,9 +65,11 @@ public class AppConfig {
     }
 
     private void validate(TankConfig tank) {
-        ValveConfig valve = valves.stream().filter(i -> i.getId().equals(tank.getValveId())).findFirst()
-                .orElseThrow(() -> new IllegalStateException("Can not find valve for tank: " + tank.getId()));
-        tank.setValve(valve);
+        if (tank.getValveId() != null) {
+            ValveConfig valve = valves.stream().filter(i -> i.getId().equals(tank.getValveId())).findFirst()
+                    .orElseThrow(() -> new IllegalStateException("Can not find valve for tank: " + tank.getId()));
+            tank.setValve(valve);
+        }
 
         if (tank.getSensorId() != null) {
             WaterLevelSensorConfig waterLevelSensor = sensors.stream().filter(i -> i.getId().equals(tank.getSensorId())).findAny()
