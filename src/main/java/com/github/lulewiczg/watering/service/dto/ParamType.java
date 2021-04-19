@@ -1,5 +1,6 @@
 package com.github.lulewiczg.watering.service.dto;
 
+import com.github.lulewiczg.watering.service.actions.dto.WateringDto;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
@@ -15,7 +16,7 @@ import java.util.function.Predicate;
 public enum ParamType {
 
     STRING(String.class, i -> i != null && i.getClass() == String.class),
-    VOID(Void.class, Objects::isNull);
+    VOID(Void.class, Objects::isNull), WATERING_DTO(WateringDto.class, i -> true);
 
     private final Class<?> type;
 

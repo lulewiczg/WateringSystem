@@ -1,8 +1,10 @@
 package com.github.lulewiczg.watering.service;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.lulewiczg.watering.config.MasterConfig;
 import com.github.lulewiczg.watering.service.actions.Action;
 import com.github.lulewiczg.watering.service.actions.ActionRunner;
+import com.github.lulewiczg.watering.service.actions.dto.WateringDto;
 import com.github.lulewiczg.watering.service.dto.*;
 import com.github.lulewiczg.watering.service.job.JobRunner;
 import com.github.lulewiczg.watering.service.job.ScheduledJob;
@@ -38,6 +40,8 @@ public class ActionServiceImpl implements ActionService {
     private final JobRunner jobRunner;
 
     private final AppState state;
+
+    private final ObjectMapper mapper;
 
     @Override
     @Cacheable
@@ -102,13 +106,22 @@ public class ActionServiceImpl implements ActionService {
         }
     }
 
+    @SneakyThrows
     private Object mapParam(ActionDto actionDto, ActionDefinitionDto definition) {
-        if (Valve.class.equals(definition.getParameterDestinationType())) {
+        Class<?> destType = definition.getParameterDestinationType();
+        if (Valve.class.equals(destType)) {
             return state.findValve(actionDto.getParam().toString());
-        } else if (Sensor.class.equals(definition.getParameterDestinationType())) {
+        } else if (Sensor.class.equals(destType)) {
             return state.findSensor(actionDto.getParam().toString());
+        } else if (WateringDto.class.equals(destType)) {
+            WateringDto wateringDto = mapper.readValue(actionDto.getParam().toString(), WateringDto.class);
+            wateringDto.getData().forEach(i -> {
+                Valve valve = state.findValve(i.getValveId());
+                i.setValve(valve);
+            });
+            return wateringDto;
         }
-        //Only Valve and Sensor supported for now
+
         return null;
     }
 
