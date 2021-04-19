@@ -45,17 +45,34 @@ public class WaterLevelSensorConfig {
     @EqualsAndHashCode.Exclude
     private Pin powerControlPin;
 
+    @Min(1)
+    private int resistorsNumber;
+
+    @Min(1)
+    private int passiveResistance;
+
+    @Min(1)
+    private int stepResistance;
+
+    @Min(1)
+    private double voltage;
+
     public void validate() {
         if (minLevel > maxLevel) {
             throw new IllegalStateException("Min water level can not be higher than max!");
         }
     }
 
-    public WaterLevelSensorConfig(String id, Integer minLevel, Integer maxLevel, Address address, String powerControlPinName) {
+    public WaterLevelSensorConfig(String id, Integer minLevel, Integer maxLevel, Address address, String powerControlPinName,
+                                  int resistorsNumber, int passiveResistance, int stepResistance, double voltage) {
         this.id = id;
         this.minLevel = minLevel;
         this.maxLevel = maxLevel;
         this.address = address;
         this.powerControlPinName = powerControlPinName;
+        this.resistorsNumber = resistorsNumber;
+        this.passiveResistance = passiveResistance;
+        this.stepResistance = stepResistance;
+        this.voltage = voltage;
     }
 }

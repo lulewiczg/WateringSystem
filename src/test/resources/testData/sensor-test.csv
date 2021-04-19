@@ -1,15 +1,21 @@
-sensor,1,2,
-sensor,10,20,
-sensor,0,0,
-sensor,100,100,
-sensor,50,50,
-sensor,-1,-1,sensors[0].maxLevel must be greater than or equal to 0
-sensor,-1, 5,sensors[0].minLevel must be greater than or equal to 0
-sensor,10,101,sensors[0].maxLevel must be less than or equal to 100
-sensor,101,101,sensors[0].maxLevel must be less than or equal to 100
-sensor,999,999,sensors[0].maxLevel must be less than or equal to 100
-sensor,16,2,Min water level can not be higher than max!
-sensor,99,98,Min water level can not be higher than max!
-sensor,2,1,Min water level can not be higher than max!
-sensor,0,101,sensors[0].maxLevel must be less than or equal to 100
-,1,2,sensors[0].id must not be empty
+sensor,1,2,10,100,200,12,
+sensor,10,20,10,100,200,12,
+sensor,0,0,10,100,200,12,
+sensor,100,100,10,100,200,12,
+sensor,50,50,10,100,200,12,
+sensor,50,50,9999,9999,9999,9999,
+sensor,50,50,10,100,200,12.01,
+sensor,-1,-1,10,100,200,12,sensors[0].maxLevel must be greater than or equal to 0
+sensor,-1, 5,10,100,200,12,sensors[0].minLevel must be greater than or equal to 0
+sensor,10,101,10,100,200,12,sensors[0].maxLevel must be less than or equal to 100
+sensor,101,101,10,100,200,12,sensors[0].maxLevel must be less than or equal to 100
+sensor,999,999,10,100,200,12,sensors[0].maxLevel must be less than or equal to 100
+sensor,16,2,10,100,200,12,Min water level can not be higher than max!
+sensor,99,98,10,100,200,12,Min water level can not be higher than max!
+sensor,2,1,10,100,200,12,Min water level can not be higher than max!
+sensor,0,101,10,100,200,12,sensors[0].maxLevel must be less than or equal to 100
+,1,2,10,100,200,12,sensors[0].id must not be empty
+sensor,1,2,0,100,200,12,sensors[0].resistorsNumber must be greater than or equal to 1
+sensor,1,2,10,0,200,12,sensors[0].passiveResistance must be greater than or equal to 1
+sensor,1,2,10,100,0,12,sensors[0].stepResistance must be greater than or equal to 1
+sensor,1,2,10,100,200,0,sensors[0].voltage must be greater than or equal to 1

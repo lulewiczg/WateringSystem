@@ -1,9 +1,10 @@
 package com.github.lulewiczg.watering.service.io;
 
 import com.github.lulewiczg.watering.config.AppConfig;
-import com.github.lulewiczg.watering.config.dto.WaterLevelSensorConfig;
+import com.github.lulewiczg.watering.config.dto.*;
 import com.github.lulewiczg.watering.service.ina219.INA219;
 import com.github.lulewiczg.watering.service.ina219.enums.Address;
+import com.github.lulewiczg.watering.state.dto.Sensor;
 import com.pi4j.io.gpio.GpioController;
 import com.pi4j.io.gpio.GpioPinDigitalOutput;
 import com.pi4j.io.gpio.PinState;
@@ -118,12 +119,13 @@ class IOServiceImplTest {
 
     @Test
     void testAnalogRead() {
-        when(config.getSensors()).thenReturn(List.of(new WaterLevelSensorConfig("test", 1, 10, Address.ADDR_40, null)));
+        when(config.getSensors()).thenReturn(List.of(new WaterLevelSensorConfig("test", 1, 10, Address.ADDR_40, null, 10, 100, 200, 12)));
         when(resolver.get(Address.ADDR_40)).thenReturn(ina219);
         when(ina219.getCurrent()).thenReturn(12.34);
         ioService = new IOServiceImpl(gpioController, resolver, config);
+        Sensor sensor = new Sensor("id", 0, 100, null, Address.ADDR_40, null, 10, 11, 12, 13);
 
-        double result = ioService.analogRead(Address.ADDR_40, null);
+        double result = ioService.analogRead(sensor);
 
         assertEquals(12.34, result);
     }
@@ -131,12 +133,13 @@ class IOServiceImplTest {
     @Test
     void testAnalogReadWithPowerControl() {
         when(gpioController.provisionDigitalOutputPin(RaspiPin.GPIO_10, RaspiPin.GPIO_10.getName(), PinState.LOW)).thenReturn(pin);
-        when(config.getSensors()).thenReturn(List.of(new WaterLevelSensorConfig("test", 1, 10, Address.ADDR_40, null)));
+        when(config.getSensors()).thenReturn(List.of(new WaterLevelSensorConfig("test", 1, 10, Address.ADDR_40, null, 10, 100, 200, 12)));
         when(resolver.get(Address.ADDR_40)).thenReturn(ina219);
         when(ina219.getCurrent()).thenReturn(12.34);
         ioService = new IOServiceImpl(gpioController, resolver, config);
+        Sensor sensor = new Sensor("id", 0, 100, null, Address.ADDR_40, RaspiPin.GPIO_10, 10, 11, 12, 13);
 
-        double result = ioService.analogRead(Address.ADDR_40, RaspiPin.GPIO_10);
+        double result = ioService.analogRead(sensor);
 
         assertEquals(12.34, result);
         InOrder inOrder = inOrder(pin, ina219);
@@ -148,28 +151,31 @@ class IOServiceImplTest {
     @Test
     void testAnalogReadMultipleSensors() {
         when(gpioController.provisionDigitalOutputPin(RaspiPin.GPIO_10, RaspiPin.GPIO_10.getName(), PinState.LOW)).thenReturn(pin);
-        when(config.getSensors()).thenReturn(List.of(new WaterLevelSensorConfig("test", 1, 10, Address.ADDR_40, null),
-                new WaterLevelSensorConfig("test", 1, 10, Address.ADDR_41, null)));
+        when(config.getSensors()).thenReturn(List.of(new WaterLevelSensorConfig("test", 1, 10, Address.ADDR_40, null, 10, 100, 200, 12),
+                new WaterLevelSensorConfig("test", 1, 10, Address.ADDR_41, null, 10, 100, 200, 12)));
         when(resolver.get(Address.ADDR_40)).thenReturn(ina219);
         when(resolver.get(Address.ADDR_41)).thenReturn(ina2192);
         when(ina2192.getCurrent()).thenReturn(43.21);
         when(ina2192.getCurrent()).thenReturn(12.34);
         ioService = new IOServiceImpl(gpioController, resolver, config);
+        Sensor sensor = new Sensor("id", 0, 100, null, Address.ADDR_41, RaspiPin.GPIO_10, 10, 11, 12, 13);
 
-        double result = ioService.analogRead(Address.ADDR_41, RaspiPin.GPIO_10);
+        double result = ioService.analogRead(sensor);
 
         assertEquals(12.34, result);
     }
 
     @Test
     void testAnalogReadInvalidAddress() {
-        when(config.getSensors()).thenReturn(List.of(new WaterLevelSensorConfig("test", 1, 10, Address.ADDR_40, null)));
+        when(config.getSensors()).thenReturn(List.of(new WaterLevelSensorConfig("test", 1, 10, Address.ADDR_40, null, 10, 100, 200, 12)));
         when(resolver.get(Address.ADDR_40)).thenReturn(ina219);
         when(ina219.getCurrent()).thenReturn(12.34);
         ioService = new IOServiceImpl(gpioController, resolver, config);
+        Sensor sensor = new Sensor("id", 0, 100, null, Address.ADDR_44, null, 10, 11, 12, 13);
 
-        String message = assertThrows(IllegalStateException.class, () -> ioService.analogRead(Address.ADDR_44, null)).getMessage();
+        String message = assertThrows(IllegalStateException.class, () -> ioService.analogRead(sensor)).getMessage();
 
         assertEquals("No sensor found for address: ADDR_44", message);
     }
+
 }

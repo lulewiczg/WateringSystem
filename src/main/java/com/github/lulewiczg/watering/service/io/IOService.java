@@ -1,6 +1,6 @@
 package com.github.lulewiczg.watering.service.io;
 
-import com.github.lulewiczg.watering.service.ina219.enums.Address;
+import com.github.lulewiczg.watering.state.dto.Sensor;
 import com.pi4j.io.gpio.Pin;
 
 /**
@@ -31,11 +31,11 @@ public interface IOService {
     boolean readPin(Pin pin);
 
     /**
-     * Reads analog value from address.
+     * Reads analog raw value from sensor.
      *
-     * @param address address
-     * @param pin     power steering pin
+     * @param sensor sensor
      * @return analog value
      */
-    double analogRead(Address address, Pin pin);
+    double analogRead(Sensor sensor);
+
 }

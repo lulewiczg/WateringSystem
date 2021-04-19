@@ -21,6 +21,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -75,7 +76,7 @@ public class AppState {
      */
     @Cacheable
     public List<Valve> getAllValves() {
-        List<Valve> tankValves = tanks.stream().map(Tank::getValve).collect(Collectors.toList());
+        List<Valve> tankValves = tanks.stream().map(Tank::getValve).filter(Objects::nonNull).collect(Collectors.toList());
         List<Valve> tapValves = taps.stream().map(WaterSource::getValve).collect(Collectors.toList());
         tankValves.addAll(tapValves);
         tankValves.addAll(outputs);

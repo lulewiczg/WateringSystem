@@ -3,6 +3,7 @@ package com.github.lulewiczg.watering.service.actions;
 import com.github.lulewiczg.watering.config.MasterConfig;
 import com.github.lulewiczg.watering.service.dto.ActionDto;
 import com.github.lulewiczg.watering.service.io.IOService;
+import com.github.lulewiczg.watering.service.io.SensorService;
 import com.github.lulewiczg.watering.state.AppState;
 import com.github.lulewiczg.watering.state.dto.Sensor;
 import lombok.RequiredArgsConstructor;
@@ -26,6 +27,8 @@ public class WaterLevelReadAction extends Action<Sensor, Double> {
     private final IOService service;
 
     private final AppState state;
+
+    private final SensorService sensorService;
 
     @Override
     public String getParamDescription() {
@@ -51,7 +54,9 @@ public class WaterLevelReadAction extends Action<Sensor, Double> {
     @Override
     protected Double doAction(ActionDto actionDto, Sensor sensor) {
         log.info("Reading water level for sensor {}", sensor);
-        return service.analogRead(sensor.getAddress(), sensor.getPowerControlPin());
+        double current = service.analogRead(sensor);
+
+        return sensorService.calculateWaterLevel(current, sensor);
     }
 
     @Override

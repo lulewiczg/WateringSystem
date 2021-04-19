@@ -26,10 +26,8 @@ public class TankConfig {
     @Min(0)
     private Integer volume;
 
-    @Valid
     private String sensorId;
 
-    @NotEmpty
     private String valveId;
 
     @NotNull
