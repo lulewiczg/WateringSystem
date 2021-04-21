@@ -24,6 +24,8 @@ public class Valve {
 
     private boolean open;
 
+    private boolean overflowOutput;
+
     @EqualsAndHashCode.Exclude
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private Pin pin;

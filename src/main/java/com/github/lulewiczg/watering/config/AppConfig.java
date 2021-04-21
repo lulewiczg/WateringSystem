@@ -3,6 +3,7 @@ package com.github.lulewiczg.watering.config;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.github.lulewiczg.watering.config.dto.TankConfig;
 import com.github.lulewiczg.watering.config.dto.ValveConfig;
+import com.github.lulewiczg.watering.config.dto.ValveType;
 import com.github.lulewiczg.watering.config.dto.WaterLevelSensorConfig;
 import com.pi4j.io.gpio.Pin;
 import com.pi4j.io.gpio.RaspiPin;
@@ -20,6 +21,7 @@ import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * Bean for holding system configuration.
@@ -62,6 +64,7 @@ public class AppConfig {
         tanks.forEach(this::validate);
         validatePins();
         validateAddresses();
+        validateValves();
     }
 
     private void validate(TankConfig tank) {
@@ -92,7 +95,6 @@ public class AppConfig {
         }
     }
 
-
     private void validatePin(List<String> usedPins, ValveConfig valve) {
         String name = valve.getPinName();
         if (usedPins.contains(name)) {
@@ -121,5 +123,10 @@ public class AppConfig {
         sensor.setPowerControlPin(pin);
     }
 
-
+    private void validateValves() {
+        Optional<ValveConfig> incorrect = valves.stream().filter(i -> i.getType() == ValveType.INPUT && i.isOverflowOutput()).findFirst();
+        if (incorrect.isPresent()) {
+            throw new IllegalStateException(String.format("Input valve %s cannot be input and overflow valve!", incorrect.get().getId()));
+        }
+    }
 }

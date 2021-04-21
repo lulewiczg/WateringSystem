@@ -72,9 +72,9 @@ class ScheduledWateringTest {
 
     @Test
     void testWateringOk() throws InterruptedException {
-        Valve valve = new Valve("valve", "valve", ValveType.OUTPUT, true, RaspiPin.GPIO_00);
+        Valve valve = new Valve("valve", "valve", ValveType.OUTPUT, true,false, RaspiPin.GPIO_00);
         Tank tank = new Tank("tank", 100, null, valve);
-        Valve valve2 = new Valve("valve2", "valve2", ValveType.OUTPUT, true, RaspiPin.GPIO_01);
+        Valve valve2 = new Valve("valve2", "valve2", ValveType.OUTPUT, true,false, RaspiPin.GPIO_01);
         Tank tank2 = new Tank("tank2", 100, null, valve2);
         when(state.getTanks()).thenReturn(List.of(tank, tank2));
         when(runner.run("test.", outputsOpenAction, null)).thenReturn(TestUtils.EMPTY_RESULT);
@@ -100,9 +100,9 @@ class ScheduledWateringTest {
 
     @Test
     void testWateringTanksOpenFail() {
-        Valve valve = new Valve("valve", "valve", ValveType.OUTPUT, true, RaspiPin.GPIO_00);
+        Valve valve = new Valve("valve", "valve", ValveType.OUTPUT, true,false, RaspiPin.GPIO_00);
         Tank tank = new Tank("tank", 100, null, valve);
-        Valve valve2 = new Valve("valve2", "valve2", ValveType.OUTPUT, true, RaspiPin.GPIO_01);
+        Valve valve2 = new Valve("valve2", "valve2", ValveType.OUTPUT, true,false, RaspiPin.GPIO_01);
         Tank tank2 = new Tank("tank2", 100, null, valve2);
         when(state.getTanks()).thenReturn(List.of(tank, tank2));
         when(runner.run("test.", outputsOpenAction, null)).thenReturn(TestUtils.EMPTY_RESULT);
@@ -123,9 +123,9 @@ class ScheduledWateringTest {
 
     @Test
     void testWateringOutputsOpenFail() {
-        Valve valve = new Valve("valve", "valve", ValveType.OUTPUT, true, RaspiPin.GPIO_00);
+        Valve valve = new Valve("valve", "valve", ValveType.OUTPUT, true,false, RaspiPin.GPIO_00);
         Tank tank = new Tank("tank", 100, null, valve);
-        Valve valve2 = new Valve("valve2", "valve2", ValveType.OUTPUT, true, RaspiPin.GPIO_01);
+        Valve valve2 = new Valve("valve2", "valve2", ValveType.OUTPUT, true,false, RaspiPin.GPIO_01);
         Tank tank2 = new Tank("tank2", 100, null, valve2);
         when(state.getTanks()).thenReturn(List.of(tank, tank2));
         when(runner.run("test.", tanksOpenAction, null)).thenReturn(TestUtils.EMPTY_RESULT);
@@ -146,9 +146,9 @@ class ScheduledWateringTest {
 
     @Test
     void testWateringTanksCloseFail() throws InterruptedException {
-        Valve valve = new Valve("valve", "valve", ValveType.OUTPUT, true, RaspiPin.GPIO_00);
+        Valve valve = new Valve("valve", "valve", ValveType.OUTPUT, true,false, RaspiPin.GPIO_00);
         Tank tank = new Tank("tank", 100, null, valve);
-        Valve valve2 = new Valve("valve2", "valve2", ValveType.OUTPUT, true, RaspiPin.GPIO_01);
+        Valve valve2 = new Valve("valve2", "valve2", ValveType.OUTPUT, true,false, RaspiPin.GPIO_01);
         Tank tank2 = new Tank("tank2", 100, null, valve2);
         when(state.getTanks()).thenReturn(List.of(tank, tank2));
         when(runner.run("test.", tanksOpenAction, null)).thenReturn(TestUtils.EMPTY_RESULT);
@@ -169,9 +169,9 @@ class ScheduledWateringTest {
 
     @Test
     void testWateringOutputsCloseFail() throws InterruptedException {
-        Valve valve = new Valve("valve", "valve", ValveType.OUTPUT, true, RaspiPin.GPIO_00);
+        Valve valve = new Valve("valve", "valve", ValveType.OUTPUT, true,false, RaspiPin.GPIO_00);
         Tank tank = new Tank("tank", 100, null, valve);
-        Valve valve2 = new Valve("valve2", "valve2", ValveType.OUTPUT, true, RaspiPin.GPIO_01);
+        Valve valve2 = new Valve("valve2", "valve2", ValveType.OUTPUT, true,false, RaspiPin.GPIO_01);
         Tank tank2 = new Tank("tank2", 100, null, valve2);
         when(state.getTanks()).thenReturn(List.of(tank, tank2));
         when(runner.run("test.", tanksOpenAction, null)).thenReturn(TestUtils.EMPTY_RESULT);

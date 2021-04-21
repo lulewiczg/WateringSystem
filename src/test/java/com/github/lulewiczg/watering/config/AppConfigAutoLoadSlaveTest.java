@@ -22,10 +22,10 @@ class AppConfigAutoLoadSlaveTest {
 
     @Test
     void testPropsLoad() {
-        ValveConfig valve = new ValveConfig("valve1", "Tank 1", ValveType.INPUT, "GPIO 3", false);
-        ValveConfig valve2 = new ValveConfig("valve2", "Tank 2", ValveType.INPUT, "GPIO 4", false);
-        ValveConfig valve3 = new ValveConfig("tap", "tap water", ValveType.INPUT, "GPIO 5", false);
-        ValveConfig valve4 = new ValveConfig("out", "out", ValveType.OUTPUT, "GPIO 6", true);
+        ValveConfig valve = new ValveConfig("valve1", "Tank 1", ValveType.INPUT, "GPIO 3", false,false);
+        ValveConfig valve2 = new ValveConfig("valve2", "Tank 2", ValveType.INPUT, "GPIO 4", false,false);
+        ValveConfig valve3 = new ValveConfig("tap", "tap water", ValveType.INPUT, "GPIO 5", false,false);
+        ValveConfig valve4 = new ValveConfig("out", "out", ValveType.OUTPUT, "GPIO 6", true,false);
         List<ValveConfig> valves = List.of(valve, valve2, valve3, valve4);
         assertEquals(valves, config.getValves());
 

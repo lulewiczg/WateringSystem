@@ -13,7 +13,8 @@
         "id": "valve1",
         "name": "Tank 1",
         "type": "INPUT",
-        "open": false
+        "open": false,
+        "overflowOutput": false
       }
     },
     {
@@ -29,7 +30,8 @@
         "id": "valve2",
         "name": "Tank 2",
         "type": "INPUT",
-        "open": false
+        "open": false,
+        "overflowOutput": false
       }
     }
   ],
@@ -49,7 +51,8 @@
       "id": "out",
       "name": "out",
       "type": "OUTPUT",
-      "open": true
+      "open": true,
+      "overflowOutput": false
     }
   ],
   "state": "IDLE"

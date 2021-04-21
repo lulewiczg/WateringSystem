@@ -34,15 +34,18 @@ public class ValveConfig {
 
     private boolean open;
 
+    private boolean overflowOutput = false;
+
     @JsonIgnore
     @EqualsAndHashCode.Exclude
     private Pin pin;
 
-    public ValveConfig(String id, String name, ValveType type, String pinName, boolean open) {
+    public ValveConfig(String id, String name, ValveType type, String pinName, boolean open, boolean overflowOutput) {
         this.id = id;
         this.name = name;
         this.type = type;
         this.pinName = pinName;
         this.open = open;
+        this.overflowOutput = overflowOutput;
     }
 }
