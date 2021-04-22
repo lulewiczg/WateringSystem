@@ -1,21 +1,21 @@
-sensor,1,2,10,100,200,12,
-sensor,10,20,10,100,200,12,
-sensor,0,0,10,100,200,12,
-sensor,100,100,10,100,200,12,
-sensor,50,50,10,100,200,12,
-sensor,50,50,9999,9999,9999,9999,
-sensor,50,50,10,100,200,12.01,
-sensor,-1,-1,10,100,200,12,sensors[0].maxLevel must be greater than or equal to 0
-sensor,-1, 5,10,100,200,12,sensors[0].minLevel must be greater than or equal to 0
-sensor,10,101,10,100,200,12,sensors[0].maxLevel must be less than or equal to 100
-sensor,101,101,10,100,200,12,sensors[0].maxLevel must be less than or equal to 100
-sensor,999,999,10,100,200,12,sensors[0].maxLevel must be less than or equal to 100
-sensor,16,2,10,100,200,12,Min water level can not be higher than max!
-sensor,99,98,10,100,200,12,Min water level can not be higher than max!
-sensor,2,1,10,100,200,12,Min water level can not be higher than max!
-sensor,0,101,10,100,200,12,sensors[0].maxLevel must be less than or equal to 100
+sensor1,1,2,10,100,200,12,
+sensor1,10,20,10,100,200,12,
+sensor1,0,0,10,100,200,12,
+sensor1,100,100,10,100,200,12,
+sensor1,50,50,10,100,200,12,
+sensor1,50,50,9999,9999,9999,9999,
+sensor1,50,50,10,100,200,12.01,
+sensor1,-1,-1,10,100,200,12,sensors[0].maxLevel must be greater than or equal to 0
+sensor1,-1, 5,10,100,200,12,sensors[0].minLevel must be greater than or equal to 0
+sensor1,10,101,10,100,200,12,sensors[0].maxLevel must be less than or equal to 100
+sensor1,101,101,10,100,200,12,sensors[0].maxLevel must be less than or equal to 100
+sensor1,999,999,10,100,200,12,sensors[0].maxLevel must be less than or equal to 100
+sensor1,16,2,10,100,200,12,Min water level can not be higher than max!
+sensor1,99,98,10,100,200,12,Min water level can not be higher than max!
+sensor1,2,1,10,100,200,12,Min water level can not be higher than max!
+sensor1,0,101,10,100,200,12,sensors[0].maxLevel must be less than or equal to 100
 ,1,2,10,100,200,12,sensors[0].id must not be empty
-sensor,1,2,0,100,200,12,sensors[0].resistorsNumber must be greater than or equal to 1
-sensor,1,2,10,0,200,12,sensors[0].passiveResistance must be greater than or equal to 1
-sensor,1,2,10,100,0,12,sensors[0].stepResistance must be greater than or equal to 1
-sensor,1,2,10,100,200,0,sensors[0].voltage must be greater than or equal to 1
+sensor1,1,2,0,100,200,12,sensors[0].resistorsNumber must be greater than or equal to 1
+sensor1,1,2,10,0,200,12,sensors[0].passiveResistance must be greater than or equal to 1
+sensor1,1,2,10,100,0,12,sensors[0].stepResistance must be greater than or equal to 1
+sensor1,1,2,10,100,200,0,sensors[0].voltage must be greater than or equal to 1

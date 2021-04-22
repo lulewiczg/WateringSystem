@@ -2,8 +2,7 @@ package com.github.lulewiczg.watering;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.github.lulewiczg.watering.config.dto.ValveType;
-import com.github.lulewiczg.watering.config.dto.WaterLevelSensorConfig;
+import com.github.lulewiczg.watering.config.dto.*;
 import com.github.lulewiczg.watering.exception.ApiError;
 import com.github.lulewiczg.watering.service.dto.ActionResultDto;
 import com.github.lulewiczg.watering.service.ina219.enums.Address;
@@ -287,5 +286,19 @@ public final class TestUtils {
         when(state.getTanks()).thenReturn(List.of(TANK, TANK2));
         when(state.getTaps()).thenReturn(List.of(TAP));
         when(state.getOutputs()).thenReturn(List.of(OUT, OUT2));
+    }
+
+    public static class Config {
+        public static final ValveConfig VALVE = new ValveConfig("valve1", "Tank 1", ValveType.INPUT, "GPIO 3", false, false, null);
+        public static final ValveConfig VALVE2 = new ValveConfig("valve2", "Tank 2", ValveType.INPUT, "GPIO 4", false, false, null);
+        public static final ValveConfig VALVE3 = new ValveConfig("tap", "tap water", ValveType.INPUT, "GPIO 5", false, false, null);
+        public static final ValveConfig OUT = new ValveConfig("out", "out", ValveType.OUTPUT, "GPIO 6", true, true, 333L);
+        public static final WaterLevelSensorConfig SENSOR = new WaterLevelSensorConfig("sensor1", 12, 21, Address.ADDR_40, "GPIO 10", 10, 1000, 100, 12);
+        public static final WaterLevelSensorConfig SENSOR2 = new WaterLevelSensorConfig("sensor2", 5, 100, Address.ADDR_41, "", 20, 50, 60, 5);
+        public static final TankConfig TANK = new TankConfig("tank1", 123, "sensor1", "valve1", TankType.DEFAULT);
+        public static final TankConfig TANK2 = new TankConfig("tank2", 321, "sensor2", "valve2", TankType.DEFAULT);
+        public static final TankConfig TAP = new TankConfig("tap", null, null, "tap", TankType.UNLIMITED);
+        public static final TankConfig TANK_NO_SENSOR = new TankConfig("tank1", 123, null, "valve1", TankType.DEFAULT);
+
     }
 }
