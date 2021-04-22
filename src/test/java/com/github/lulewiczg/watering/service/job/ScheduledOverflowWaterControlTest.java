@@ -61,8 +61,6 @@ class ScheduledOverflowWaterControlTest {
     @Autowired
     private ScheduledOverflowWaterControl job;
 
-    private final Valve out = new Valve("out", "out", ValveType.OUTPUT, true, false, 1L, RaspiPin.GPIO_00);
-
     @AfterEach
     void after() {
         verifyNoInteractions(tanksCloseAction);
@@ -83,11 +81,10 @@ class ScheduledOverflowWaterControlTest {
     @ParameterizedTest
     @CsvFileSource(resources = "/testData/overflow-running-test.csv")
     void testAlreadyRunning(int minLevel, int maxLevel, Integer level) {
-        Valve valve = new Valve("valve", "valve", ValveType.INPUT, true, false, null,RaspiPin.GPIO_00);
         Sensor sensor = new Sensor("sensor", minLevel, maxLevel, level, Address.ADDR_40, RaspiPin.GPIO_10, 10, 12, 100, 200);
-        Tank tank = new Tank("tank", 100, sensor, valve);
+        Tank tank = new Tank("tank", 100, sensor, TestUtils.VALVE);
         when(state.getTanks()).thenReturn(List.of(tank));
-        when(state.getOverflowValves()).thenReturn(List.of(out));
+        when(state.getOverflowValves()).thenReturn(List.of(TestUtils.OUT));
         JobDto jobDto = new JobDto("test", null);
 
         job.doJobRunning(jobDto);
@@ -101,21 +98,20 @@ class ScheduledOverflowWaterControlTest {
     @ParameterizedTest
     @CsvFileSource(resources = "/testData/overflow-ok-test.csv")
     void testAlreadyRunningNotFinished(int minLevel, int maxLevel, Integer level) {
-        Valve valve = new Valve("valve", "valve", ValveType.INPUT, true, false, null,RaspiPin.GPIO_00);
         Sensor sensor = new Sensor("sensor", minLevel, maxLevel, level, Address.ADDR_40, RaspiPin.GPIO_10, 10, 12, 100, 200);
-        Tank tank = new Tank("tank", 100, sensor, valve);
+        Tank tank = new Tank("tank", 100, sensor, TestUtils.VALVE);
         when(state.getTanks()).thenReturn(List.of(tank));
-        when(state.getOverflowValves()).thenReturn(List.of(out));
+        when(state.getOverflowValves()).thenReturn(List.of(TestUtils.OUT));
         JobDto jobDto = new JobDto("test", null);
         when(runner.run("test.", tanksCloseAction, null)).thenReturn(TestUtils.EMPTY_RESULT);
-        when(runner.run("test.", valveCloseAction, out)).thenReturn(TestUtils.EMPTY_RESULT);
+        when(runner.run("test.", valveCloseAction, TestUtils.OUT)).thenReturn(TestUtils.EMPTY_RESULT);
 
         job.doJobRunning(jobDto);
 
         verify(runner).run("test.", tanksCloseAction, null);
         verify(runner, never()).run(any(), eq(valveOpenAction), any());
-        verify(runner).run("test.", valveCloseAction, out);
-        verify(runner, never()).run("test.", valveCloseAction, valve);
+        verify(runner).run("test.", valveCloseAction, TestUtils.OUT);
+        verify(runner, never()).run("test.", valveCloseAction, TestUtils.VALVE);
 
         verify(state).setState(SystemStatus.IDLE);
     }
@@ -123,11 +119,10 @@ class ScheduledOverflowWaterControlTest {
     @ParameterizedTest
     @CsvFileSource(resources = "/testData/overflow-ok-test.csv")
     void testOverflowOk(int minLevel, int maxLevel, Integer level) {
-        Valve valve = new Valve("valve", "valve", ValveType.INPUT, true, false, null, RaspiPin.GPIO_00);
         Sensor sensor = new Sensor("sensor", minLevel, maxLevel, level, Address.ADDR_40, RaspiPin.GPIO_10, 10, 12, 100, 200);
-        Tank tank = new Tank("tank", 100, sensor, valve);
+        Tank tank = new Tank("tank", 100, sensor, TestUtils.VALVE);
         when(state.getTanks()).thenReturn(List.of(tank));
-        when(state.getOverflowValves()).thenReturn(List.of(out));
+        when(state.getOverflowValves()).thenReturn(List.of(TestUtils.OUT));
         JobDto jobDto = new JobDto("test", null);
 
         job.doJob(jobDto);
@@ -141,36 +136,29 @@ class ScheduledOverflowWaterControlTest {
     @ParameterizedTest
     @CsvFileSource(resources = "/testData/overflow-test.csv")
     void testOverflow(int minLevel, int maxLevel, int level) {
-        Valve valve = new Valve("valve", "valve", ValveType.INPUT, true, false, null, RaspiPin.GPIO_00);
         Sensor sensor = new Sensor("sensor", minLevel, maxLevel, level, Address.ADDR_40, RaspiPin.GPIO_10, 10, 12, 100, 200);
-        Tank tank = new Tank("tank", 100, sensor, valve);
-        Valve valve2 = new Valve("valve2", "valve2", ValveType.INPUT, true, false, null, RaspiPin.GPIO_02);
-        Sensor sensor2 = new Sensor("sensor", 1, 3, 2, Address.ADDR_40, RaspiPin.GPIO_20, 10, 12, 100, 200);
-        Tank tank2 = new Tank("tank2", 100, sensor2, valve2);
-        when(state.getTanks()).thenReturn(List.of(tank, tank2));
-        when(state.getOverflowValves()).thenReturn(List.of(out));
+        Tank tank = new Tank("tank", 100, sensor, TestUtils.VALVE);
+        when(state.getTanks()).thenReturn(List.of(tank, TestUtils.TANK2));
+        when(state.getOverflowValves()).thenReturn(List.of(TestUtils.OUT));
         JobDto jobDto = new JobDto("test", null);
-        when(runner.run("test.", valveOpenAction, out)).thenReturn(TestUtils.EMPTY_RESULT);
-        when(runner.run("test.", valveOpenAction, valve)).thenReturn(TestUtils.EMPTY_RESULT);
+        when(runner.run("test.", valveOpenAction, TestUtils.OUT)).thenReturn(TestUtils.EMPTY_RESULT);
+        when(runner.run("test.", valveOpenAction, TestUtils.VALVE)).thenReturn(TestUtils.EMPTY_RESULT);
 
         job.doJob(jobDto);
 
         verify(runner, never()).run(any(), eq(tanksCloseAction), any());
-        verify(runner).run("test.", valveOpenAction, out);
-        verify(runner).run("test.", valveOpenAction, valve);
-        verify(runner, never()).run("test.", valveOpenAction, valve2);
+        verify(runner).run("test.", valveOpenAction, TestUtils.OUT);
+        verify(runner).run("test.", valveOpenAction, TestUtils.VALVE);
+        verify(runner, never()).run("test.", valveOpenAction, TestUtils.VALVE2);
         verify(runner, never()).run(any(), eq(valveCloseAction), any());
         verify(state).setState(SystemStatus.DRAINING);
     }
 
     @Test
     void testActionValveOpenFail() {
-        Valve valve = new Valve("valve", "valve", ValveType.INPUT, true, false, null, RaspiPin.GPIO_00);
-        Sensor sensor = new Sensor("sensor", 1, 11, 20, Address.ADDR_40, RaspiPin.GPIO_10, 10, 12, 100, 200);
-        Tank tank = new Tank("tank", 100, sensor, valve);
-        when(state.getTanks()).thenReturn(List.of(tank));
-        when(runner.run("test.", valveOpenAction, valve)).thenReturn(TestUtils.ERROR_RESULT);
-        when(state.getOverflowValves()).thenReturn(List.of(out));
+        when(state.getTanks()).thenReturn(List.of(TestUtils.OVERFLOW_TANK));
+        when(runner.run("test.", valveOpenAction, TestUtils.VALVE)).thenReturn(TestUtils.ERROR_RESULT);
+        when(state.getOverflowValves()).thenReturn(List.of(TestUtils.OUT));
         JobDto jobDto = new JobDto("test", null);
 
         String error = assertThrows(ActionException.class, () -> job.doJob(jobDto)).getLocalizedMessage();
@@ -182,13 +170,10 @@ class ScheduledOverflowWaterControlTest {
 
     @Test
     void testActionValveCloseFail() {
-        Valve valve = new Valve("valve", "valve", ValveType.INPUT, true, false, null, RaspiPin.GPIO_00);
-        Sensor sensor = new Sensor("sensor", 1, 11, 10, Address.ADDR_40, RaspiPin.GPIO_10, 10, 12, 100, 200);
-        Tank tank = new Tank("tank", 100, sensor, valve);
-        when(state.getTanks()).thenReturn(List.of(tank));
+        when(state.getTanks()).thenReturn(List.of(TestUtils.TANK));
         when(runner.run("test.", tanksCloseAction, null)).thenReturn(TestUtils.EMPTY_RESULT);
-        when(runner.run("test.", valveCloseAction, out)).thenReturn(TestUtils.ERROR_RESULT);
-        when(state.getOverflowValves()).thenReturn(List.of(out));
+        when(runner.run("test.", valveCloseAction, TestUtils.OUT)).thenReturn(TestUtils.ERROR_RESULT);
+        when(state.getOverflowValves()).thenReturn(List.of(TestUtils.OUT));
         JobDto jobDto = new JobDto("test", null);
 
         String error = assertThrows(ActionException.class, () -> job.doJobRunning(jobDto)).getLocalizedMessage();
@@ -199,11 +184,8 @@ class ScheduledOverflowWaterControlTest {
 
     @Test
     void testActionTanksCloseFail() {
-        Valve valve = new Valve("valve", "valve", ValveType.INPUT, true, false, null, RaspiPin.GPIO_00);
-        Sensor sensor = new Sensor("sensor", 1, 90, 89, Address.ADDR_40, RaspiPin.GPIO_10, 10, 12, 100, 200);
-        Tank tank = new Tank("tank", 100, sensor, valve);
-        when(state.getTanks()).thenReturn(List.of(tank));
-        when(state.getOverflowValves()).thenReturn(List.of(out));
+        when(state.getTanks()).thenReturn(List.of(TestUtils.TANK));
+        when(state.getOverflowValves()).thenReturn(List.of(TestUtils.OUT));
         JobDto jobDto = new JobDto("test", null);
         when(runner.run("test.", tanksCloseAction, null)).thenReturn(TestUtils.ERROR_RESULT);
 

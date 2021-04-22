@@ -7,6 +7,7 @@ import com.github.lulewiczg.watering.state.AppState;
 import com.github.lulewiczg.watering.state.SystemStatus;
 import com.github.lulewiczg.watering.state.dto.Tank;
 import com.github.lulewiczg.watering.state.dto.Valve;
+import com.github.lulewiczg.watering.state.dto.WaterSource;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
@@ -44,6 +45,7 @@ public class ScheduledValveRead extends ScheduledIoJob {
     public void doJob(JobDto job) {
         log.debug("Checking valves...");
         state.getOutputs().forEach(this::readValve);
+        state.getTaps().stream().map(WaterSource::getValve).forEach(this::readValve);
         state.getTanks().stream().map(Tank::getValve).forEach(this::readValve);
         log.debug("Valves check finished.");
     }

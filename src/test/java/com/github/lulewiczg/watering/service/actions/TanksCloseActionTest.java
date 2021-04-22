@@ -4,9 +4,6 @@ import com.github.lulewiczg.watering.TestUtils;
 import com.github.lulewiczg.watering.exception.ActionException;
 import com.github.lulewiczg.watering.service.dto.ActionDto;
 import com.github.lulewiczg.watering.state.AppState;
-import com.github.lulewiczg.watering.state.dto.Tank;
-import com.github.lulewiczg.watering.state.dto.Valve;
-import com.github.lulewiczg.watering.state.dto.WaterSource;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -16,8 +13,6 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
-
-import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -47,12 +42,7 @@ class TanksCloseActionTest {
 
     @BeforeEach
     void before() {
-        List<Valve> valves = List.of(TestUtils.OUT, TestUtils.OUT2);
-        List<Tank> tanks = List.of(TestUtils.TANK, TestUtils.TANK2);
-        List<WaterSource> taps = List.of(TestUtils.TAP);
-        when(state.getOutputs()).thenReturn(valves);
-        when(state.getTanks()).thenReturn(tanks);
-        when(state.getTaps()).thenReturn(taps);
+        TestUtils.standardMock(state);
     }
 
     @Test

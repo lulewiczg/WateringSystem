@@ -6,6 +6,7 @@ import com.github.lulewiczg.watering.config.dto.ValveType;
 import com.github.lulewiczg.watering.exception.ApiError;
 import com.github.lulewiczg.watering.service.dto.ActionResultDto;
 import com.github.lulewiczg.watering.service.ina219.enums.Address;
+import com.github.lulewiczg.watering.state.AppState;
 import com.github.lulewiczg.watering.state.dto.Sensor;
 import com.github.lulewiczg.watering.state.dto.Tank;
 import com.github.lulewiczg.watering.state.dto.Valve;
@@ -25,6 +26,7 @@ import java.util.Date;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -47,25 +49,29 @@ public final class TestUtils {
 
     public static final ActionResultDto<Void> ERROR_RESULT = new ActionResultDto<>("id", null, null, LocalDateTime.now(), "error");
 
-    public static final Valve VALVE = new Valve("valve", "valve", ValveType.INPUT, true, false, 1L, RaspiPin.GPIO_00);
+    public static final Valve VALVE = new Valve("valve", "valve", ValveType.INPUT, true, false, 1L, RaspiPin.GPIO_10);
 
     public static final Sensor SENSOR = new Sensor("sensor", 10, 90, null, Address.ADDR_40, RaspiPin.GPIO_10, 10, 12, 100, 200);
 
     public static final Tank TANK = new Tank("tank", 100, SENSOR, VALVE);
 
-    public static final Valve VALVE2 = new Valve("valve2", "valve2", ValveType.INPUT, true, false, 1L, RaspiPin.GPIO_01);
+    public static final Valve VALVE2 = new Valve("valve2", "valve2", ValveType.INPUT, true, false, 1L, RaspiPin.GPIO_11);
 
     public static final Sensor SENSOR2 = new Sensor("sensor2", 10, 90, 10, Address.ADDR_40, null, 10, 12, 100, 200);
 
     public static final Tank TANK2 = new Tank("tank2", 100, SENSOR2, VALVE2);
 
-    public static final Valve TAP_VALVE = new Valve("tap", "tap", ValveType.INPUT, true, false, 1L, RaspiPin.GPIO_29);
+    public static final Valve TAP_VALVE = new Valve("tap", "tap", ValveType.INPUT, false, false, 1L, RaspiPin.GPIO_21);
 
     public static final WaterSource TAP = new WaterSource("water", TAP_VALVE);
 
-    public static final Valve OUT = new Valve("out", "out", ValveType.OUTPUT, true, false, 1L, RaspiPin.GPIO_30);
+    public static final Valve OUT = new Valve("out", "out", ValveType.OUTPUT, false, false, 1L, RaspiPin.GPIO_30);
 
-    public static final Valve OUT2 = new Valve("out2", "out2", ValveType.OUTPUT, true, true, 1L, RaspiPin.GPIO_31);
+    public static final Valve OUT2 = new Valve("out2", "out2", ValveType.OUTPUT, false, true, 1L, RaspiPin.GPIO_31);
+
+    public static final Sensor OVERFLOW_SENSOR = new Sensor("overflowSensor", 10, 90, 100, Address.ADDR_40, null, 10, 12, 100, 200);
+
+    public static final Tank OVERFLOW_TANK = new Tank("overflow", 100, OVERFLOW_SENSOR, VALVE);
 
     /**
      * Reads json from file and maps to object.
@@ -265,5 +271,16 @@ public final class TestUtils {
      */
     public static List<String> splitId(String id) {
         return Arrays.asList(id.split("\\."));
+    }
+
+    /**
+     * Sets up standard system config.
+     *
+     * @param state app state
+     */
+    public static void standardMock(AppState state) {
+        when(state.getTanks()).thenReturn(List.of(TANK, TANK2));
+        when(state.getTaps()).thenReturn(List.of(TAP));
+        when(state.getOutputs()).thenReturn(List.of(OUT, OUT2));
     }
 }

@@ -30,6 +30,8 @@ public class ScheduledWaterFillControl extends ScheduledJob {
 
     private final TapsOpenAction tapsOpenAction;
 
+    private final TapsCloseAction tapsCloseAction;
+
     private final ValveOpenAction valveOpenAction;
 
     private final OutputsCloseAction outputsCloseAction;
@@ -81,6 +83,7 @@ public class ScheduledWaterFillControl extends ScheduledJob {
         if (tanks.isEmpty()) {
             log.info("Water levels are OK, filling finished");
             runNested(actionRunner, job, tanksCloseAction, null);
+            runNested(actionRunner, job, tapsCloseAction, null);
             state.setState(SystemStatus.IDLE);
         }
     }
