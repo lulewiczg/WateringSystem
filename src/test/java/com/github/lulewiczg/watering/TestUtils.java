@@ -1,6 +1,5 @@
 package com.github.lulewiczg.watering;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.lulewiczg.watering.config.dto.*;
 import com.github.lulewiczg.watering.exception.ApiError;
@@ -49,33 +48,39 @@ public final class TestUtils {
 
     public static final ActionResultDto<Void> ERROR_RESULT = new ActionResultDto<>("id", null, null, LocalDateTime.now(), "error");
 
-    public static final Valve VALVE = new Valve("valve", "valve", ValveType.INPUT, true, false, 1L, RaspiPin.GPIO_10);
+    /**
+     * Object constants.
+     */
+    public static class Objects {
+        public static final Valve VALVE = new Valve("valve", "valve", ValveType.INPUT, true, false, 1L, RaspiPin.GPIO_10);
+        public static final Valve VALVE2 = new Valve("valve2", "valve2", ValveType.INPUT, true, false, 1L, RaspiPin.GPIO_11);
+        public static final Valve TAP_VALVE = new Valve("tap", "tap", ValveType.INPUT, false, false, 1L, RaspiPin.GPIO_21);
+        public static final Valve OUT = new Valve("out", "out", ValveType.OUTPUT, false, false, 1L, RaspiPin.GPIO_30);
+        public static final Valve OUT2 = new Valve("out2", "out2", ValveType.OUTPUT, false, true, 1L, RaspiPin.GPIO_31);
+        public static final Sensor SENSOR = new Sensor("sensor1", 12, 21, null, Address.ADDR_40, RaspiPin.GPIO_10, 10, 1000, 100, 12);
+        public static final Sensor SENSOR2 = new Sensor("sensor2", 5, 100, null, Address.ADDR_41, null, 20, 50, 60, 5);
+        public static final Tank TANK = new Tank("tank", 100, SENSOR, VALVE);
+        public static final Tank TANK2 = new Tank("tank2", 100, SENSOR2, VALVE2);
+        public static final WaterSource TAP = new WaterSource("water", TAP_VALVE);
+        public static final Sensor OVERFLOW_SENSOR = new Sensor("overflowSensor", 10, 90, 100, Address.ADDR_40, null, 10, 12, 100, 200);
+        public static final Tank OVERFLOW_TANK = new Tank("overflow", 100, OVERFLOW_SENSOR, VALVE);
+    }
 
-    public static final Sensor SENSOR = new Sensor("sensor1", 12, 21, null, Address.ADDR_40, RaspiPin.GPIO_10, 10, 1000, 100, 12);
-
-    public static final Tank TANK = new Tank("tank", 100, SENSOR, VALVE);
-
-    public static final Valve VALVE2 = new Valve("valve2", "valve2", ValveType.INPUT, true, false, 1L, RaspiPin.GPIO_11);
-
-    public static final Sensor SENSOR2 = new Sensor("sensor2", 5, 100, null, Address.ADDR_41, null, 20, 50, 60, 5);
-
-    public static final Tank TANK2 = new Tank("tank2", 100, SENSOR2, VALVE2);
-
-    public static final Valve TAP_VALVE = new Valve("tap", "tap", ValveType.INPUT, false, false, 1L, RaspiPin.GPIO_21);
-
-    public static final WaterSource TAP = new WaterSource("water", TAP_VALVE);
-
-    public static final Valve OUT = new Valve("out", "out", ValveType.OUTPUT, false, false, 1L, RaspiPin.GPIO_30);
-
-    public static final Valve OUT2 = new Valve("out2", "out2", ValveType.OUTPUT, false, true, 1L, RaspiPin.GPIO_31);
-
-    public static final Sensor OVERFLOW_SENSOR = new Sensor("overflowSensor", 10, 90, 100, Address.ADDR_40, null, 10, 12, 100, 200);
-
-    public static final Tank OVERFLOW_TANK = new Tank("overflow", 100, OVERFLOW_SENSOR, VALVE);
-
-    public static final WaterLevelSensorConfig SENSOR_CONFIG = new WaterLevelSensorConfig("test", 1, 10, Address.ADDR_41, null, 10, 100, 200, 12);
-
-    public static final WaterLevelSensorConfig SENSOR_CONFIG2 = new WaterLevelSensorConfig("test", 1, 10, Address.ADDR_40, null, 10, 100, 200, 12);
+    /**
+     * Config constants.
+     */
+    public static class Config {
+        public static final ValveConfig VALVE = new ValveConfig("valve1", "Tank 1", ValveType.INPUT, "GPIO 3", false, false, null);
+        public static final ValveConfig VALVE2 = new ValveConfig("valve2", "Tank 2", ValveType.INPUT, "GPIO 4", false, false, null);
+        public static final ValveConfig VALVE3 = new ValveConfig("tap", "tap water", ValveType.INPUT, "GPIO 5", false, false, null);
+        public static final ValveConfig OUT = new ValveConfig("out", "out", ValveType.OUTPUT, "GPIO 6", true, true, 333L);
+        public static final WaterLevelSensorConfig SENSOR = new WaterLevelSensorConfig("sensor1", 12, 21, Address.ADDR_40, "GPIO 10", 10, 1000, 100, 12);
+        public static final WaterLevelSensorConfig SENSOR2 = new WaterLevelSensorConfig("sensor2", 5, 100, Address.ADDR_41, "", 20, 50, 60, 5);
+        public static final TankConfig TANK = new TankConfig("tank1", 123, "sensor1", "valve1", TankType.DEFAULT);
+        public static final TankConfig TANK2 = new TankConfig("tank2", 321, "sensor2", "valve2", TankType.DEFAULT);
+        public static final TankConfig TAP = new TankConfig("tap", null, null, "tap", TankType.UNLIMITED);
+        public static final TankConfig TANK_NO_SENSOR = new TankConfig("tank1", 123, null, "valve1", TankType.DEFAULT);
+    }
 
     /**
      * Reads json from file and maps to object.
@@ -109,9 +114,9 @@ public final class TestUtils {
      * @param json     response
      * @param expected expected error
      * @param mapper   mapper
-     * @throws JsonProcessingException
      */
-    public static void testError(String json, ApiError expected, ObjectMapper mapper) throws JsonProcessingException {
+    @SneakyThrows
+    public static void testError(String json, ApiError expected, ObjectMapper mapper) {
         Date expectedDate = expected.getTimestamp();
         ApiError error = mapper.readValue(json, ApiError.class);
         assertNotNull(error.getTimestamp());
@@ -216,22 +221,21 @@ public final class TestUtils {
     /**
      * Tests not found error for get.
      *
-     * @param mvc    mock mvc
-     * @param mapper mapper
-     * @param url    URL
+     * @param mvc mock mvc
+     * @param url URL
      */
     @SneakyThrows
-    public static void testNotFoundGet(MockMvc mvc, ObjectMapper mapper, String url) {
-        mvc.perform(get(url))
-                .andExpect(status().isNotFound());
+    public static void testNotFoundGet(MockMvc mvc, String url) {
+        mvc.perform(get(url)).andExpect(status().isNotFound());
     }
 
     /**
      * Tests not found error for post.
      *
-     * @param mvc    mock mvc
-     * @param mapper mapper
-     * @param url    URL
+     * @param mvc     mock mvc
+     * @param mapper  mapper
+     * @param url     URL
+     * @param payload payload
      */
     @SneakyThrows
     public static void tesNotFoundPost(MockMvc mvc, ObjectMapper mapper, String url, Object payload) {
@@ -283,22 +287,9 @@ public final class TestUtils {
      * @param state app state
      */
     public static void standardMock(AppState state) {
-        when(state.getTanks()).thenReturn(List.of(TANK, TANK2));
-        when(state.getTaps()).thenReturn(List.of(TAP));
-        when(state.getOutputs()).thenReturn(List.of(OUT, OUT2));
+        when(state.getTanks()).thenReturn(List.of(Objects.TANK, Objects.TANK2));
+        when(state.getTaps()).thenReturn(List.of(Objects.TAP));
+        when(state.getOutputs()).thenReturn(List.of(Objects.OUT, Objects.OUT2));
     }
 
-    public static class Config {
-        public static final ValveConfig VALVE = new ValveConfig("valve1", "Tank 1", ValveType.INPUT, "GPIO 3", false, false, null);
-        public static final ValveConfig VALVE2 = new ValveConfig("valve2", "Tank 2", ValveType.INPUT, "GPIO 4", false, false, null);
-        public static final ValveConfig VALVE3 = new ValveConfig("tap", "tap water", ValveType.INPUT, "GPIO 5", false, false, null);
-        public static final ValveConfig OUT = new ValveConfig("out", "out", ValveType.OUTPUT, "GPIO 6", true, true, 333L);
-        public static final WaterLevelSensorConfig SENSOR = new WaterLevelSensorConfig("sensor1", 12, 21, Address.ADDR_40, "GPIO 10", 10, 1000, 100, 12);
-        public static final WaterLevelSensorConfig SENSOR2 = new WaterLevelSensorConfig("sensor2", 5, 100, Address.ADDR_41, "", 20, 50, 60, 5);
-        public static final TankConfig TANK = new TankConfig("tank1", 123, "sensor1", "valve1", TankType.DEFAULT);
-        public static final TankConfig TANK2 = new TankConfig("tank2", 321, "sensor2", "valve2", TankType.DEFAULT);
-        public static final TankConfig TAP = new TankConfig("tap", null, null, "tap", TankType.UNLIMITED);
-        public static final TankConfig TANK_NO_SENSOR = new TankConfig("tank1", 123, null, "valve1", TankType.DEFAULT);
-
-    }
 }

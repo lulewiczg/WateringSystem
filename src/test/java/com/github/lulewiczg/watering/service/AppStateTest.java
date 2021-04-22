@@ -92,7 +92,7 @@ class AppStateTest {
     }
 
     @Test
-    void testGetOutputVales(){
+    void testGetOutputVales() {
         List<Valve> allValves = state.getOverflowValves();
 
         assertEquals(state.getOutputs(), allValves);

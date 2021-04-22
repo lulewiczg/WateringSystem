@@ -66,11 +66,11 @@ class SetDefaultsTest {
 
         job.doJob(jobDto);
 
-        verify(runner).run("test.", openAction, TestUtils.VALVE);
-        verify(runner).run("test.", openAction, TestUtils.VALVE2);
-        verify(runner).run("test.", closeAction, TestUtils.OUT);
-        verify(runner).run("test.", closeAction, TestUtils.OUT2);
-        verify(runner).run("test.", closeAction, TestUtils.TAP_VALVE);
+        verify(runner).run("test.", openAction, TestUtils.Objects.VALVE);
+        verify(runner).run("test.", openAction, TestUtils.Objects.VALVE2);
+        verify(runner).run("test.", closeAction, TestUtils.Objects.OUT);
+        verify(runner).run("test.", closeAction, TestUtils.Objects.OUT2);
+        verify(runner).run("test.", closeAction, TestUtils.Objects.TAP_VALVE);
         verify(ioService, times(1)).toggleOff(RaspiPin.GPIO_10);
     }
 
@@ -83,7 +83,7 @@ class SetDefaultsTest {
         String error = assertThrows(ActionException.class, () -> job.doJob(jobDto)).getLocalizedMessage();
 
         assertEquals("Action [id] failed: error", error);
-        verify(runner).run("test.", openAction, TestUtils.VALVE);
+        verify(runner).run("test.", openAction, TestUtils.Objects.VALVE);
     }
 
     @Test
@@ -95,9 +95,9 @@ class SetDefaultsTest {
         String error = assertThrows(ActionException.class, () -> job.doJob(jobDto)).getLocalizedMessage();
 
         assertEquals("Action [id] failed: error", error);
-        verify(runner).run("test.", openAction, TestUtils.VALVE);
-        verify(runner).run("test.", openAction, TestUtils.VALVE2);
-        verify(runner).run("test.", closeAction, TestUtils.OUT);
+        verify(runner).run("test.", openAction, TestUtils.Objects.VALVE);
+        verify(runner).run("test.", openAction, TestUtils.Objects.VALVE2);
+        verify(runner).run("test.", closeAction, TestUtils.Objects.OUT);
 
     }
 

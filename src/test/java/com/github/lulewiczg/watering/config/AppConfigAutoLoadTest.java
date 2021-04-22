@@ -33,12 +33,12 @@ class AppConfigAutoLoadTest {
         List<TankConfig> configuredTanks = config.getTanks();
         assertEquals(tanks, configuredTanks);
 
-        assertEquals(configuredTanks.get(0).getSensor(), TestUtils.Config.SENSOR);
-        assertEquals(configuredTanks.get(1).getSensor(), TestUtils.Config.SENSOR2);
+        assertEquals(TestUtils.Config.SENSOR, configuredTanks.get(0).getSensor());
+        assertEquals(TestUtils.Config.SENSOR2, configuredTanks.get(1).getSensor());
         assertNull(configuredTanks.get(2).getSensor());
-        assertEquals(configuredTanks.get(0).getValve(), TestUtils.Config.VALVE);
-        assertEquals(configuredTanks.get(1).getValve(), TestUtils.Config.VALVE2);
-        assertEquals(configuredTanks.get(2).getValve(), TestUtils.Config.VALVE3);
+        assertEquals(TestUtils.Config.VALVE, configuredTanks.get(0).getValve());
+        assertEquals(TestUtils.Config.VALVE2, configuredTanks.get(1).getValve());
+        assertEquals(TestUtils.Config.VALVE3, configuredTanks.get(2).getValve());
     }
 
 }

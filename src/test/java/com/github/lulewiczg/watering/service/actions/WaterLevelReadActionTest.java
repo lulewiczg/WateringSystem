@@ -38,16 +38,16 @@ class WaterLevelReadActionTest {
 
     @Test
     void testAction() {
-        when(service.analogRead(TestUtils.SENSOR)).thenReturn(12.34);
-        when(sensorService.calculateWaterLevel(12.34, TestUtils.SENSOR)).thenReturn(43.21);
+        when(service.analogRead(TestUtils.Objects.SENSOR)).thenReturn(12.34);
+        when(sensorService.calculateWaterLevel(12.34, TestUtils.Objects.SENSOR)).thenReturn(43.21);
 
-        Double result = action.doAction(new ActionDto(), TestUtils.SENSOR);
+        Double result = action.doAction(new ActionDto(), TestUtils.Objects.SENSOR);
         assertEquals(43.21, result);
     }
 
     @Test
     void testActionEnabled() {
-        when(state.getTanks()).thenReturn(List.of(TestUtils.TANK));
+        when(state.getTanks()).thenReturn(List.of(TestUtils.Objects.TANK));
 
         assertTrue(action.isEnabled());
     }

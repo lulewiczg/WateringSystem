@@ -61,29 +61,29 @@ class ScheduledSensorReadTest {
     @Test
     void testJob() {
         JobDto jobDto = new JobDto("test", null);
-        when(runner.run("test.", readAction, TestUtils.SENSOR))
+        when(runner.run("test.", readAction, TestUtils.Objects.SENSOR))
                 .thenReturn(new ActionResultDto<>(UUID.randomUUID().toString(), null, 11.0, LocalDateTime.now(), null));
-        when(runner.run("test.", readAction, TestUtils.SENSOR2))
+        when(runner.run("test.", readAction, TestUtils.Objects.SENSOR2))
                 .thenReturn(new ActionResultDto<>(UUID.randomUUID().toString(), null, 22.0, LocalDateTime.now(), null));
 
         job.doJob(jobDto);
 
-        assertEquals(11, TestUtils.SENSOR.getLevel());
-        assertEquals(22, TestUtils.SENSOR2.getLevel());
+        assertEquals(11, TestUtils.Objects.SENSOR.getLevel());
+        assertEquals(22, TestUtils.Objects.SENSOR2.getLevel());
     }
 
     @Test
     void testJobNestedError() {
         JobDto jobDto = new JobDto("test", null);
-        when(runner.run("test.", readAction, TestUtils.SENSOR))
+        when(runner.run("test.", readAction, TestUtils.Objects.SENSOR))
                 .thenReturn(new ActionResultDto<>(UUID.randomUUID().toString(), null, 11.0, LocalDateTime.now(), null));
-        when(runner.run("test.", readAction, TestUtils.SENSOR2)).thenReturn(new ActionResultDto<>("id", null, null, LocalDateTime.now(), "error"));
+        when(runner.run("test.", readAction, TestUtils.Objects.SENSOR2)).thenReturn(new ActionResultDto<>("id", null, null, LocalDateTime.now(), "error"));
 
         String error = assertThrows(ActionException.class, () -> job.doJob(jobDto)).getLocalizedMessage();
 
         assertEquals("Action [id] failed: error", error);
-        verify(runner).run("test.", readAction, TestUtils.SENSOR);
-        verify(runner).run("test.", readAction, TestUtils.SENSOR);
+        verify(runner).run("test.", readAction, TestUtils.Objects.SENSOR);
+        verify(runner).run("test.", readAction, TestUtils.Objects.SENSOR);
     }
 
     @ParameterizedTest

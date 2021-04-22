@@ -2,7 +2,6 @@ package com.github.lulewiczg.watering.service.io;
 
 import com.github.lulewiczg.watering.TestUtils;
 import com.github.lulewiczg.watering.config.AppConfig;
-import com.github.lulewiczg.watering.config.dto.*;
 import com.github.lulewiczg.watering.service.ina219.INA219;
 import com.github.lulewiczg.watering.service.ina219.enums.Address;
 import com.github.lulewiczg.watering.state.dto.Sensor;
@@ -120,12 +119,12 @@ class IOServiceImplTest {
 
     @Test
     void testAnalogRead() {
-        when(config.getSensors()).thenReturn(List.of(TestUtils.SENSOR_CONFIG));
+        when(config.getSensors()).thenReturn(List.of(TestUtils.Config.SENSOR2));
         when(resolver.get(Address.ADDR_41)).thenReturn(ina219);
         when(ina219.getCurrent()).thenReturn(12.34);
         ioService = new IOServiceImpl(gpioController, resolver, config);
 
-        double result = ioService.analogRead(TestUtils.SENSOR2);
+        double result = ioService.analogRead(TestUtils.Objects.SENSOR2);
 
         assertEquals(12.34, result);
     }
@@ -133,12 +132,12 @@ class IOServiceImplTest {
     @Test
     void testAnalogReadWithPowerControl() {
         when(gpioController.provisionDigitalOutputPin(RaspiPin.GPIO_10, RaspiPin.GPIO_10.getName(), PinState.LOW)).thenReturn(pin);
-        when(config.getSensors()).thenReturn(List.of(TestUtils.SENSOR_CONFIG2));
+        when(config.getSensors()).thenReturn(List.of(TestUtils.Config.SENSOR));
         when(resolver.get(Address.ADDR_40)).thenReturn(ina219);
         when(ina219.getCurrent()).thenReturn(12.34);
         ioService = new IOServiceImpl(gpioController, resolver, config);
 
-        double result = ioService.analogRead(TestUtils.SENSOR);
+        double result = ioService.analogRead(TestUtils.Objects.SENSOR);
 
         assertEquals(12.34, result);
         InOrder inOrder = inOrder(pin, ina219);
@@ -150,7 +149,7 @@ class IOServiceImplTest {
     @Test
     void testAnalogReadMultipleSensors() {
         when(gpioController.provisionDigitalOutputPin(RaspiPin.GPIO_10, RaspiPin.GPIO_10.getName(), PinState.LOW)).thenReturn(pin);
-        when(config.getSensors()).thenReturn(List.of(TestUtils.SENSOR_CONFIG, TestUtils.SENSOR_CONFIG2));
+        when(config.getSensors()).thenReturn(List.of(TestUtils.Config.SENSOR, TestUtils.Config.SENSOR2));
         when(resolver.get(Address.ADDR_40)).thenReturn(ina219);
         when(resolver.get(Address.ADDR_41)).thenReturn(ina2192);
         when(ina2192.getCurrent()).thenReturn(43.21);
@@ -165,12 +164,12 @@ class IOServiceImplTest {
 
     @Test
     void testAnalogReadInvalidAddress() {
-        when(config.getSensors()).thenReturn(List.of(TestUtils.SENSOR_CONFIG));
+        when(config.getSensors()).thenReturn(List.of(TestUtils.Config.SENSOR));
         when(resolver.get(Address.ADDR_40)).thenReturn(ina219);
         when(ina219.getCurrent()).thenReturn(12.34);
         ioService = new IOServiceImpl(gpioController, resolver, config);
 
-        String message = assertThrows(IllegalStateException.class, () -> ioService.analogRead(TestUtils.SENSOR2)).getMessage();
+        String message = assertThrows(IllegalStateException.class, () -> ioService.analogRead(TestUtils.Objects.SENSOR2)).getMessage();
 
         assertEquals("No sensor found for address: ADDR_41", message);
     }

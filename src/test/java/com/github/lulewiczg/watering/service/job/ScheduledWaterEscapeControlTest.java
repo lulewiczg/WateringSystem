@@ -1,7 +1,6 @@
 package com.github.lulewiczg.watering.service.job;
 
 import com.github.lulewiczg.watering.TestUtils;
-import com.github.lulewiczg.watering.config.dto.ValveType;
 import com.github.lulewiczg.watering.exception.ActionException;
 import com.github.lulewiczg.watering.service.actions.ActionRunner;
 import com.github.lulewiczg.watering.service.actions.EmergencyStopAction;
@@ -11,7 +10,6 @@ import com.github.lulewiczg.watering.state.AppState;
 import com.github.lulewiczg.watering.state.SystemStatus;
 import com.github.lulewiczg.watering.state.dto.Sensor;
 import com.github.lulewiczg.watering.state.dto.Tank;
-import com.github.lulewiczg.watering.state.dto.Valve;
 import com.pi4j.io.gpio.RaspiPin;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
@@ -64,7 +62,7 @@ class ScheduledWaterEscapeControlTest {
     @CsvFileSource(resources = "/testData/leak-ok-test.csv")
     void testLeakOk(Integer level, Integer level2) {
         Sensor sensor = new Sensor("sensor", 0, 100, level, Address.ADDR_40, RaspiPin.GPIO_10, 10, 12, 100, 200);
-        Tank tank = new Tank("tank", 100, sensor, TestUtils.VALVE);
+        Tank tank = new Tank("tank", 100, sensor, TestUtils.Objects.VALVE);
         when(state.getTanks()).thenReturn(List.of(tank));
         when(runner.run("test.", emergencyStopAction, null)).thenReturn(TestUtils.EMPTY_RESULT);
         JobDto jobDto = new JobDto("test", null);
@@ -86,8 +84,8 @@ class ScheduledWaterEscapeControlTest {
     @CsvFileSource(resources = "/testData/leak-test.csv")
     void testLeak(int level, int level2) {
         Sensor sensor = new Sensor("sensor", 0, 100, level, Address.ADDR_40, RaspiPin.GPIO_10, 10, 12, 100, 200);
-        Tank tank = new Tank("tank", 100, sensor, TestUtils.VALVE);
-        when(state.getTanks()).thenReturn(List.of(tank, TestUtils.TANK2));
+        Tank tank = new Tank("tank", 100, sensor, TestUtils.Objects.VALVE);
+        when(state.getTanks()).thenReturn(List.of(tank, TestUtils.Objects.TANK2));
         when(runner.run("test.", emergencyStopAction, null)).thenReturn(TestUtils.EMPTY_RESULT);
         JobDto jobDto = new JobDto("test", null);
 
@@ -108,7 +106,7 @@ class ScheduledWaterEscapeControlTest {
     @DirtiesContext
     void testWaterUse() {
         Sensor sensor = new Sensor("sensor", 0, 90, 90, Address.ADDR_40, RaspiPin.GPIO_10, 10, 12, 100, 200);
-        Tank tank = new Tank("tank", 100, sensor, TestUtils.VALVE);
+        Tank tank = new Tank("tank", 100, sensor, TestUtils.Objects.VALVE);
         when(state.getTanks()).thenReturn(List.of(tank));
         when(runner.run("test.", emergencyStopAction, null)).thenReturn(TestUtils.EMPTY_RESULT);
         JobDto jobDto = new JobDto("test", null);
@@ -127,7 +125,7 @@ class ScheduledWaterEscapeControlTest {
     @DirtiesContext
     void testNestedFail() {
         Sensor sensor = new Sensor("sensor", 0, 90, 90, Address.ADDR_40, RaspiPin.GPIO_10, 10, 12, 100, 200);
-        Tank tank = new Tank("tank", 100, sensor, TestUtils.VALVE);
+        Tank tank = new Tank("tank", 100, sensor, TestUtils.Objects.VALVE);
         when(state.getTanks()).thenReturn(List.of(tank));
         when(runner.run("test.", emergencyStopAction, null)).thenReturn(TestUtils.ERROR_RESULT);
         JobDto jobDto = new JobDto("test", null);

@@ -31,16 +31,16 @@ class ValveCloseActionTest {
 
     @Test
     void testClose() {
-        action.doAction(new ActionDto(), TestUtils.VALVE);
+        action.doAction(new ActionDto(), TestUtils.Objects.VALVE);
 
-        verify(service).toggleOff(TestUtils.VALVE.getPin());
+        verify(service).toggleOff(TestUtils.Objects.VALVE.getPin());
     }
 
     @Test
     void testAlreadyClosed() {
-        action.doAction(new ActionDto(), TestUtils.VALVE);
+        action.doAction(new ActionDto(), TestUtils.Objects.VALVE);
 
-        verify(service).toggleOff(TestUtils.VALVE.getPin());
-        assertFalse(TestUtils.VALVE.isOpen());
+        verify(service).toggleOff(TestUtils.Objects.VALVE.getPin());
+        assertFalse(TestUtils.Objects.VALVE.isOpen());
     }
 }

@@ -53,11 +53,11 @@ class TapsCloseActionTest {
 
         action.doAction(actionDto, null);
 
-        verify(runner).run("test.", closeAction, TestUtils.TAP_VALVE);
-        verify(runner, never()).run("test.", closeAction, TestUtils.VALVE);
-        verify(runner, never()).run("test.", closeAction, TestUtils.VALVE);
-        verify(runner, never()).run("test.", closeAction, TestUtils.OUT);
-        verify(runner, never()).run("test.", closeAction, TestUtils.OUT2);
+        verify(runner).run("test.", closeAction, TestUtils.Objects.TAP_VALVE);
+        verify(runner, never()).run("test.", closeAction, TestUtils.Objects.VALVE);
+        verify(runner, never()).run("test.", closeAction, TestUtils.Objects.VALVE);
+        verify(runner, never()).run("test.", closeAction, TestUtils.Objects.OUT);
+        verify(runner, never()).run("test.", closeAction, TestUtils.Objects.OUT2);
     }
 
     @Test
@@ -68,11 +68,11 @@ class TapsCloseActionTest {
         String error = assertThrows(ActionException.class, () -> action.doAction(actionDto, null)).getLocalizedMessage();
 
         assertEquals("Action [id] failed: error", error);
-        verify(runner).run("test.", closeAction, TestUtils.TAP_VALVE);
-        verify(runner, never()).run("test.", closeAction, TestUtils.VALVE);
-        verify(runner, never()).run("test.", closeAction, TestUtils.VALVE);
-        verify(runner, never()).run("test.", closeAction, TestUtils.OUT);
-        verify(runner, never()).run("test.", closeAction, TestUtils.OUT2);
+        verify(runner).run("test.", closeAction, TestUtils.Objects.TAP_VALVE);
+        verify(runner, never()).run("test.", closeAction, TestUtils.Objects.VALVE);
+        verify(runner, never()).run("test.", closeAction, TestUtils.Objects.VALVE);
+        verify(runner, never()).run("test.", closeAction, TestUtils.Objects.OUT);
+        verify(runner, never()).run("test.", closeAction, TestUtils.Objects.OUT2);
     }
 
     @Test

@@ -67,7 +67,7 @@ class ActionServiceImplTest {
     void testRunAction() {
         service.runAction(new ActionDto(deCapitalize(WaterLevelReadAction.class.getSimpleName()), "sensor1"));
 
-        verify(ioService, atLeast(1)).analogRead(TestUtils.SENSOR);
+        verify(ioService, atLeast(1)).analogRead(TestUtils.Objects.SENSOR);
     }
 
 
@@ -125,8 +125,8 @@ class ActionServiceImplTest {
 
     @Test
     void testRunJob() {
-        when(ioService.analogRead(TestUtils.SENSOR)).thenReturn(0.008);
-        when(ioService.analogRead(TestUtils.SENSOR2)).thenReturn(0.004201680672269);
+        when(ioService.analogRead(TestUtils.Objects.SENSOR)).thenReturn(0.008);
+        when(ioService.analogRead(TestUtils.Objects.SENSOR2)).thenReturn(0.004201680672269);
 
         service.runJob(new JobDto(deCapitalize(ScheduledSensorRead.class.getSimpleName())));
 

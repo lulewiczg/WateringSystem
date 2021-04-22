@@ -83,25 +83,25 @@ class JobControllerSlaveTest {
     @Test
     @WithMockUser(roles = "USER")
     void testGetResults() {
-        TestUtils.testNotFoundGet(mvc, mapper, "/rest/jobs/results");
+        TestUtils.testNotFoundGet(mvc, "/rest/jobs/results");
     }
 
     @Test
     @WithMockUser(roles = "ADMIN")
     void testGetResultsAdmin() {
-        TestUtils.testNotFoundGet(mvc, mapper, "/rest/jobs/results");
+        TestUtils.testNotFoundGet(mvc, "/rest/jobs/results");
     }
 
     @Test
     @WithMockUser(roles = "GUEST")
     void testGetResultsGuest() {
-        TestUtils.testNotFoundGet(mvc, mapper, "/rest/jobs/results");
+        TestUtils.testNotFoundGet(mvc, "/rest/jobs/results");
     }
 
     @Test
     @WithMockUser(roles = "SLAVE")
     void testGetResultsSlave() {
-        TestUtils.testNotFoundGet(mvc, mapper, "/rest/jobs/results");
+        TestUtils.testNotFoundGet(mvc, "/rest/jobs/results");
     }
 
     @Test
