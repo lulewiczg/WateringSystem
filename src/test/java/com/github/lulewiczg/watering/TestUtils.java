@@ -3,6 +3,7 @@ package com.github.lulewiczg.watering;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.lulewiczg.watering.config.dto.ValveType;
+import com.github.lulewiczg.watering.config.dto.WaterLevelSensorConfig;
 import com.github.lulewiczg.watering.exception.ApiError;
 import com.github.lulewiczg.watering.service.dto.ActionResultDto;
 import com.github.lulewiczg.watering.service.ina219.enums.Address;
@@ -51,13 +52,13 @@ public final class TestUtils {
 
     public static final Valve VALVE = new Valve("valve", "valve", ValveType.INPUT, true, false, 1L, RaspiPin.GPIO_10);
 
-    public static final Sensor SENSOR = new Sensor("sensor", 10, 90, null, Address.ADDR_40, RaspiPin.GPIO_10, 10, 12, 100, 200);
+    public static final Sensor SENSOR = new Sensor("sensor1", 12, 21, null, Address.ADDR_40, RaspiPin.GPIO_10, 10, 1000, 100, 12);
 
     public static final Tank TANK = new Tank("tank", 100, SENSOR, VALVE);
 
     public static final Valve VALVE2 = new Valve("valve2", "valve2", ValveType.INPUT, true, false, 1L, RaspiPin.GPIO_11);
 
-    public static final Sensor SENSOR2 = new Sensor("sensor2", 10, 90, 10, Address.ADDR_40, null, 10, 12, 100, 200);
+    public static final Sensor SENSOR2 = new Sensor("sensor2", 5, 100, null, Address.ADDR_41, null, 20, 50, 60, 5);
 
     public static final Tank TANK2 = new Tank("tank2", 100, SENSOR2, VALVE2);
 
@@ -72,6 +73,10 @@ public final class TestUtils {
     public static final Sensor OVERFLOW_SENSOR = new Sensor("overflowSensor", 10, 90, 100, Address.ADDR_40, null, 10, 12, 100, 200);
 
     public static final Tank OVERFLOW_TANK = new Tank("overflow", 100, OVERFLOW_SENSOR, VALVE);
+
+    public static final WaterLevelSensorConfig SENSOR_CONFIG = new WaterLevelSensorConfig("test", 1, 10, Address.ADDR_41, null, 10, 100, 200, 12);
+
+    public static final WaterLevelSensorConfig SENSOR_CONFIG2 = new WaterLevelSensorConfig("test", 1, 10, Address.ADDR_40, null, 10, 100, 200, 12);
 
     /**
      * Reads json from file and maps to object.

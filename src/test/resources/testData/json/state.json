@@ -26,7 +26,7 @@
       "volume": 321,
       "sensor": {
         "id": "sensor2",
-        "minLevel": 99,
+        "minLevel": 5,
         "maxLevel": 100,
         "level": null,
         "resistorsNumber": 20,
