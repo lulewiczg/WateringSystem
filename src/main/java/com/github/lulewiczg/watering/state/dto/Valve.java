@@ -26,6 +26,8 @@ public class Valve {
 
     private boolean overflowOutput;
 
+    private Long wateringTime;
+
     @EqualsAndHashCode.Exclude
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private Pin pin;

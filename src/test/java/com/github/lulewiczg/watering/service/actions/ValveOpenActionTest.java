@@ -33,7 +33,7 @@ class ValveOpenActionTest {
 
     @Test
     void testOpen() {
-        Valve valve = new Valve("test", "test", ValveType.OUTPUT, false,false, RaspiPin.GPIO_00);
+        Valve valve = new Valve("test", "test", ValveType.OUTPUT, false,false, 1L, RaspiPin.GPIO_00);
 
         action.doAction(new ActionDto(), valve);
 
@@ -43,7 +43,7 @@ class ValveOpenActionTest {
 
     @Test
     void testAlreadyOpened() {
-        Valve valve = new Valve("test", "test", ValveType.OUTPUT, true,false, RaspiPin.GPIO_00);
+        Valve valve = new Valve("test", "test", ValveType.OUTPUT, true,false,1L, RaspiPin.GPIO_00);
 
         action.doAction(new ActionDto(), valve);
 

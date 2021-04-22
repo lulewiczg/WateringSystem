@@ -1,6 +1,11 @@
-valve,Andrzej,INPUT,true,
-valve,Zbigniew,OUTPUT,false,
-valve,Stasiek,OUTPUT,false,
-valve,,INPUT,true,valves[0].name must not be empty
-valve,Alojzy,,false,valves[0].type must not be null
-,Andrzej,INPUT,true,valves[0].id must not be empty
+valve,Andrzej,INPUT,true,,
+valve,Zbigniew,OUTPUT,false,1,
+valve,Stasiek,OUTPUT,false,1000,
+valve,,INPUT,true,,valves[0].name must not be empty
+valve,Alojzy,,false,,valves[0].type must not be null
+,Andrzej,INPUT,true,,valves[0].id must not be empty
+valve,Andrzej,OUTPUT,true,,Output valve valve must have watering time!
+valve,Andrzej,INPUT,true,4,Input valve valve cannot have watering time!
+valve,Andrzej,OUTPUT,true,-1,valves[0].wateringTime must be greater than or equal to 1
+valve,Andrzej,OUTPUT,true,0,valves[0].wateringTime must be greater than or equal to 1
+valve,Andrzej,OUTPUT,true,9999999,valves[0].wateringTime must be less than or equal to 7200

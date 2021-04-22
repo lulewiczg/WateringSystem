@@ -61,15 +61,15 @@ class SetDefaultsTest {
 
     @Test
     void testJob() {
-        Valve valve = new Valve("valve", "valve", ValveType.OUTPUT, true, false, RaspiPin.GPIO_00);
+        Valve valve = new Valve("valve", "valve", ValveType.OUTPUT, true, false, 1L, RaspiPin.GPIO_00);
         Sensor sensor = new Sensor("sensor", 10, 90, null, Address.ADDR_40, RaspiPin.GPIO_10, 10, 12, 100, 200);
         Tank tank = new Tank("tank", 10, sensor, valve);
-        Valve valve2 = new Valve("valve2", "valve2", ValveType.OUTPUT, false, false, RaspiPin.GPIO_01);
+        Valve valve2 = new Valve("valve2", "valve2", ValveType.OUTPUT, false, false, 1L, RaspiPin.GPIO_01);
         Sensor sensor2 = new Sensor("sensor2", 10, 90, null, Address.ADDR_41, RaspiPin.GPIO_10, 10, 12, 100, 200);
         Tank tank2 = new Tank("tank2", 100, sensor2, valve2);
         when(state.getTanks()).thenReturn(List.of(tank, tank2));
-        Valve valve3 = new Valve("valve3", "valve3", ValveType.OUTPUT, true, false, RaspiPin.GPIO_02);
-        Valve valve4 = new Valve("valve4", "valve4", ValveType.OUTPUT, false, false, RaspiPin.GPIO_03);
+        Valve valve3 = new Valve("valve3", "valve3", ValveType.OUTPUT, true, false, 1L, RaspiPin.GPIO_02);
+        Valve valve4 = new Valve("valve4", "valve4", ValveType.OUTPUT, false, false, 1L, RaspiPin.GPIO_03);
         when(state.getOutputs()).thenReturn(List.of(valve3, valve4));
         when(runner.run(eq("test."), eq(openAction), any())).thenReturn(TestUtils.EMPTY_RESULT);
         when(runner.run(eq("test."), eq(closeAction), any())).thenReturn(TestUtils.EMPTY_RESULT);
@@ -86,13 +86,13 @@ class SetDefaultsTest {
 
     @Test
     void testOpenFail() {
-        Valve valve = new Valve("valve", "valve", ValveType.OUTPUT, true, false, RaspiPin.GPIO_00);
+        Valve valve = new Valve("valve", "valve", ValveType.OUTPUT, true, false, 1L, RaspiPin.GPIO_00);
         Tank tank = new Tank("tank", 10, null, valve);
-        Valve valve2 = new Valve("valve2", "valve2", ValveType.OUTPUT, false, false, RaspiPin.GPIO_01);
+        Valve valve2 = new Valve("valve2", "valve2", ValveType.OUTPUT, false, false, 1L, RaspiPin.GPIO_01);
         Tank tank2 = new Tank("tank2", 100, null, valve2);
         when(state.getTanks()).thenReturn(List.of(tank, tank2));
-        Valve valve3 = new Valve("valve3", "valve3", ValveType.OUTPUT, true, false, RaspiPin.GPIO_02);
-        Valve valve4 = new Valve("valve4", "valve4", ValveType.OUTPUT, false, false, RaspiPin.GPIO_03);
+        Valve valve3 = new Valve("valve3", "valve3", ValveType.OUTPUT, true, false, 1L, RaspiPin.GPIO_02);
+        Valve valve4 = new Valve("valve4", "valve4", ValveType.OUTPUT, false, false, 1L, RaspiPin.GPIO_03);
         when(state.getOutputs()).thenReturn(List.of(valve3, valve4));
         when(runner.run(eq("test."), eq(openAction), any())).thenReturn(TestUtils.ERROR_RESULT);
         when(runner.run(eq("test."), eq(closeAction), any())).thenReturn(TestUtils.EMPTY_RESULT);
@@ -106,13 +106,13 @@ class SetDefaultsTest {
 
     @Test
     void testCloseFail() {
-        Valve valve = new Valve("valve", "valve", ValveType.OUTPUT, true, false, RaspiPin.GPIO_00);
+        Valve valve = new Valve("valve", "valve", ValveType.OUTPUT, true, false, 1L, RaspiPin.GPIO_00);
         Tank tank = new Tank("tank", 10, null, valve);
-        Valve valve2 = new Valve("valve2", "valve2", ValveType.OUTPUT, false, false, RaspiPin.GPIO_01);
+        Valve valve2 = new Valve("valve2", "valve2", ValveType.OUTPUT, false, false, 1L, RaspiPin.GPIO_01);
         Tank tank2 = new Tank("tank2", 100, null, valve2);
         when(state.getTanks()).thenReturn(List.of(tank, tank2));
-        Valve valve3 = new Valve("valve3", "valve3", ValveType.OUTPUT, true, false, RaspiPin.GPIO_02);
-        Valve valve4 = new Valve("valve4", "valve4", ValveType.OUTPUT, false, false, RaspiPin.GPIO_03);
+        Valve valve3 = new Valve("valve3", "valve3", ValveType.OUTPUT, true, false, 1L, RaspiPin.GPIO_02);
+        Valve valve4 = new Valve("valve4", "valve4", ValveType.OUTPUT, false, false, 1L, RaspiPin.GPIO_03);
         when(state.getOutputs()).thenReturn(List.of(valve3, valve4));
         when(runner.run(eq("test."), eq(closeAction), any())).thenReturn(TestUtils.ERROR_RESULT);
         when(runner.run(eq("test."), eq(openAction), any())).thenReturn(TestUtils.EMPTY_RESULT);

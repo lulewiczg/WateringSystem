@@ -5,17 +5,19 @@ import com.github.lulewiczg.watering.service.actions.*;
 import com.github.lulewiczg.watering.service.dto.JobDto;
 import com.github.lulewiczg.watering.state.AppState;
 import com.github.lulewiczg.watering.state.SystemStatus;
+import com.github.lulewiczg.watering.state.dto.Valve;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * Job for scheduled watering.
@@ -27,16 +29,13 @@ import java.util.concurrent.TimeUnit;
 @ConditionalOnProperty("com.github.lulewiczg.watering.schedule.watering.enabled")
 public class ScheduledWatering extends ScheduledJob {
 
-    @Value("${com.github.lulewiczg.watering.schedule.watering.duration}")
-    private Long wateringLength;
-
     private final TanksOpenAction tanksOpenAction;
 
     private final TanksCloseAction tanksCloseAction;
 
-    private final OutputsOpenAction outputsOpenAction;
+    private final ValveOpenAction valveOpenAction;
 
-    private final OutputsCloseAction outputsCloseAction;
+    private final ValveCloseAction valveCloseAction;
 
     private final AppState state;
 
@@ -75,16 +74,24 @@ public class ScheduledWatering extends ScheduledJob {
     public void doJob(JobDto job) {
         state.setState(SystemStatus.WATERING);
         runNested(actionRunner, job, tanksOpenAction, null);
-        runNested(actionRunner, job, outputsOpenAction, null);
-        log.info("Valves opened");
-        exec.schedule(() -> finish(job), wateringLength, TimeUnit.SECONDS);
+        List<Valve> outputs = state.getOutputs();
+        AtomicInteger counter = new AtomicInteger(outputs.size());
+        outputs.forEach(i -> {
+            log.info("Opening valve {}", i.getId());
+            runNested(actionRunner, job, valveOpenAction, i);
+            exec.schedule(() -> finish(job, i, counter), i.getWateringTime(), TimeUnit.SECONDS);
+        });
     }
 
-    private void finish(JobDto job) {
-        log.info("Stopping watering job...");
-        runNested(actionRunner, job, tanksCloseAction, null);
-        runNested(actionRunner, job, outputsCloseAction, null);
-        state.setState(SystemStatus.IDLE);
-        log.info("Watering finished!");
+    private void finish(JobDto job, Valve valve, AtomicInteger counter) {
+        log.info("Closing valve {}", valve.getId());
+        runNested(actionRunner, job, valveCloseAction, valve);
+        int c = counter.decrementAndGet();
+        if (c == 0) {
+            log.info("Stopping watering job...");
+            runNested(actionRunner, job, tanksCloseAction, null);
+            state.setState(SystemStatus.IDLE);
+            log.info("Watering finished!");
+        }
     }
 }

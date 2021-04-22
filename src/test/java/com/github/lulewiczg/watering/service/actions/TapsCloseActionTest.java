@@ -47,10 +47,10 @@ class TapsCloseActionTest {
 
     @Test
     void testAction() {
-        Valve valve = new Valve("test", "test", ValveType.OUTPUT, true,false,  RaspiPin.GPIO_00);
-        Valve valve2 = new Valve("test2", "test2", ValveType.OUTPUT, true,false,  RaspiPin.GPIO_01);
-        Valve valve3 = new Valve("test3", "test3", ValveType.INPUT, true,false,  RaspiPin.GPIO_03);
-        Valve valve4 = new Valve("test4", "test4", ValveType.INPUT, true, false, RaspiPin.GPIO_04);
+        Valve valve = new Valve("test", "test", ValveType.OUTPUT, true, false, 1L, RaspiPin.GPIO_00);
+        Valve valve2 = new Valve("test2", "test2", ValveType.OUTPUT, true, false, 1L, RaspiPin.GPIO_01);
+        Valve valve3 = new Valve("test3", "test3", ValveType.INPUT, true, false, null, RaspiPin.GPIO_03);
+        Valve valve4 = new Valve("test4", "test4", ValveType.INPUT, true, false, null, RaspiPin.GPIO_04);
         List<Valve> valves = List.of(valve, valve2);
         List<Tank> tanks = List.of(new Tank("tank", 1, null, valve3));
         List<WaterSource> taps = List.of(new WaterSource("tap", valve4));
@@ -70,10 +70,10 @@ class TapsCloseActionTest {
 
     @Test
     void testActionNestedFail() {
-        Valve valve = new Valve("test", "test", ValveType.OUTPUT, true, false, RaspiPin.GPIO_00);
-        Valve valve2 = new Valve("test2", "test2", ValveType.OUTPUT, true, false, RaspiPin.GPIO_01);
-        Valve valve3 = new Valve("test3", "test3", ValveType.INPUT, true, false, RaspiPin.GPIO_03);
-        Valve valve4 = new Valve("test4", "test4", ValveType.INPUT, true, false, RaspiPin.GPIO_04);
+        Valve valve = new Valve("test", "test", ValveType.OUTPUT, true, false, 1L, RaspiPin.GPIO_00);
+        Valve valve2 = new Valve("test2", "test2", ValveType.OUTPUT, true, false, 1L, RaspiPin.GPIO_01);
+        Valve valve3 = new Valve("test3", "test3", ValveType.INPUT, true, false, null, RaspiPin.GPIO_03);
+        Valve valve4 = new Valve("test4", "test4", ValveType.INPUT, true, false, null, RaspiPin.GPIO_04);
         List<Valve> valves = List.of(valve, valve2);
         List<Tank> tanks = List.of(new Tank("tank", 1, null, valve3));
         List<WaterSource> taps = List.of(new WaterSource("tap", valve4));

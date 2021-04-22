@@ -128,5 +128,13 @@ public class AppConfig {
         if (incorrect.isPresent()) {
             throw new IllegalStateException(String.format("Input valve %s cannot be input and overflow valve!", incorrect.get().getId()));
         }
+        Optional<ValveConfig> invalidInput = valves.stream().filter(i -> i.getType() == ValveType.INPUT && i.getWateringTime() != null).findFirst();
+        if (invalidInput.isPresent()) {
+            throw new IllegalStateException(String.format("Input valve %s cannot have watering time!", invalidInput.get().getId()));
+        }
+        Optional<ValveConfig> invalidOutput = valves.stream().filter(i -> i.getType() == ValveType.OUTPUT && i.getWateringTime() == null).findFirst();
+        if (invalidOutput.isPresent()) {
+            throw new IllegalStateException(String.format("Output valve %s must have watering time!", invalidOutput.get().getId()));
+        }
     }
 }

@@ -8,6 +8,8 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import org.springframework.validation.annotation.Validated;
 
+import javax.validation.constraints.Max;
+import javax.validation.constraints.Min;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 
@@ -36,16 +38,21 @@ public class ValveConfig {
 
     private boolean overflowOutput = false;
 
+    @Min(1)
+    @Max(7200)
+    private Long wateringTime;
+
     @JsonIgnore
     @EqualsAndHashCode.Exclude
     private Pin pin;
 
-    public ValveConfig(String id, String name, ValveType type, String pinName, boolean open, boolean overflowOutput) {
+    public ValveConfig(String id, String name, ValveType type, String pinName, boolean open, boolean overflowOutput, Long wateringTime) {
         this.id = id;
         this.name = name;
         this.type = type;
         this.pinName = pinName;
         this.open = open;
         this.overflowOutput = overflowOutput;
+        this.wateringTime = wateringTime;
     }
 }

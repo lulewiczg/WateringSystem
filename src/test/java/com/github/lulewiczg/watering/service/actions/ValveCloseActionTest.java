@@ -33,7 +33,7 @@ class ValveCloseActionTest {
 
     @Test
     void testClose() {
-        Valve valve = new Valve("test", "test", ValveType.OUTPUT, true,false, RaspiPin.GPIO_00);
+        Valve valve = new Valve("test", "test", ValveType.OUTPUT, true, false, 1L, RaspiPin.GPIO_00);
 
         action.doAction(new ActionDto(), valve);
 
@@ -42,7 +42,7 @@ class ValveCloseActionTest {
 
     @Test
     void testAlreadyClosed() {
-        Valve valve = new Valve("test", "test", ValveType.OUTPUT, false,false, RaspiPin.GPIO_00);
+        Valve valve = new Valve("test", "test", ValveType.OUTPUT, false, false, 1L, RaspiPin.GPIO_00);
 
         action.doAction(new ActionDto(), valve);
 

@@ -7,7 +7,11 @@
         "id": "sensor1",
         "minLevel": 12,
         "maxLevel": 21,
-        "level": null
+        "level": null,
+        "resistorsNumber": 10,
+        "passiveResistance": 1000,
+        "stepResistance": 100,
+        "voltage": 12.0
       },
       "valve": {
         "id": "valve1",
@@ -24,7 +28,11 @@
         "id": "sensor2",
         "minLevel": 99,
         "maxLevel": 100,
-        "level": null
+        "level": null,
+        "resistorsNumber": 20,
+        "passiveResistance": 50,
+        "stepResistance": 60,
+        "voltage": 5.0
       },
       "valve": {
         "id": "valve2",
@@ -52,7 +60,8 @@
       "name": "out",
       "type": "OUTPUT",
       "open": true,
-      "overflowOutput": false
+      "overflowOutput": true,
+      "wateringTime": 333
     }
   ],
   "state": "IDLE"

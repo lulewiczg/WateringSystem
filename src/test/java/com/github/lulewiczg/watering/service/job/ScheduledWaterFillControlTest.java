@@ -72,7 +72,7 @@ class ScheduledWaterFillControlTest {
     @ParameterizedTest
     @CsvFileSource(resources = "/testData/fill-ok-test.csv")
     void testNothingToDo(int minLevel, int maxLevel, Integer level) {
-        Valve valve = new Valve("valve", "valve", ValveType.OUTPUT, true,false, RaspiPin.GPIO_00);
+        Valve valve = new Valve("valve", "valve", ValveType.OUTPUT, true,false, 1L, RaspiPin.GPIO_00);
         Sensor sensor = new Sensor("sensor", minLevel, maxLevel, level, Address.ADDR_40, RaspiPin.GPIO_10, 10, 12, 100, 200);
         Tank tank = new Tank("tank", 100, sensor, valve);
         when(state.getTanks()).thenReturn(List.of(tank));
@@ -90,10 +90,10 @@ class ScheduledWaterFillControlTest {
     @ParameterizedTest
     @CsvFileSource(resources = "/testData/fill-test.csv")
     void testFill(int minLevel, int maxLevel, int level) {
-        Valve valve = new Valve("valve", "valve", ValveType.OUTPUT, true,false, RaspiPin.GPIO_00);
+        Valve valve = new Valve("valve", "valve", ValveType.INPUT, true,false,null, RaspiPin.GPIO_00);
         Sensor sensor = new Sensor("sensor", minLevel, maxLevel, level, Address.ADDR_40, RaspiPin.GPIO_10, 10, 12, 100, 200);
         Tank tank = new Tank("tank", 100, sensor, valve);
-        Valve valve2 = new Valve("valve2", "valve2", ValveType.OUTPUT, true,false, RaspiPin.GPIO_02);
+        Valve valve2 = new Valve("valve2", "valve2", ValveType.INPUT, true,false,null, RaspiPin.GPIO_02);
         Sensor sensor2 = new Sensor("sensor2", 1, 3, 2, Address.ADDR_41, RaspiPin.GPIO_20, 10, 12, 100, 200);
         Tank tank2 = new Tank("tank2", 100, sensor2, valve2);
         when(state.getTanks()).thenReturn(List.of(tank, tank2));
@@ -115,7 +115,7 @@ class ScheduledWaterFillControlTest {
     @ParameterizedTest
     @CsvFileSource(resources = "/testData/fill-ok-test.csv")
     void testRunningFinished(int minLevel, int maxLevel, Integer level) {
-        Valve valve = new Valve("valve", "valve", ValveType.OUTPUT, true,false, RaspiPin.GPIO_00);
+        Valve valve = new Valve("valve", "valve", ValveType.INPUT, true,false,null, RaspiPin.GPIO_00);
         Sensor sensor = new Sensor("sensor", minLevel, maxLevel, level, Address.ADDR_40, RaspiPin.GPIO_10, 10, 12, 100, 200);
         Tank tank = new Tank("tank", 100, sensor, valve);
         when(state.getTanks()).thenReturn(List.of(tank));
@@ -134,7 +134,7 @@ class ScheduledWaterFillControlTest {
     @ParameterizedTest
     @CsvFileSource(resources = "/testData/fill-running-test.csv")
     void testRunning(int minLevel, int maxLevel, Integer level) {
-        Valve valve = new Valve("valve", "valve", ValveType.OUTPUT, true,false, RaspiPin.GPIO_00);
+        Valve valve = new Valve("valve", "valve", ValveType.INPUT, true,false,null, RaspiPin.GPIO_00);
         Sensor sensor = new Sensor("sensor", minLevel, maxLevel, level, Address.ADDR_40, RaspiPin.GPIO_10, 10, 12, 100, 200);
         Tank tank = new Tank("tank", 100, sensor, valve);
         when(state.getTanks()).thenReturn(List.of(tank));
@@ -152,10 +152,10 @@ class ScheduledWaterFillControlTest {
 
     @Test
     void testOutputsCloseFail() {
-        Valve valve = new Valve("valve", "valve", ValveType.OUTPUT, true,false, RaspiPin.GPIO_00);
+        Valve valve = new Valve("valve", "valve", ValveType.INPUT, true,false,null, RaspiPin.GPIO_00);
         Sensor sensor = new Sensor("sensor", 20, 100, 10, Address.ADDR_40, RaspiPin.GPIO_10, 10, 12, 100, 200);
         Tank tank = new Tank("tank", 100, sensor, valve);
-        Valve valve2 = new Valve("valve2", "valve2", ValveType.OUTPUT, true,false, RaspiPin.GPIO_02);
+        Valve valve2 = new Valve("valve2", "valve2", ValveType.INPUT, true,false,null, RaspiPin.GPIO_02);
         Sensor sensor2 = new Sensor("sensor2", 1, 3, 2, Address.ADDR_41, RaspiPin.GPIO_20, 10, 12, 100, 200);
         Tank tank2 = new Tank("tank2", 100, sensor2, valve2);
         when(state.getTanks()).thenReturn(List.of(tank, tank2));
@@ -176,10 +176,10 @@ class ScheduledWaterFillControlTest {
 
     @Test
     void testTapsOpenFail() {
-        Valve valve = new Valve("valve", "valve", ValveType.OUTPUT, true,false, RaspiPin.GPIO_00);
+        Valve valve = new Valve("valve", "valve", ValveType.INPUT, true,false,null, RaspiPin.GPIO_00);
         Sensor sensor = new Sensor("sensor", 20, 100, 10, Address.ADDR_40, RaspiPin.GPIO_10, 10, 12, 100, 200);
         Tank tank = new Tank("tank", 100, sensor, valve);
-        Valve valve2 = new Valve("valve2", "valve2", ValveType.OUTPUT, true,false, RaspiPin.GPIO_02);
+        Valve valve2 = new Valve("valve2", "valve2", ValveType.INPUT, true,false,null, RaspiPin.GPIO_02);
         Sensor sensor2 = new Sensor("sensor2", 1, 3, 2, Address.ADDR_41, RaspiPin.GPIO_20, 10, 12, 100, 200);
         Tank tank2 = new Tank("tank2", 100, sensor2, valve2);
         when(state.getTanks()).thenReturn(List.of(tank, tank2));
@@ -201,10 +201,10 @@ class ScheduledWaterFillControlTest {
 
     @Test
     void testValveOpenFail() {
-        Valve valve = new Valve("valve", "valve", ValveType.OUTPUT, true,false, RaspiPin.GPIO_00);
+        Valve valve = new Valve("valve", "valve", ValveType.INPUT, true,false,null, RaspiPin.GPIO_00);
         Sensor sensor = new Sensor("sensor", 20, 100, 10, Address.ADDR_40, RaspiPin.GPIO_10, 10, 12, 100, 200);
         Tank tank = new Tank("tank", 100, sensor, valve);
-        Valve valve2 = new Valve("valve2", "valve2", ValveType.OUTPUT, true,false, RaspiPin.GPIO_02);
+        Valve valve2 = new Valve("valve2", "valve2", ValveType.INPUT, true,false,null, RaspiPin.GPIO_02);
         Sensor sensor2 = new Sensor("sensor2", 1, 3, 2, Address.ADDR_41, RaspiPin.GPIO_20, 10, 12, 100, 200);
         Tank tank2 = new Tank("tank2", 100, sensor2, valve2);
         when(state.getTanks()).thenReturn(List.of(tank, tank2));
@@ -226,7 +226,7 @@ class ScheduledWaterFillControlTest {
 
     @Test
     void testTanksCloseFail() {
-        Valve valve = new Valve("valve", "valve", ValveType.OUTPUT, true,false, RaspiPin.GPIO_00);
+        Valve valve = new Valve("valve", "valve", ValveType.INPUT, true,false,null, RaspiPin.GPIO_00);
         Sensor sensor = new Sensor("sensor", 1, 100, 101, Address.ADDR_40, RaspiPin.GPIO_10, 10, 12, 100, 200);
         Tank tank = new Tank("tank", 100, sensor, valve);
         when(state.getTanks()).thenReturn(List.of(tank));
