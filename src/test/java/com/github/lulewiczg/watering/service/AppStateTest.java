@@ -91,4 +91,10 @@ class AppStateTest {
         assertThrows(ValveNotFoundException.class, () -> state.findValve("qweretyuiop"));
     }
 
+    @Test
+    void testGetOutputVales() {
+        List<Valve> allValves = state.getOverflowValves();
+
+        assertEquals(state.getOutputs(), allValves);
+    }
 }

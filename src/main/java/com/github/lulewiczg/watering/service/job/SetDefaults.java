@@ -64,6 +64,7 @@ public class SetDefaults extends ScheduledJob {
         log.info("Settings defaults...");
         state.getTanks().stream().map(Tank::getValve).forEach(i -> setValveState(i, job));
         state.getOutputs().forEach(i -> setValveState(i, job));
+        state.getTaps().forEach(i -> setValveState(i.getValve(), job));
         state.getTanks().stream().map(Tank::getSensor).map(Sensor::getPowerControlPin).distinct().forEach(ioService::toggleOff);
     }
 

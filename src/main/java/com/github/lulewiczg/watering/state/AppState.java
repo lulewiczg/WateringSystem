@@ -1,5 +1,6 @@
 package com.github.lulewiczg.watering.state;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.github.lulewiczg.watering.config.AppConfig;
 import com.github.lulewiczg.watering.config.dto.TankType;
@@ -44,7 +45,6 @@ public class AppState {
 
     private List<Valve> outputs;
 
-
     /**
      * Finds valve with given ID.
      *
@@ -75,6 +75,7 @@ public class AppState {
      * @return valves
      */
     @Cacheable
+    @JsonIgnore
     public List<Valve> getAllValves() {
         List<Valve> tankValves = tanks.stream().map(Tank::getValve).filter(Objects::nonNull).collect(Collectors.toList());
         List<Valve> tapValves = taps.stream().map(WaterSource::getValve).collect(Collectors.toList());
@@ -82,6 +83,21 @@ public class AppState {
         tankValves.addAll(outputs);
 
         return tankValves;
+    }
+
+    /**
+     * Finds all overflow valves..
+     *
+     * @return valves
+     */
+    @Cacheable
+    @JsonIgnore
+    public List<Valve> getOverflowValves() {
+        List<Valve> valves = outputs.stream().filter(Valve::isOverflowOutput).collect(Collectors.toList());
+        if (!valves.isEmpty()) {
+            return valves;
+        }
+        return outputs;
     }
 
     @Autowired

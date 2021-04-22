@@ -3,6 +3,7 @@ package com.github.lulewiczg.watering.service.job;
 import com.github.lulewiczg.watering.config.MasterConfig;
 import com.github.lulewiczg.watering.service.actions.ActionRunner;
 import com.github.lulewiczg.watering.service.actions.TanksCloseAction;
+import com.github.lulewiczg.watering.service.actions.ValveCloseAction;
 import com.github.lulewiczg.watering.service.actions.ValveOpenAction;
 import com.github.lulewiczg.watering.service.dto.JobDto;
 import com.github.lulewiczg.watering.state.AppState;
@@ -25,12 +26,14 @@ import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor
 @ConditionalOnMissingBean(MasterConfig.class)
-@ConditionalOnProperty("com.github.lulewiczg.watering.schedule.fill.enabled")
+@ConditionalOnProperty("com.github.lulewiczg.watering.schedule.overflow.enabled")
 public class ScheduledOverflowWaterControl extends ScheduledJob {
 
     private final TanksCloseAction tanksCloseAction;
 
     private final ValveOpenAction valveOpenAction;
+
+    private final ValveCloseAction valveCloseAction;
 
     private final AppState state;
 
@@ -38,7 +41,7 @@ public class ScheduledOverflowWaterControl extends ScheduledJob {
 
     private final JobRunner jobRunner;
 
-    @Scheduled(cron = "${com.github.lulewiczg.watering.schedule.fill.cron}")
+    @Scheduled(cron = "${com.github.lulewiczg.watering.schedule.overflow.cron}")
     void schedule() {
         schedule(jobRunner);
     }
@@ -69,6 +72,7 @@ public class ScheduledOverflowWaterControl extends ScheduledJob {
         log.info("Water level too high for {}", () -> tanks.stream().map(Tank::getId).collect(Collectors.toList()));
 
         tanks.forEach(i -> runNested(actionRunner, job, valveOpenAction, i.getValve()));
+        state.getOverflowValves().forEach((i -> runNested(actionRunner, job, valveOpenAction, i)));
         log.info("Draining tanks started.");
     }
 
@@ -78,6 +82,7 @@ public class ScheduledOverflowWaterControl extends ScheduledJob {
         if (tanks.isEmpty()) {
             log.info("Water levels are OK, stopping");
             runNested(actionRunner, job, tanksCloseAction, null);
+            state.getOverflowValves().forEach((i -> runNested(actionRunner, job, valveCloseAction, i)));
             state.setState(SystemStatus.IDLE);
         }
     }

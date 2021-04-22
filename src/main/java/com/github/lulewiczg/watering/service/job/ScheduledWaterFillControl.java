@@ -23,12 +23,14 @@ import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor
 @ConditionalOnMissingBean(MasterConfig.class)
-@ConditionalOnProperty("com.github.lulewiczg.watering.schedule.overflow.enabled")
+@ConditionalOnProperty("com.github.lulewiczg.watering.schedule.fill.enabled")
 public class ScheduledWaterFillControl extends ScheduledJob {
 
     private final TanksCloseAction tanksCloseAction;
 
     private final TapsOpenAction tapsOpenAction;
+
+    private final TapsCloseAction tapsCloseAction;
 
     private final ValveOpenAction valveOpenAction;
 
@@ -40,7 +42,7 @@ public class ScheduledWaterFillControl extends ScheduledJob {
 
     private final ActionRunner actionRunner;
 
-    @Scheduled(cron = "${com.github.lulewiczg.watering.schedule.overflow.cron}")
+    @Scheduled(cron = "${com.github.lulewiczg.watering.schedule.fill.cron}")
     void schedule() {
         schedule(jobRunner);
     }
@@ -81,6 +83,7 @@ public class ScheduledWaterFillControl extends ScheduledJob {
         if (tanks.isEmpty()) {
             log.info("Water levels are OK, filling finished");
             runNested(actionRunner, job, tanksCloseAction, null);
+            runNested(actionRunner, job, tapsCloseAction, null);
             state.setState(SystemStatus.IDLE);
         }
     }

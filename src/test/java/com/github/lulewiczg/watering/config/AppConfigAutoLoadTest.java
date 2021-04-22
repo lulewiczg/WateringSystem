@@ -1,13 +1,14 @@
 package com.github.lulewiczg.watering.config;
 
-import com.github.lulewiczg.watering.config.dto.*;
-import com.github.lulewiczg.watering.service.ina219.enums.Address;
+import com.github.lulewiczg.watering.TestUtils;
+import com.github.lulewiczg.watering.config.dto.TankConfig;
+import com.github.lulewiczg.watering.config.dto.ValveConfig;
+import com.github.lulewiczg.watering.config.dto.WaterLevelSensorConfig;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.TestPropertySource;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -22,31 +23,22 @@ class AppConfigAutoLoadTest {
 
     @Test
     void testPropsLoad() {
-        ValveConfig valve = new ValveConfig("valve1", "Tank 1", ValveType.INPUT, "GPIO 3", false);
-        ValveConfig valve2 = new ValveConfig("valve2", "Tank 2", ValveType.INPUT, "GPIO 4", false);
-        ValveConfig valve3 = new ValveConfig("tap", "tap water", ValveType.INPUT, "GPIO 5", false);
-        ValveConfig valve4 = new ValveConfig("out", "out", ValveType.OUTPUT, "GPIO 6", true);
-        List<ValveConfig> valves = List.of(valve, valve2, valve3, valve4);
+        List<ValveConfig> valves = List.of(TestUtils.Config.VALVE, TestUtils.Config.VALVE2, TestUtils.Config.VALVE3, TestUtils.Config.OUT);
         assertEquals(valves, config.getValves());
 
-        WaterLevelSensorConfig sensor = new WaterLevelSensorConfig("sensor1", 12, 21, Address.ADDR_40, "GPIO 10", 10, 1000, 100, 12);
-        WaterLevelSensorConfig sensor2 = new WaterLevelSensorConfig("sensor2", 99, 100, Address.ADDR_41, "", 20, 50, 60, 5);
-        List<WaterLevelSensorConfig> sensors = List.of(sensor, sensor2);
+        List<WaterLevelSensorConfig> sensors = List.of(TestUtils.Config.SENSOR, TestUtils.Config.SENSOR2);
         assertEquals(sensors, config.getSensors());
 
-        List<TankConfig> tanks = new ArrayList<>();
-        tanks.add(new TankConfig("tank1", 123, "sensor1", "valve1", TankType.DEFAULT));
-        tanks.add(new TankConfig("tank2", 321, "sensor2", "valve2", TankType.DEFAULT));
-        tanks.add(new TankConfig("tap", null, null, "tap", TankType.UNLIMITED));
+        List<TankConfig> tanks = List.of(TestUtils.Config.TANK, TestUtils.Config.TANK2, TestUtils.Config.TAP);
         List<TankConfig> configuredTanks = config.getTanks();
         assertEquals(tanks, configuredTanks);
 
-        assertEquals(configuredTanks.get(0).getSensor(), sensor);
-        assertEquals(configuredTanks.get(1).getSensor(), sensor2);
+        assertEquals(TestUtils.Config.SENSOR, configuredTanks.get(0).getSensor());
+        assertEquals(TestUtils.Config.SENSOR2, configuredTanks.get(1).getSensor());
         assertNull(configuredTanks.get(2).getSensor());
-        assertEquals(configuredTanks.get(0).getValve(), valve);
-        assertEquals(configuredTanks.get(1).getValve(), valve2);
-        assertEquals(configuredTanks.get(2).getValve(), valve3);
+        assertEquals(TestUtils.Config.VALVE, configuredTanks.get(0).getValve());
+        assertEquals(TestUtils.Config.VALVE2, configuredTanks.get(1).getValve());
+        assertEquals(TestUtils.Config.VALVE3, configuredTanks.get(2).getValve());
     }
 
 }

@@ -44,6 +44,9 @@ class ScheduledWaterFillControlTest {
     private TapsOpenAction tapsOpenAction;
 
     @MockBean
+    private TapsCloseAction tapsCloseAction;
+
+    @MockBean
     private ValveOpenAction valveOpenAction;
 
     @MockBean
@@ -65,6 +68,7 @@ class ScheduledWaterFillControlTest {
     void after() {
         verifyNoInteractions(tanksCloseAction);
         verifyNoInteractions(tapsOpenAction);
+        verifyNoInteractions(tanksCloseAction);
         verifyNoInteractions(valveOpenAction);
         verifyNoInteractions(outputsCloseAction);
     }
@@ -72,9 +76,8 @@ class ScheduledWaterFillControlTest {
     @ParameterizedTest
     @CsvFileSource(resources = "/testData/fill-ok-test.csv")
     void testNothingToDo(int minLevel, int maxLevel, Integer level) {
-        Valve valve = new Valve("valve", "valve", ValveType.OUTPUT, true, RaspiPin.GPIO_00);
         Sensor sensor = new Sensor("sensor", minLevel, maxLevel, level, Address.ADDR_40, RaspiPin.GPIO_10, 10, 12, 100, 200);
-        Tank tank = new Tank("tank", 100, sensor, valve);
+        Tank tank = new Tank("tank", 100, sensor, TestUtils.Objects.VALVE);
         when(state.getTanks()).thenReturn(List.of(tank));
         JobDto jobDto = new JobDto("test", null);
 
@@ -85,21 +88,18 @@ class ScheduledWaterFillControlTest {
         verify(runner, never()).run(any(), eq(tapsOpenAction), any());
         verify(runner, never()).run(any(), eq(valveOpenAction), any());
         verify(runner, never()).run(any(), eq(outputsCloseAction), any());
+        verify(runner, never()).run(any(), eq(tapsCloseAction), any());
     }
 
     @ParameterizedTest
     @CsvFileSource(resources = "/testData/fill-test.csv")
     void testFill(int minLevel, int maxLevel, int level) {
-        Valve valve = new Valve("valve", "valve", ValveType.OUTPUT, true, RaspiPin.GPIO_00);
         Sensor sensor = new Sensor("sensor", minLevel, maxLevel, level, Address.ADDR_40, RaspiPin.GPIO_10, 10, 12, 100, 200);
-        Tank tank = new Tank("tank", 100, sensor, valve);
-        Valve valve2 = new Valve("valve2", "valve2", ValveType.OUTPUT, true, RaspiPin.GPIO_02);
-        Sensor sensor2 = new Sensor("sensor2", 1, 3, 2, Address.ADDR_41, RaspiPin.GPIO_20, 10, 12, 100, 200);
-        Tank tank2 = new Tank("tank2", 100, sensor2, valve2);
-        when(state.getTanks()).thenReturn(List.of(tank, tank2));
+        Tank tank = new Tank("tank", 100, sensor, TestUtils.Objects.VALVE);
+        when(state.getTanks()).thenReturn(List.of(tank, TestUtils.Objects.TANK2));
         when(runner.run("test.", outputsCloseAction, null)).thenReturn(TestUtils.EMPTY_RESULT);
         when(runner.run("test.", tapsOpenAction, null)).thenReturn(TestUtils.EMPTY_RESULT);
-        when(runner.run("test.", valveOpenAction, valve)).thenReturn(TestUtils.EMPTY_RESULT);
+        when(runner.run("test.", valveOpenAction, TestUtils.Objects.VALVE)).thenReturn(TestUtils.EMPTY_RESULT);
 
         JobDto jobDto = new JobDto("test", null);
 
@@ -108,24 +108,26 @@ class ScheduledWaterFillControlTest {
         verify(state).setState(SystemStatus.FILLING);
         verify(runner).run("test.", outputsCloseAction, null);
         verify(runner).run("test.", tapsOpenAction, null);
-        verify(runner).run("test.", valveOpenAction, valve);
+        verify(runner).run("test.", valveOpenAction, TestUtils.Objects.VALVE);
         verify(runner, never()).run(any(), eq(tanksCloseAction), any());
+        verify(runner, never()).run(any(), eq(tapsCloseAction), any());
     }
 
     @ParameterizedTest
     @CsvFileSource(resources = "/testData/fill-ok-test.csv")
     void testRunningFinished(int minLevel, int maxLevel, Integer level) {
-        Valve valve = new Valve("valve", "valve", ValveType.OUTPUT, true, RaspiPin.GPIO_00);
         Sensor sensor = new Sensor("sensor", minLevel, maxLevel, level, Address.ADDR_40, RaspiPin.GPIO_10, 10, 12, 100, 200);
-        Tank tank = new Tank("tank", 100, sensor, valve);
+        Tank tank = new Tank("tank", 100, sensor, TestUtils.Objects.VALVE);
         when(state.getTanks()).thenReturn(List.of(tank));
         when(runner.run("test.", tanksCloseAction, null)).thenReturn(TestUtils.EMPTY_RESULT);
+        when(runner.run("test.", tapsCloseAction, null)).thenReturn(TestUtils.EMPTY_RESULT);
         JobDto jobDto = new JobDto("test", null);
 
         job.doJobRunning(jobDto);
 
         verify(state).setState(SystemStatus.IDLE);
         verify(runner).run("test.", tanksCloseAction, null);
+        verify(runner).run("test.", tapsCloseAction, null);
         verify(runner, never()).run(any(), eq(tapsOpenAction), any());
         verify(runner, never()).run(any(), eq(valveOpenAction), any());
         verify(runner, never()).run(any(), eq(outputsCloseAction), any());
@@ -134,17 +136,18 @@ class ScheduledWaterFillControlTest {
     @ParameterizedTest
     @CsvFileSource(resources = "/testData/fill-running-test.csv")
     void testRunning(int minLevel, int maxLevel, Integer level) {
-        Valve valve = new Valve("valve", "valve", ValveType.OUTPUT, true, RaspiPin.GPIO_00);
         Sensor sensor = new Sensor("sensor", minLevel, maxLevel, level, Address.ADDR_40, RaspiPin.GPIO_10, 10, 12, 100, 200);
-        Tank tank = new Tank("tank", 100, sensor, valve);
+        Tank tank = new Tank("tank", 100, sensor, TestUtils.Objects.VALVE);
         when(state.getTanks()).thenReturn(List.of(tank));
         when(runner.run("test.", tanksCloseAction, null)).thenReturn(TestUtils.EMPTY_RESULT);
+        when(runner.run("test.", tapsCloseAction, null)).thenReturn(TestUtils.EMPTY_RESULT);
         JobDto jobDto = new JobDto("test", null);
 
         job.doJobRunning(jobDto);
 
         verify(state).setState(SystemStatus.IDLE);
         verify(runner).run("test.", tanksCloseAction, null);
+        verify(runner).run("test.", tapsCloseAction, null);
         verify(runner, never()).run(any(), eq(tapsOpenAction), any());
         verify(runner, never()).run(any(), eq(valveOpenAction), any());
         verify(runner, never()).run(any(), eq(outputsCloseAction), any());
@@ -152,10 +155,10 @@ class ScheduledWaterFillControlTest {
 
     @Test
     void testOutputsCloseFail() {
-        Valve valve = new Valve("valve", "valve", ValveType.OUTPUT, true, RaspiPin.GPIO_00);
+        Valve valve = new Valve("valve", "valve", ValveType.INPUT, true, false, null, RaspiPin.GPIO_00);
         Sensor sensor = new Sensor("sensor", 20, 100, 10, Address.ADDR_40, RaspiPin.GPIO_10, 10, 12, 100, 200);
         Tank tank = new Tank("tank", 100, sensor, valve);
-        Valve valve2 = new Valve("valve2", "valve2", ValveType.OUTPUT, true, RaspiPin.GPIO_02);
+        Valve valve2 = new Valve("valve2", "valve2", ValveType.INPUT, true, false, null, RaspiPin.GPIO_02);
         Sensor sensor2 = new Sensor("sensor2", 1, 3, 2, Address.ADDR_41, RaspiPin.GPIO_20, 10, 12, 100, 200);
         Tank tank2 = new Tank("tank2", 100, sensor2, valve2);
         when(state.getTanks()).thenReturn(List.of(tank, tank2));
@@ -172,17 +175,14 @@ class ScheduledWaterFillControlTest {
         verify(runner, never()).run(any(), eq(tapsOpenAction), any());
         verify(runner, never()).run(any(), eq(valveOpenAction), any());
         verify(runner, never()).run(any(), eq(tanksCloseAction), any());
+        verify(runner, never()).run(any(), eq(tapsCloseAction), any());
     }
 
     @Test
     void testTapsOpenFail() {
-        Valve valve = new Valve("valve", "valve", ValveType.OUTPUT, true, RaspiPin.GPIO_00);
         Sensor sensor = new Sensor("sensor", 20, 100, 10, Address.ADDR_40, RaspiPin.GPIO_10, 10, 12, 100, 200);
-        Tank tank = new Tank("tank", 100, sensor, valve);
-        Valve valve2 = new Valve("valve2", "valve2", ValveType.OUTPUT, true, RaspiPin.GPIO_02);
-        Sensor sensor2 = new Sensor("sensor2", 1, 3, 2, Address.ADDR_41, RaspiPin.GPIO_20, 10, 12, 100, 200);
-        Tank tank2 = new Tank("tank2", 100, sensor2, valve2);
-        when(state.getTanks()).thenReturn(List.of(tank, tank2));
+        Tank tank = new Tank("tank", 100, sensor, TestUtils.Objects.VALVE);
+        when(state.getTanks()).thenReturn(List.of(tank, TestUtils.Objects.TANK2));
         when(runner.run(eq("test."), eq(valveOpenAction), any())).thenReturn(TestUtils.EMPTY_RESULT);
         when(runner.run("test.", outputsCloseAction, null)).thenReturn(TestUtils.EMPTY_RESULT);
         when(runner.run("test.", tapsOpenAction, null)).thenReturn(TestUtils.ERROR_RESULT);
@@ -197,17 +197,14 @@ class ScheduledWaterFillControlTest {
         verify(runner).run("test.", tapsOpenAction, null);
         verify(runner, never()).run(any(), eq(valveOpenAction), any());
         verify(runner, never()).run(any(), eq(tanksCloseAction), any());
+        verify(runner, never()).run(any(), eq(tapsCloseAction), any());
     }
 
     @Test
     void testValveOpenFail() {
-        Valve valve = new Valve("valve", "valve", ValveType.OUTPUT, true, RaspiPin.GPIO_00);
         Sensor sensor = new Sensor("sensor", 20, 100, 10, Address.ADDR_40, RaspiPin.GPIO_10, 10, 12, 100, 200);
-        Tank tank = new Tank("tank", 100, sensor, valve);
-        Valve valve2 = new Valve("valve2", "valve2", ValveType.OUTPUT, true, RaspiPin.GPIO_02);
-        Sensor sensor2 = new Sensor("sensor2", 1, 3, 2, Address.ADDR_41, RaspiPin.GPIO_20, 10, 12, 100, 200);
-        Tank tank2 = new Tank("tank2", 100, sensor2, valve2);
-        when(state.getTanks()).thenReturn(List.of(tank, tank2));
+        Tank tank = new Tank("tank", 100, sensor, TestUtils.Objects.VALVE);
+        when(state.getTanks()).thenReturn(List.of(tank, TestUtils.Objects.TANK2));
         when(runner.run("test.", outputsCloseAction, null)).thenReturn(TestUtils.EMPTY_RESULT);
         when(runner.run("test.", tapsOpenAction, null)).thenReturn(TestUtils.EMPTY_RESULT);
         when(runner.run(eq("test."), eq(valveOpenAction), any())).thenReturn(TestUtils.ERROR_RESULT);
@@ -220,15 +217,15 @@ class ScheduledWaterFillControlTest {
         verify(state).setState(SystemStatus.FILLING);
         verify(runner).run("test.", outputsCloseAction, null);
         verify(runner).run("test.", tapsOpenAction, null);
-        verify(runner).run("test.", valveOpenAction, valve);
+        verify(runner).run("test.", valveOpenAction, TestUtils.Objects.VALVE);
         verify(runner, never()).run(any(), eq(tanksCloseAction), any());
+        verify(runner, never()).run(any(), eq(tapsCloseAction), any());
     }
 
     @Test
     void testTanksCloseFail() {
-        Valve valve = new Valve("valve", "valve", ValveType.OUTPUT, true, RaspiPin.GPIO_00);
         Sensor sensor = new Sensor("sensor", 1, 100, 101, Address.ADDR_40, RaspiPin.GPIO_10, 10, 12, 100, 200);
-        Tank tank = new Tank("tank", 100, sensor, valve);
+        Tank tank = new Tank("tank", 100, sensor, TestUtils.Objects.VALVE);
         when(state.getTanks()).thenReturn(List.of(tank));
         when(runner.run("test.", tanksCloseAction, null)).thenReturn(TestUtils.ERROR_RESULT);
         JobDto jobDto = new JobDto("test", null);
@@ -238,6 +235,27 @@ class ScheduledWaterFillControlTest {
         assertEquals("Action [id] failed: error", error);
         verify(state, never()).setState(any());
         verify(runner).run("test.", tanksCloseAction, null);
+        verify(runner, never()).run(any(), eq(tapsOpenAction), any());
+        verify(runner, never()).run(any(), eq(valveOpenAction), any());
+        verify(runner, never()).run(any(), eq(outputsCloseAction), any());
+        verify(runner, never()).run(any(), eq(tapsCloseAction), any());
+    }
+
+    @Test
+    void testTapsCloseFail() {
+        Sensor sensor = new Sensor("sensor", 1, 100, 101, Address.ADDR_40, RaspiPin.GPIO_10, 10, 12, 100, 200);
+        Tank tank = new Tank("tank", 100, sensor, TestUtils.Objects.VALVE);
+        when(state.getTanks()).thenReturn(List.of(tank));
+        when(runner.run("test.", tanksCloseAction, null)).thenReturn(TestUtils.EMPTY_RESULT);
+        when(runner.run("test.", tapsCloseAction, null)).thenReturn(TestUtils.ERROR_RESULT);
+        JobDto jobDto = new JobDto("test", null);
+
+        String error = assertThrows(ActionException.class, () -> job.doJobRunning(jobDto)).getLocalizedMessage();
+
+        assertEquals("Action [id] failed: error", error);
+        verify(state, never()).setState(any());
+        verify(runner).run("test.", tanksCloseAction, null);
+        verify(runner).run("test.", tapsCloseAction, null);
         verify(runner, never()).run(any(), eq(tapsOpenAction), any());
         verify(runner, never()).run(any(), eq(valveOpenAction), any());
         verify(runner, never()).run(any(), eq(outputsCloseAction), any());

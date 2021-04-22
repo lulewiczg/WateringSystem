@@ -1,20 +1,16 @@
 package com.github.lulewiczg.watering.service.job;
 
 import com.github.lulewiczg.watering.TestUtils;
-import com.github.lulewiczg.watering.config.dto.ValveType;
 import com.github.lulewiczg.watering.exception.ActionException;
 import com.github.lulewiczg.watering.service.actions.ActionRunner;
 import com.github.lulewiczg.watering.service.actions.ValveCloseAction;
 import com.github.lulewiczg.watering.service.actions.ValveOpenAction;
 import com.github.lulewiczg.watering.service.dto.JobDto;
-import com.github.lulewiczg.watering.service.ina219.enums.Address;
 import com.github.lulewiczg.watering.service.io.IOService;
 import com.github.lulewiczg.watering.state.AppState;
 import com.github.lulewiczg.watering.state.SystemStatus;
-import com.github.lulewiczg.watering.state.dto.Sensor;
-import com.github.lulewiczg.watering.state.dto.Tank;
-import com.github.lulewiczg.watering.state.dto.Valve;
 import com.pi4j.io.gpio.RaspiPin;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -25,8 +21,6 @@ import org.springframework.context.annotation.Import;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
-
-import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.*;
@@ -59,41 +53,29 @@ class SetDefaultsTest {
     @Autowired
     private SetDefaults job;
 
+    @BeforeEach
+    void before() {
+        TestUtils.standardMock(state);
+    }
+
     @Test
     void testJob() {
-        Valve valve = new Valve("valve", "valve", ValveType.OUTPUT, true, RaspiPin.GPIO_00);
-        Sensor sensor = new Sensor("sensor", 10, 90, null, Address.ADDR_40, RaspiPin.GPIO_10, 10, 12, 100, 200);
-        Tank tank = new Tank("tank", 10, sensor, valve);
-        Valve valve2 = new Valve("valve2", "valve2", ValveType.OUTPUT, false, RaspiPin.GPIO_01);
-        Sensor sensor2 = new Sensor("sensor2", 10, 90, null, Address.ADDR_41, RaspiPin.GPIO_10, 10, 12, 100, 200);
-        Tank tank2 = new Tank("tank2", 100, sensor2, valve2);
-        when(state.getTanks()).thenReturn(List.of(tank, tank2));
-        Valve valve3 = new Valve("valve3", "valve3", ValveType.OUTPUT, true, RaspiPin.GPIO_02);
-        Valve valve4 = new Valve("valve4", "valve4", ValveType.OUTPUT, false, RaspiPin.GPIO_03);
-        when(state.getOutputs()).thenReturn(List.of(valve3, valve4));
         when(runner.run(eq("test."), eq(openAction), any())).thenReturn(TestUtils.EMPTY_RESULT);
         when(runner.run(eq("test."), eq(closeAction), any())).thenReturn(TestUtils.EMPTY_RESULT);
         JobDto jobDto = new JobDto("test", null);
 
         job.doJob(jobDto);
 
-        verify(runner).run("test.", openAction, valve);
-        verify(runner).run("test.", openAction, valve3);
-        verify(runner).run("test.", closeAction, valve2);
-        verify(runner).run("test.", closeAction, valve4);
+        verify(runner).run("test.", openAction, TestUtils.Objects.VALVE);
+        verify(runner).run("test.", openAction, TestUtils.Objects.VALVE2);
+        verify(runner).run("test.", closeAction, TestUtils.Objects.OUT);
+        verify(runner).run("test.", closeAction, TestUtils.Objects.OUT2);
+        verify(runner).run("test.", closeAction, TestUtils.Objects.TAP_VALVE);
         verify(ioService, times(1)).toggleOff(RaspiPin.GPIO_10);
     }
 
     @Test
     void testOpenFail() {
-        Valve valve = new Valve("valve", "valve", ValveType.OUTPUT, true, RaspiPin.GPIO_00);
-        Tank tank = new Tank("tank", 10, null, valve);
-        Valve valve2 = new Valve("valve2", "valve2", ValveType.OUTPUT, false, RaspiPin.GPIO_01);
-        Tank tank2 = new Tank("tank2", 100, null, valve2);
-        when(state.getTanks()).thenReturn(List.of(tank, tank2));
-        Valve valve3 = new Valve("valve3", "valve3", ValveType.OUTPUT, true, RaspiPin.GPIO_02);
-        Valve valve4 = new Valve("valve4", "valve4", ValveType.OUTPUT, false, RaspiPin.GPIO_03);
-        when(state.getOutputs()).thenReturn(List.of(valve3, valve4));
         when(runner.run(eq("test."), eq(openAction), any())).thenReturn(TestUtils.ERROR_RESULT);
         when(runner.run(eq("test."), eq(closeAction), any())).thenReturn(TestUtils.EMPTY_RESULT);
         JobDto jobDto = new JobDto("test", null);
@@ -101,19 +83,11 @@ class SetDefaultsTest {
         String error = assertThrows(ActionException.class, () -> job.doJob(jobDto)).getLocalizedMessage();
 
         assertEquals("Action [id] failed: error", error);
-        verify(runner).run("test.", openAction, valve);
+        verify(runner).run("test.", openAction, TestUtils.Objects.VALVE);
     }
 
     @Test
     void testCloseFail() {
-        Valve valve = new Valve("valve", "valve", ValveType.OUTPUT, true, RaspiPin.GPIO_00);
-        Tank tank = new Tank("tank", 10, null, valve);
-        Valve valve2 = new Valve("valve2", "valve2", ValveType.OUTPUT, false, RaspiPin.GPIO_01);
-        Tank tank2 = new Tank("tank2", 100, null, valve2);
-        when(state.getTanks()).thenReturn(List.of(tank, tank2));
-        Valve valve3 = new Valve("valve3", "valve3", ValveType.OUTPUT, true, RaspiPin.GPIO_02);
-        Valve valve4 = new Valve("valve4", "valve4", ValveType.OUTPUT, false, RaspiPin.GPIO_03);
-        when(state.getOutputs()).thenReturn(List.of(valve3, valve4));
         when(runner.run(eq("test."), eq(closeAction), any())).thenReturn(TestUtils.ERROR_RESULT);
         when(runner.run(eq("test."), eq(openAction), any())).thenReturn(TestUtils.EMPTY_RESULT);
         JobDto jobDto = new JobDto("test", null);
@@ -121,8 +95,10 @@ class SetDefaultsTest {
         String error = assertThrows(ActionException.class, () -> job.doJob(jobDto)).getLocalizedMessage();
 
         assertEquals("Action [id] failed: error", error);
-        verify(runner).run("test.", openAction, valve);
-        verify(runner).run("test.", closeAction, valve2);
+        verify(runner).run("test.", openAction, TestUtils.Objects.VALVE);
+        verify(runner).run("test.", openAction, TestUtils.Objects.VALVE2);
+        verify(runner).run("test.", closeAction, TestUtils.Objects.OUT);
+
     }
 
     @ParameterizedTest
