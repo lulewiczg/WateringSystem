@@ -10,6 +10,7 @@ import com.github.lulewiczg.watering.state.dto.Valve;
 import com.github.lulewiczg.watering.state.dto.WaterSource;
 import com.pi4j.io.gpio.RaspiPin;
 import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -45,62 +46,54 @@ class TapsOpenActionTest {
         verifyNoInteractions(openAction);
     }
 
-    @Test
-    void testAction() {
-        Valve valve = new Valve("test", "test", ValveType.OUTPUT, true, false, 1L, RaspiPin.GPIO_00);
-        Valve valve2 = new Valve("test2", "test2", ValveType.OUTPUT, true, false, 1L, RaspiPin.GPIO_01);
-        Valve valve3 = new Valve("test3", "test3", ValveType.INPUT, true, false, null, RaspiPin.GPIO_03);
-        Valve valve4 = new Valve("test4", "test4", ValveType.INPUT, true, false, null, RaspiPin.GPIO_04);
-        List<Valve> valves = List.of(valve, valve2);
-        List<Tank> tanks = List.of(new Tank("tank", 1, null, valve3));
-        List<WaterSource> taps = List.of(new WaterSource("tap", valve4));
+    @BeforeEach
+    void before() {
+        List<Valve> valves = List.of(TestUtils.OUT, TestUtils.OUT2);
+        List<Tank> tanks = List.of(TestUtils.TANK, TestUtils.TANK2);
+        List<WaterSource> taps = List.of(TestUtils.TAP);
         when(state.getOutputs()).thenReturn(valves);
         when(state.getTanks()).thenReturn(tanks);
         when(state.getTaps()).thenReturn(taps);
+    }
+
+    @Test
+    void testAction() {
         when(runner.run(eq("test."), eq(openAction), any())).thenReturn(TestUtils.EMPTY_RESULT);
         ActionDto actionDto = new ActionDto("test");
 
         action.doAction(actionDto, null);
 
-        verify(runner).run("test.", openAction, valve4);
-        verify(runner, never()).run("test.", openAction, valve);
-        verify(runner, never()).run("test.", openAction, valve2);
-        verify(runner, never()).run("test.", openAction, valve3);
+        verify(runner).run("test.", openAction, TestUtils.TAP_VALVE);
+        verify(runner, never()).run("test.", openAction, TestUtils.VALVE);
+        verify(runner, never()).run("test.", openAction, TestUtils.VALVE2);
+        verify(runner, never()).run("test.", openAction, TestUtils.OUT);
+        verify(runner, never()).run("test.", openAction, TestUtils.OUT2);
     }
 
     @Test
     void testActionNestedFail() {
-        Valve valve = new Valve("test", "test", ValveType.OUTPUT, true, false, 1L, RaspiPin.GPIO_00);
-        Valve valve2 = new Valve("test2", "test2", ValveType.OUTPUT, true, false, 1L, RaspiPin.GPIO_01);
-        Valve valve3 = new Valve("test3", "test3", ValveType.INPUT, true, false, null, RaspiPin.GPIO_03);
-        Valve valve4 = new Valve("test4", "test4", ValveType.INPUT, true, false, null, RaspiPin.GPIO_04);
-        List<Valve> valves = List.of(valve, valve2);
-        List<Tank> tanks = List.of(new Tank("tank", 1, null, valve3));
-        List<WaterSource> taps = List.of(new WaterSource("tap", valve4));
-        when(state.getOutputs()).thenReturn(valves);
-        when(state.getTanks()).thenReturn(tanks);
-        when(state.getTaps()).thenReturn(taps);
         when(runner.run(eq("test."), eq(openAction), any())).thenReturn(TestUtils.ERROR_RESULT);
         ActionDto actionDto = new ActionDto("test");
 
         String error = assertThrows(ActionException.class, () -> action.doAction(actionDto, null)).getLocalizedMessage();
 
         assertEquals("Action [id] failed: error", error);
-        verify(runner).run("test.", openAction, valve4);
-        verify(runner, never()).run("test.", openAction, valve);
-        verify(runner, never()).run("test.", openAction, valve2);
-        verify(runner, never()).run("test.", openAction, valve3);
+        verify(runner).run("test.", openAction, TestUtils.TAP_VALVE);
+        verify(runner, never()).run("test.", openAction, TestUtils.VALVE);
+        verify(runner, never()).run("test.", openAction, TestUtils.VALVE2);
+        verify(runner, never()).run("test.", openAction, TestUtils.OUT);
+        verify(runner, never()).run("test.", openAction, TestUtils.OUT2);
     }
 
     @Test
     void testActionEnabled() {
-        when(state.getTaps()).thenReturn(List.of(new WaterSource()));
-
         assertTrue(action.isEnabled());
     }
 
     @Test
     void testActionDisabled() {
+        when(state.getTaps()).thenReturn(List.of());
+
         assertFalse(action.isEnabled());
     }
 

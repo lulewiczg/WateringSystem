@@ -1,13 +1,11 @@
 package com.github.lulewiczg.watering.service.actions;
 
+import com.github.lulewiczg.watering.TestUtils;
 import com.github.lulewiczg.watering.service.dto.ActionDto;
-import com.github.lulewiczg.watering.service.ina219.enums.Address;
 import com.github.lulewiczg.watering.service.io.IOService;
 import com.github.lulewiczg.watering.service.io.SensorService;
 import com.github.lulewiczg.watering.state.AppState;
-import com.github.lulewiczg.watering.state.dto.Sensor;
 import com.github.lulewiczg.watering.state.dto.Tank;
-import com.pi4j.io.gpio.RaspiPin;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -40,18 +38,16 @@ class WaterLevelReadActionTest {
 
     @Test
     void testAction() {
-        Sensor sensor = new Sensor("id", 0, 100, null, Address.ADDR_40, RaspiPin.GPIO_10, 10, 11, 12, 13);
+        when(service.analogRead(TestUtils.SENSOR)).thenReturn(12.34);
+        when(sensorService.calculateWaterLevel(12.34, TestUtils.SENSOR)).thenReturn(43.21);
 
-        when(service.analogRead(sensor)).thenReturn(12.34);
-        when(sensorService.calculateWaterLevel(12.34, sensor)).thenReturn(43.21);
-
-        Double result = action.doAction(new ActionDto(), sensor);
+        Double result = action.doAction(new ActionDto(), TestUtils.SENSOR);
         assertEquals(43.21, result);
     }
 
     @Test
     void testActionEnabled() {
-        when(state.getTanks()).thenReturn(List.of(new Tank(), new Tank(null, null, new Sensor(), null)));
+        when(state.getTanks()).thenReturn(List.of(TestUtils.TANK));
 
         assertTrue(action.isEnabled());
     }

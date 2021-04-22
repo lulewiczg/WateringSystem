@@ -1,5 +1,6 @@
 package com.github.lulewiczg.watering.service.actions;
 
+import com.github.lulewiczg.watering.TestUtils;
 import com.github.lulewiczg.watering.config.dto.ValveType;
 import com.github.lulewiczg.watering.service.dto.ActionDto;
 import com.github.lulewiczg.watering.service.io.IOService;
@@ -33,21 +34,17 @@ class ValveOpenActionTest {
 
     @Test
     void testOpen() {
-        Valve valve = new Valve("test", "test", ValveType.OUTPUT, false,false, 1L, RaspiPin.GPIO_00);
+        action.doAction(new ActionDto(), TestUtils.VALVE);
 
-        action.doAction(new ActionDto(), valve);
-
-        verify(service).toggleOn(valve.getPin());
-        assertTrue(valve.isOpen());
+        verify(service).toggleOn(TestUtils.VALVE.getPin());
+        assertTrue(TestUtils.VALVE.isOpen());
     }
 
     @Test
     void testAlreadyOpened() {
-        Valve valve = new Valve("test", "test", ValveType.OUTPUT, true,false,1L, RaspiPin.GPIO_00);
+        action.doAction(new ActionDto(), TestUtils.VALVE);
 
-        action.doAction(new ActionDto(), valve);
-
-        verify(service).toggleOn(valve.getPin());
-        assertTrue(valve.isOpen());
+        verify(service).toggleOn(TestUtils.VALVE.getPin());
+        assertTrue(TestUtils.VALVE.isOpen());
     }
 }

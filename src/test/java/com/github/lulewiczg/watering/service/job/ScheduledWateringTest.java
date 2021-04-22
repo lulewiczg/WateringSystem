@@ -60,7 +60,6 @@ class ScheduledWateringTest {
 
     private final Valve out = new Valve("out", "out", ValveType.OUTPUT, true, false, 1L, RaspiPin.GPIO_10);
 
-
     @AfterEach
     void after() {
         verifyNoInteractions(tanksCloseAction);

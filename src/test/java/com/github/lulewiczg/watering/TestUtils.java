@@ -2,8 +2,15 @@ package com.github.lulewiczg.watering;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.github.lulewiczg.watering.config.dto.ValveType;
 import com.github.lulewiczg.watering.exception.ApiError;
 import com.github.lulewiczg.watering.service.dto.ActionResultDto;
+import com.github.lulewiczg.watering.service.ina219.enums.Address;
+import com.github.lulewiczg.watering.state.dto.Sensor;
+import com.github.lulewiczg.watering.state.dto.Tank;
+import com.github.lulewiczg.watering.state.dto.Valve;
+import com.github.lulewiczg.watering.state.dto.WaterSource;
+import com.pi4j.io.gpio.RaspiPin;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import lombok.SneakyThrows;
@@ -39,6 +46,26 @@ public final class TestUtils {
     public static final ActionResultDto<Void> EMPTY_RESULT = new ActionResultDto<>("id", null, null, LocalDateTime.now(), null);
 
     public static final ActionResultDto<Void> ERROR_RESULT = new ActionResultDto<>("id", null, null, LocalDateTime.now(), "error");
+
+    public static final Valve VALVE = new Valve("valve", "valve", ValveType.INPUT, true, false, 1L, RaspiPin.GPIO_00);
+
+    public static final Sensor SENSOR = new Sensor("sensor", 10, 90, null, Address.ADDR_40, RaspiPin.GPIO_10, 10, 12, 100, 200);
+
+    public static final Tank TANK = new Tank("tank", 100, SENSOR, VALVE);
+
+    public static final Valve VALVE2 = new Valve("valve2", "valve2", ValveType.INPUT, true, false, 1L, RaspiPin.GPIO_01);
+
+    public static final Sensor SENSOR2 = new Sensor("sensor2", 10, 90, 10, Address.ADDR_40, null, 10, 12, 100, 200);
+
+    public static final Tank TANK2 = new Tank("tank2", 100, SENSOR2, VALVE2);
+
+    public static final Valve TAP_VALVE = new Valve("tap", "tap", ValveType.INPUT, true, false, 1L, RaspiPin.GPIO_29);
+
+    public static final WaterSource TAP = new WaterSource("water", TAP_VALVE);
+
+    public static final Valve OUT = new Valve("out", "out", ValveType.OUTPUT, true, false, 1L, RaspiPin.GPIO_30);
+
+    public static final Valve OUT2 = new Valve("out2", "out2", ValveType.OUTPUT, true, true, 1L, RaspiPin.GPIO_31);
 
     /**
      * Reads json from file and maps to object.
