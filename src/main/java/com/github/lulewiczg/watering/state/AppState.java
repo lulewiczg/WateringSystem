@@ -15,8 +15,10 @@ import com.github.lulewiczg.watering.state.mapper.TankMapper;
 import com.github.lulewiczg.watering.state.mapper.ValveMapper;
 import com.github.lulewiczg.watering.state.mapper.WaterSourceMapper;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
@@ -33,6 +35,9 @@ import java.util.stream.Collectors;
 @Service
 @NoArgsConstructor
 public class AppState {
+
+    @Value("#{'${com.github.lulewiczg.watering.role:}' != 'master' ? '${build.version} @ ${build.timestamp}' : null }")
+    private String build;
 
     private volatile SystemStatus state = SystemStatus.IDLE;
 

@@ -16,8 +16,7 @@ import org.springframework.test.context.TestPropertySource;
 
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
 @TestPropertySource(locations = "classpath:application-test.properties")
@@ -40,6 +39,7 @@ class AppStateTest {
 
     @Test
     void testStateCreation() {
+        assertNotNull(state.getBuild());
         assertEquals(1, state.getOutputs().size());
         assertEquals(valveMapper.map(config.getValves().get(3)), state.getOutputs().get(0));
         assertEquals(2, state.getTanks().size());
