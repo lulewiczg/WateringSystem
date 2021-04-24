@@ -89,6 +89,6 @@ public class ScheduledOverflowWaterControl extends ScheduledJob {
 
     private List<Tank> findOverflowTanks() {
         return state.getTanks().stream()
-                .filter(i -> i.getSensor().getLevel() != null && i.getSensor().getLevel() > i.getSensor().getMaxLevel()).collect(Collectors.toList());
+                .filter(i -> i.getSensor() != null && i.getSensor().getLevel() != null && i.getSensor().getLevel() > i.getSensor().getMaxLevel()).collect(Collectors.toList());
     }
 }

@@ -195,6 +195,21 @@ class ScheduledOverflowWaterControlTest {
         verify(state, never()).setState(any());
     }
 
+    @Test
+    void testNoSensor() {
+        Tank tank = new Tank("tank", 100, null, TestUtils.Objects.VALVE);
+        when(state.getTanks()).thenReturn(List.of(tank));
+        when(state.getOverflowValves()).thenReturn(List.of(TestUtils.Objects.OUT));
+        JobDto jobDto = new JobDto("test", null);
+
+        job.doJob(jobDto);
+
+        verify(runner, never()).run(any(), eq(tanksCloseAction), any());
+        verify(runner, never()).run(any(), eq(valveOpenAction), any());
+        verify(runner, never()).run(any(), eq(valveCloseAction), any());
+        verify(state, never()).setState(any());
+    }
+
     @ParameterizedTest
     @EnumSource(value = SystemStatus.class, names = {"FILLING", "IDLE"})
     void testCanBeRun(SystemStatus status) {
