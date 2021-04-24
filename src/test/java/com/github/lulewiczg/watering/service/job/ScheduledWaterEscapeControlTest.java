@@ -139,6 +139,19 @@ class ScheduledWaterEscapeControlTest {
         verify(state).setState(SystemStatus.ERROR);
     }
 
+    @Test
+    void testLeakOk() {
+        Tank tank = new Tank("tank", 100, null, TestUtils.Objects.VALVE);
+        when(state.getTanks()).thenReturn(List.of(tank));
+        when(runner.run("test.", emergencyStopAction, null)).thenReturn(TestUtils.EMPTY_RESULT);
+        JobDto jobDto = new JobDto("test", null);
+
+        job.doJob(jobDto);
+
+        verify(runner, never()).run(any(), eq(emergencyStopAction), any());
+        verify(state, never()).setState(any());
+    }
+
     @ParameterizedTest
     @EnumSource(value = SystemStatus.class, names = {"IDLE", "FILLING"})
     void testCanBeRun(SystemStatus status) {

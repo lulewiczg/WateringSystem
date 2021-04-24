@@ -94,7 +94,7 @@ public class ScheduledWaterEscapeControl extends ScheduledJob {
     }
 
     private Map<String, Integer> getLevels() {
-        return state.getTanks().stream().filter(i -> i.getSensor().getLevel() != null)
+        return state.getTanks().stream().filter(i -> i.getSensor() != null && i.getSensor().getLevel() != null)
                 .collect(Collectors.toMap(Tank::getId, i -> i.getSensor().getLevel()));
     }
 
