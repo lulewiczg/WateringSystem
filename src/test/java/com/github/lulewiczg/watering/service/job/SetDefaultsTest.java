@@ -9,6 +9,7 @@ import com.github.lulewiczg.watering.service.dto.JobDto;
 import com.github.lulewiczg.watering.service.io.IOService;
 import com.github.lulewiczg.watering.state.AppState;
 import com.github.lulewiczg.watering.state.SystemStatus;
+import com.github.lulewiczg.watering.state.dto.Tank;
 import com.pi4j.io.gpio.RaspiPin;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -21,6 +22,8 @@ import org.springframework.context.annotation.Import;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
+
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.*;
@@ -98,7 +101,16 @@ class SetDefaultsTest {
         verify(runner).run("test.", openAction, TestUtils.Objects.VALVE);
         verify(runner).run("test.", openAction, TestUtils.Objects.VALVE2);
         verify(runner).run("test.", closeAction, TestUtils.Objects.OUT);
+    }
 
+    @Test
+    void testJobNoTankValve() {
+        when(state.getTanks()).thenReturn(List.of(new Tank("id", 100, null, null)));
+        when(runner.run(eq("test."), eq(openAction), any())).thenReturn(TestUtils.EMPTY_RESULT);
+        when(runner.run(eq("test."), eq(closeAction), any())).thenReturn(TestUtils.EMPTY_RESULT);
+        JobDto jobDto = new JobDto("test", null);
+
+        assertDoesNotThrow(() -> job.doJob(jobDto));
     }
 
     @ParameterizedTest

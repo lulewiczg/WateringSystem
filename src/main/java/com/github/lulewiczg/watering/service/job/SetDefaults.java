@@ -17,6 +17,7 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean
 import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
+import java.util.Objects;
 
 /**
  * Job for settings defaults on startup.
@@ -62,10 +63,11 @@ public class SetDefaults extends ScheduledJob {
     @Override
     public void doJob(JobDto job) {
         log.info("Settings defaults...");
-        state.getTanks().stream().map(Tank::getValve).forEach(i -> setValveState(i, job));
+        state.getTanks().stream().map(Tank::getValve).filter(Objects::nonNull).forEach(i -> setValveState(i, job));
         state.getOutputs().forEach(i -> setValveState(i, job));
         state.getTaps().forEach(i -> setValveState(i.getValve(), job));
-        state.getTanks().stream().map(Tank::getSensor).map(Sensor::getPowerControlPin).distinct().forEach(ioService::toggleOff);
+        state.getTanks().stream().map(Tank::getSensor).filter(Objects::nonNull).
+                map(Sensor::getPowerControlPin).distinct().forEach(ioService::toggleOff);
     }
 
     private void setValveState(Valve i, JobDto jobDto) {
