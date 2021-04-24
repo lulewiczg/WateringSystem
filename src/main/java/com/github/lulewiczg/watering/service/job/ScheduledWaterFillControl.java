@@ -89,7 +89,8 @@ public class ScheduledWaterFillControl extends ScheduledJob {
     }
 
     private List<Tank> findTanks() {
-        return state.getTanks().stream().filter(i -> i.getSensor().getLevel() != null && i.getSensor().getLevel() < i.getSensor().getMinLevel())
+        return state.getTanks().stream().filter(i -> i.getSensor() != null && i.getSensor().getLevel() != null
+                && i.getSensor().getLevel() < i.getSensor().getMinLevel())
                 .collect(Collectors.toList());
     }
 }

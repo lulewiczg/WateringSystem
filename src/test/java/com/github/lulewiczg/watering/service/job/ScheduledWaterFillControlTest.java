@@ -261,6 +261,26 @@ class ScheduledWaterFillControlTest {
         verify(runner, never()).run(any(), eq(outputsCloseAction), any());
     }
 
+    @Test
+    void testNoSensor() {
+        Tank tank = new Tank("tank", 100, null, TestUtils.Objects.VALVE);
+        when(state.getTanks()).thenReturn(List.of(tank));
+        when(runner.run("test.", outputsCloseAction, null)).thenReturn(TestUtils.EMPTY_RESULT);
+        when(runner.run("test.", tapsOpenAction, null)).thenReturn(TestUtils.EMPTY_RESULT);
+        when(runner.run("test.", valveOpenAction, TestUtils.Objects.VALVE)).thenReturn(TestUtils.EMPTY_RESULT);
+
+        JobDto jobDto = new JobDto("test", null);
+
+        job.doJob(jobDto);
+
+        verify(state, never()).setState(any());
+        verify(runner, never()).run(any(), eq(outputsCloseAction), any());
+        verify(runner, never()).run(any(), eq(valveOpenAction), any());
+        verify(runner, never()).run(any(), eq(tanksCloseAction), any());
+        verify(runner, never()).run(any(), eq(tapsOpenAction), any());
+        verify(runner, never()).run(any(), eq(tapsCloseAction), any());
+    }
+
     @ParameterizedTest
     @EnumSource(value = SystemStatus.class, names = {"ERROR", "WATERING", "DRAINING", "FILLING"})
     void testCanBeRun(SystemStatus status) {
