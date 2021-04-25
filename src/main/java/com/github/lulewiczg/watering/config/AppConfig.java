@@ -132,9 +132,5 @@ public class AppConfig {
         if (invalidInput.isPresent()) {
             throw new IllegalStateException(String.format("Input valve %s cannot have watering time!", invalidInput.get().getId()));
         }
-        Optional<ValveConfig> invalidOutput = valves.stream().filter(i -> i.getType() == ValveType.OUTPUT && i.getWateringTime() == null).findFirst();
-        if (invalidOutput.isPresent()) {
-            throw new IllegalStateException(String.format("Output valve %s must have watering time!", invalidOutput.get().getId()));
-        }
     }
 }

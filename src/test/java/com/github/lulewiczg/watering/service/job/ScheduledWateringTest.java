@@ -1,11 +1,14 @@
 package com.github.lulewiczg.watering.service.job;
 
 import com.github.lulewiczg.watering.TestUtils;
+import com.github.lulewiczg.watering.config.dto.ValveType;
 import com.github.lulewiczg.watering.exception.ActionException;
 import com.github.lulewiczg.watering.service.actions.*;
 import com.github.lulewiczg.watering.service.dto.JobDto;
 import com.github.lulewiczg.watering.state.AppState;
 import com.github.lulewiczg.watering.state.SystemStatus;
+import com.github.lulewiczg.watering.state.dto.Valve;
+import com.pi4j.io.gpio.RaspiPin;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -18,6 +21,8 @@ import org.springframework.context.annotation.Import;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
+
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
@@ -68,6 +73,8 @@ class ScheduledWateringTest {
 
     @Test
     void testWateringOk() throws InterruptedException {
+        Valve valve = new Valve("no", "pls no", ValveType.OUTPUT, false, false, null, RaspiPin.GPIO_11);
+        when(state.getOutputs()).thenReturn(List.of(TestUtils.Objects.OUT, TestUtils.Objects.OUT2, valve));
         when(runner.run("test.", valveOpenAction, TestUtils.Objects.OUT)).thenReturn(TestUtils.EMPTY_RESULT);
         when(runner.run("test.", valveCloseAction, TestUtils.Objects.OUT)).thenReturn(TestUtils.EMPTY_RESULT);
         when(runner.run("test.", valveOpenAction, TestUtils.Objects.OUT2)).thenReturn(TestUtils.EMPTY_RESULT);
@@ -91,7 +98,7 @@ class ScheduledWateringTest {
         verify(runner).run("test.", tanksCloseAction, null);
         verify(runner).run("test.", valveCloseAction, TestUtils.Objects.OUT);
         verify(runner).run("test.", valveCloseAction, TestUtils.Objects.OUT2);
-
+        verify(runner, never()).run(any(), any(), eq(valve));
     }
 
     @Test

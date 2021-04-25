@@ -18,6 +18,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.Collectors;
 
 /**
  * Job for scheduled watering.
@@ -74,7 +75,7 @@ public class ScheduledWatering extends ScheduledJob {
     public void doJob(JobDto job) {
         state.setState(SystemStatus.WATERING);
         runNested(actionRunner, job, tanksOpenAction, null);
-        List<Valve> outputs = state.getOutputs();
+        List<Valve> outputs = state.getOutputs().stream().filter(i -> i.getWateringTime() != null).collect(Collectors.toList());
         AtomicInteger counter = new AtomicInteger(outputs.size());
         outputs.forEach(i -> {
             log.info("Opening valve {}", i.getId());
