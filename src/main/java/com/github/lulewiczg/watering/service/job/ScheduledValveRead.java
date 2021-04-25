@@ -22,7 +22,7 @@ import org.springframework.stereotype.Service;
 @Service
 @RequiredArgsConstructor
 @ConditionalOnMissingBean(MasterConfig.class)
-@ConditionalOnProperty("com.github.lulewiczg.watering.schedule.sensorsRead.enabled")
+@ConditionalOnProperty("com.github.lulewiczg.watering.schedule.valveRead.enabled")
 public class ScheduledValveRead extends ScheduledIoJob {
 
     private final AppState state;
@@ -31,7 +31,7 @@ public class ScheduledValveRead extends ScheduledIoJob {
 
     private final JobRunner jobRunner;
 
-    @Scheduled(cron = "${com.github.lulewiczg.watering.schedule.sensorsRead.cron}")
+    @Scheduled(cron = "${com.github.lulewiczg.watering.schedule.valveRead.cron}")
     void schedule() {
         schedule(jobRunner);
     }
