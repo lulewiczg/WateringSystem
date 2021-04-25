@@ -35,6 +35,7 @@ public class MasterService {
     public MasterResponse update(SlaveStateDto state) {
         log.debug("Updating slave state: {}", state);
         AppState appState = state.getState();
+        this.state.setBuild(appState.getBuild());
         this.state.setState(appState.getState());
         this.state.setOutputs(appState.getOutputs());
         this.state.setTanks(appState.getTanks());

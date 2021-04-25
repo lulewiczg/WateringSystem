@@ -58,6 +58,7 @@ class MasterServiceTest {
         assertEquals(List.of(), masterState.getActions());
         assertEquals(List.of(), masterState.getJobs());
 
+        verify(state).setBuild(dto.getState().getBuild());
         verify(state).setState(dto.getState().getState());
         verify(state).setOutputs(dto.getState().getOutputs());
         verify(state).setTanks(dto.getState().getTanks());
