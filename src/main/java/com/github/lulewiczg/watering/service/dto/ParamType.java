@@ -5,6 +5,7 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
 import java.util.Arrays;
+import java.util.Map;
 import java.util.Objects;
 import java.util.function.Predicate;
 
@@ -16,7 +17,7 @@ import java.util.function.Predicate;
 public enum ParamType {
 
     STRING(String.class, i -> i != null && i.getClass() == String.class),
-    VOID(Void.class, Objects::isNull), WATERING_DTO(WateringDto.class, i -> true);
+    VOID(Void.class, Objects::isNull), WATERING_DTO(WateringDto.class, i -> i instanceof Map);
 
     private final Class<?> type;
 

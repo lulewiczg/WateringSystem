@@ -2,12 +2,10 @@ package com.github.lulewiczg.watering.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.lulewiczg.watering.TestUtils;
-import com.github.lulewiczg.watering.exception.ActionNotFoundException;
-import com.github.lulewiczg.watering.exception.JobNotFoundException;
-import com.github.lulewiczg.watering.exception.TypeMismatchException;
-import com.github.lulewiczg.watering.exception.ValueNotAllowedException;
+import com.github.lulewiczg.watering.exception.*;
 import com.github.lulewiczg.watering.service.actions.EmergencyStopAction;
 import com.github.lulewiczg.watering.service.actions.WaterLevelReadAction;
+import com.github.lulewiczg.watering.service.actions.WateringAction;
 import com.github.lulewiczg.watering.service.dto.ActionDefinitionDto;
 import com.github.lulewiczg.watering.service.dto.ActionDto;
 import com.github.lulewiczg.watering.service.dto.JobDefinitionDto;
@@ -23,6 +21,7 @@ import org.springframework.test.context.ActiveProfiles;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -73,54 +72,90 @@ class ActionServiceImplTest {
 
     @Test
     void testRunInvalidAction() {
-        ActionDto sensor = new ActionDto("test", "test");
+        ActionDto dto = new ActionDto("test", "test");
 
-        String message = assertThrows(ActionNotFoundException.class, () -> service.runAction(sensor)).getMessage();
+        String message = assertThrows(ActionNotFoundException.class, () -> service.runAction(dto)).getMessage();
 
         assertEquals("Action not found: test", message);
     }
 
     @Test
     void testRunActionMissingParam() {
-        ActionDto sensor = new ActionDto(deCapitalize(WaterLevelReadAction.class.getSimpleName()), null);
+        ActionDto dto = new ActionDto(deCapitalize(WaterLevelReadAction.class.getSimpleName()), null);
 
-        String message = assertThrows(TypeMismatchException.class, () -> service.runAction(sensor)).getMessage();
+        String message = assertThrows(TypeMismatchException.class, () -> service.runAction(dto)).getMessage();
 
         assertEquals("[null] is not valid value for class java.lang.String type!", message);
     }
 
     @Test
     void testRunActionInvalidParam() {
-        ActionDto sensor = new ActionDto(deCapitalize(WaterLevelReadAction.class.getSimpleName()), "invalid");
+        ActionDto dto = new ActionDto(deCapitalize(WaterLevelReadAction.class.getSimpleName()), "invalid");
 
-        String message = assertThrows(ValueNotAllowedException.class, () -> service.runAction(sensor)).getMessage();
+        String message = assertThrows(ValueNotAllowedException.class, () -> service.runAction(dto)).getMessage();
 
         assertEquals("Value [invalid] does not match [sensor1, sensor2]!", message);
     }
 
     @Test
     void testRunActionInvalidParamType() {
-        ActionDto sensor = new ActionDto(deCapitalize(WaterLevelReadAction.class.getSimpleName()), 1);
+        ActionDto dto = new ActionDto(deCapitalize(WaterLevelReadAction.class.getSimpleName()), 1);
 
-        String message = assertThrows(TypeMismatchException.class, () -> service.runAction(sensor)).getMessage();
+        String message = assertThrows(TypeMismatchException.class, () -> service.runAction(dto)).getMessage();
 
         assertEquals("[1] is not valid value for class java.lang.String type!", message);
     }
 
     @Test
     void testRunActionVoidType() {
-        ActionDto sensor = new ActionDto(deCapitalize(EmergencyStopAction.class.getSimpleName()), null);
+        ActionDto dto = new ActionDto(deCapitalize(EmergencyStopAction.class.getSimpleName()), null);
 
-        service.runAction(sensor);
+        service.runAction(dto);
     }
 
     @Test
     void testRunActionVoidWithParam() {
-        ActionDto sensor = new ActionDto(deCapitalize(EmergencyStopAction.class.getSimpleName()), "some value");
+        ActionDto dto = new ActionDto(deCapitalize(EmergencyStopAction.class.getSimpleName()), "some value");
 
-        String message = assertThrows(TypeMismatchException.class, () -> service.runAction(sensor)).getMessage();
+        String message = assertThrows(TypeMismatchException.class, () -> service.runAction(dto)).getMessage();
 
         assertEquals("[some value] is not valid value for class java.lang.Void type!", message);
+    }
+
+    @Test
+    void testRunActionWithCustomParam() throws InterruptedException {
+        ActionDto dto = new ActionDto(deCapitalize(WateringAction.class.getSimpleName()), Map.of("valveId", "out", "seconds", 1));
+
+        service.runAction(dto);
+
+        Thread.sleep(1000);
+    }
+
+    @Test
+    void testRunActionWithCustomParamMissingField() {
+        ActionDto dto = new ActionDto(deCapitalize(WateringAction.class.getSimpleName()), Map.of("valveId", "out"));
+
+        String message = assertThrows(ValidationException.class, () -> service.runAction(dto)).getMessage();
+
+        assertEquals("seconds must not be null", message);
+    }
+
+    @Test
+    void testRunActionWithCustomParamMissing() {
+        ActionDto dto = new ActionDto(deCapitalize(WateringAction.class.getSimpleName()), null);
+
+        String message = assertThrows(TypeMismatchException.class, () -> service.runAction(dto)).getMessage();
+
+        assertEquals("[null] is not valid value for class com.github.lulewiczg.watering.service.actions.dto.WateringDto type!", message);
+    }
+
+    @Test
+    void testRunActionWithCustomParamInvalidType() {
+        ActionDto dto = new ActionDto(deCapitalize(WateringAction.class.getSimpleName()), "some value");
+
+        String message = assertThrows(TypeMismatchException.class, () -> service.runAction(dto)).getMessage();
+
+        assertEquals("[some value] is not valid value for class com.github.lulewiczg.watering.service.actions.dto.WateringDto type!", message);
     }
 
     @Test
