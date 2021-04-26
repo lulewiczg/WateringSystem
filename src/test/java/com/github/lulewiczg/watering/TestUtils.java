@@ -52,11 +52,11 @@ public final class TestUtils {
      * Object constants.
      */
     public static class Objects {
-        public static final Valve VALVE = new Valve("valve", "valve", ValveType.INPUT, true, false, 1L, RaspiPin.GPIO_10);
-        public static final Valve VALVE2 = new Valve("valve2", "valve2", ValveType.INPUT, true, false, 1L, RaspiPin.GPIO_11);
-        public static final Valve TAP_VALVE = new Valve("tap", "tap", ValveType.INPUT, false, false, 1L, RaspiPin.GPIO_21);
-        public static final Valve OUT = new Valve("out", "out", ValveType.OUTPUT, false, false, 1L, RaspiPin.GPIO_30);
-        public static final Valve OUT2 = new Valve("out2", "out2", ValveType.OUTPUT, false, true, 1L, RaspiPin.GPIO_31);
+        public static final Valve VALVE = new Valve("valve", "valve", ValveType.INPUT, true, false, 1, RaspiPin.GPIO_10);
+        public static final Valve VALVE2 = new Valve("valve2", "valve2", ValveType.INPUT, true, false, 1, RaspiPin.GPIO_11);
+        public static final Valve TAP_VALVE = new Valve("tap", "tap", ValveType.INPUT, false, false, 1, RaspiPin.GPIO_21);
+        public static final Valve OUT = new Valve("out", "out", ValveType.OUTPUT, false, false, 1, RaspiPin.GPIO_30);
+        public static final Valve OUT2 = new Valve("out2", "out2", ValveType.OUTPUT, false, true, 2, RaspiPin.GPIO_31);
         public static final Sensor SENSOR = new Sensor("sensor1", 12, 21, null, Address.ADDR_40, RaspiPin.GPIO_10, 10, 1000, 100, 12);
         public static final Sensor SENSOR2 = new Sensor("sensor2", 5, 100, null, Address.ADDR_41, null, 20, 50, 60, 5);
         public static final Tank TANK = new Tank("tank", 100, SENSOR, VALVE);

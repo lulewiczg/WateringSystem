@@ -1,10 +1,11 @@
 package com.github.lulewiczg.watering.service;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.lulewiczg.watering.config.MasterConfig;
+import com.github.lulewiczg.watering.exception.ValidationException;
 import com.github.lulewiczg.watering.service.actions.Action;
 import com.github.lulewiczg.watering.service.actions.ActionRunner;
 import com.github.lulewiczg.watering.service.actions.dto.WateringDto;
+import com.github.lulewiczg.watering.service.actions.dto.WateringDtoMapper;
 import com.github.lulewiczg.watering.service.dto.*;
 import com.github.lulewiczg.watering.service.job.JobRunner;
 import com.github.lulewiczg.watering.service.job.ScheduledJob;
@@ -19,9 +20,11 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Service;
+import org.springframework.validation.beanvalidation.LocalValidatorFactoryBean;
 
-import java.util.List;
-import java.util.Map;
+import javax.validation.ConstraintViolation;
+import javax.validation.ConstraintViolationException;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -41,7 +44,9 @@ public class ActionServiceImpl implements ActionService {
 
     private final AppState state;
 
-    private final ObjectMapper mapper;
+    private final WateringDtoMapper wateringDtoMapper;
+
+    private final LocalValidatorFactoryBean validator;
 
     @Override
     @Cacheable
@@ -114,11 +119,14 @@ public class ActionServiceImpl implements ActionService {
         } else if (Sensor.class.equals(destType)) {
             return state.findSensor(actionDto.getParam().toString());
         } else if (WateringDto.class.equals(destType)) {
-            WateringDto wateringDto = mapper.readValue(actionDto.getParam().toString(), WateringDto.class);
-            wateringDto.getData().forEach(i -> {
-                Valve valve = state.findValve(i.getValveId());
-                i.setValve(valve);
-            });
+            WateringDto wateringDto = wateringDtoMapper.map((Map<String, Object>) actionDto.getParam());
+            Set<ConstraintViolation<WateringDto>> errors = validator.validate(wateringDto);
+            Optional<ConstraintViolation<WateringDto>> error = errors.stream().min(Comparator.comparing(i -> i.getPropertyPath().toString()));
+            if (error.isPresent()) {
+                throw new ValidationException(error.get().getPropertyPath() + " " + error.get().getMessage());
+            }
+            Valve valve = state.findValve(wateringDto.getValveId());
+            wateringDto.setValve(valve);
             return wateringDto;
         }
 

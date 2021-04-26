@@ -138,5 +138,12 @@ class RestExceptionHandlerTest {
         TestUtils.testError(Objects.requireNonNull(response.getBody()), expected);
     }
 
+    @Test
+    void testHandleValidationError() {
+        ApiError expected = new ApiError(HttpStatus.BAD_REQUEST.value(), HttpStatus.BAD_REQUEST.getReasonPhrase(), "Error");
 
+        ResponseEntity<ApiError> response = handler.handle(new ValidationException("Error"), req);
+
+        TestUtils.testError(Objects.requireNonNull(response.getBody()), expected);
+    }
 }

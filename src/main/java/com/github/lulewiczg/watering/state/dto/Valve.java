@@ -26,7 +26,7 @@ public class Valve {
 
     private boolean overflowOutput;
 
-    private Long wateringTime;
+    private Integer wateringTime;
 
     @EqualsAndHashCode.Exclude
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)

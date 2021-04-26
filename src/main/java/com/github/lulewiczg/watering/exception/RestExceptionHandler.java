@@ -93,6 +93,11 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
         return getGenericError(e, HttpStatus.FORBIDDEN, request);
     }
 
+    @ExceptionHandler(ValidationException.class)
+    public ResponseEntity<ApiError> handle(ValidationException e, WebRequest request) {
+        return getGenericError(e, HttpStatus.BAD_REQUEST, request);
+    }
+
     @Override
     protected ResponseEntity<Object> handleHttpMediaTypeNotSupported(HttpMediaTypeNotSupportedException e, HttpHeaders headers, HttpStatus status, WebRequest request) {
         return new ResponseEntity<>(getApiError(e, status, request), status);

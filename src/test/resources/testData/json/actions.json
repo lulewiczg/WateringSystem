@@ -101,5 +101,14 @@
     ],
     "parameterDescription": "Sensor ID",
     "returnType": "java.lang.Double"
+  },
+  {
+    "actionName": "wateringAction",
+    "description": "Opens given valves",
+    "parameterType": "com.github.lulewiczg.watering.service.actions.dto.WateringDto",
+    "parameterDestinationType": "com.github.lulewiczg.watering.service.actions.dto.WateringDto",
+    "allowedValues": null,
+    "parameterDescription": "Valves data",
+    "returnType": "java.lang.Void"
   }
 ]

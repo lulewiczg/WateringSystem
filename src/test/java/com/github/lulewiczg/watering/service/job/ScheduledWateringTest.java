@@ -3,7 +3,9 @@ package com.github.lulewiczg.watering.service.job;
 import com.github.lulewiczg.watering.TestUtils;
 import com.github.lulewiczg.watering.config.dto.ValveType;
 import com.github.lulewiczg.watering.exception.ActionException;
-import com.github.lulewiczg.watering.service.actions.*;
+import com.github.lulewiczg.watering.service.actions.ActionRunner;
+import com.github.lulewiczg.watering.service.actions.WateringAction;
+import com.github.lulewiczg.watering.service.actions.dto.WateringDto;
 import com.github.lulewiczg.watering.service.dto.JobDto;
 import com.github.lulewiczg.watering.state.AppState;
 import com.github.lulewiczg.watering.state.SystemStatus;
@@ -15,6 +17,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
+import org.mockito.ArgumentCaptor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
@@ -23,9 +26,9 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 @ActiveProfiles("test")
@@ -38,16 +41,7 @@ class ScheduledWateringTest {
     private AppState state;
 
     @MockBean
-    private TanksOpenAction tanksOpenAction;
-
-    @MockBean
-    private TanksCloseAction tanksCloseAction;
-
-    @MockBean
-    private ValveOpenAction valveOpenAction;
-
-    @MockBean
-    private ValveCloseAction valveCloseAction;
+    private WateringAction wateringAction;
 
     @MockBean
     private ActionRunner runner;
@@ -60,10 +54,7 @@ class ScheduledWateringTest {
 
     @AfterEach
     void after() {
-        verifyNoInteractions(tanksCloseAction);
-        verifyNoInteractions(tanksOpenAction);
-        verifyNoInteractions(valveOpenAction);
-        verifyNoInteractions(valveCloseAction);
+        verifyNoInteractions(wateringAction);
     }
 
     @BeforeEach
@@ -72,110 +63,49 @@ class ScheduledWateringTest {
     }
 
     @Test
-    void testWateringOk() throws InterruptedException {
+    void testWateringOk() {
         Valve valve = new Valve("no", "pls no", ValveType.OUTPUT, false, false, null, RaspiPin.GPIO_11);
         when(state.getOutputs()).thenReturn(List.of(TestUtils.Objects.OUT, TestUtils.Objects.OUT2, valve));
-        when(runner.run("test.", valveOpenAction, TestUtils.Objects.OUT)).thenReturn(TestUtils.EMPTY_RESULT);
-        when(runner.run("test.", valveCloseAction, TestUtils.Objects.OUT)).thenReturn(TestUtils.EMPTY_RESULT);
-        when(runner.run("test.", valveOpenAction, TestUtils.Objects.OUT2)).thenReturn(TestUtils.EMPTY_RESULT);
-        when(runner.run("test.", valveCloseAction, TestUtils.Objects.OUT2)).thenReturn(TestUtils.EMPTY_RESULT);
-        when(runner.run("test.", tanksOpenAction, null)).thenReturn(TestUtils.EMPTY_RESULT);
-        when(runner.run("test.", tanksCloseAction, null)).thenReturn(TestUtils.EMPTY_RESULT);
+        when(runner.run(any(), eq(wateringAction), any())).thenReturn(TestUtils.EMPTY_RESULT);
         JobDto jobDto = new JobDto("test", null);
 
         job.doJob(jobDto);
 
-        verify(state).setState(SystemStatus.WATERING);
-        verify(runner, never()).run(any(), eq(tanksCloseAction), any());
-        verify(runner, never()).run(any(), eq(valveCloseAction), any());
-        verify(runner).run("test.", tanksOpenAction, null);
-        verify(runner).run("test.", valveOpenAction, TestUtils.Objects.OUT);
-        verify(runner).run("test.", valveOpenAction, TestUtils.Objects.OUT2);
+        ArgumentCaptor<WateringDto> captor = ArgumentCaptor.forClass(WateringDto.class);
+        verify(runner, times(2)).run(eq("test."), eq(wateringAction), captor.capture());
+        List<WateringDto> values = captor.getAllValues();
+        assertEquals(2, values.size());
+        WateringDto value = values.get(0);
+        assertEquals(2, value.getCounter().get());
+        value.setCounter(null);
+        WateringDto wateringDto = new WateringDto(TestUtils.Objects.OUT.getId(), TestUtils.Objects.OUT, 1, null);
+        assertEquals(wateringDto, value);
 
-        Thread.sleep(1500);
+        WateringDto value2 = values.get(1);
+        assertEquals(2, value2.getCounter().get());
+        value2.setCounter(null);
+        WateringDto wateringDto2 = new WateringDto(TestUtils.Objects.OUT2.getId(), TestUtils.Objects.OUT2, 2, null);
+        assertEquals(wateringDto2, value2);
 
-        verify(state).setState(SystemStatus.IDLE);
-        verify(runner).run("test.", tanksCloseAction, null);
-        verify(runner).run("test.", valveCloseAction, TestUtils.Objects.OUT);
-        verify(runner).run("test.", valveCloseAction, TestUtils.Objects.OUT2);
-        verify(runner, never()).run(any(), any(), eq(valve));
+        verifyNoMoreInteractions(runner);
     }
 
     @Test
-    void testWateringTanksOpenFail() {
-        when(runner.run("test.", tanksCloseAction, null)).thenReturn(TestUtils.EMPTY_RESULT);
-        when(runner.run("test.", tanksOpenAction, null)).thenReturn(TestUtils.ERROR_RESULT);
+    void testWateringTanksActionFail() {
+        when(runner.run(any(), eq(wateringAction), any())).thenReturn(TestUtils.ERROR_RESULT);
         JobDto jobDto = new JobDto("test", null);
 
         String error = assertThrows(ActionException.class, () -> job.doJob(jobDto)).getLocalizedMessage();
 
         assertEquals("Action [id] failed: error", error);
-        verify(state).setState(SystemStatus.WATERING);
-        verify(runner).run("test.", tanksOpenAction, null);
-        verify(runner, never()).run(any(), eq(tanksCloseAction), any());
-        verify(runner, never()).run(any(), eq(valveCloseAction), any());
-        verify(runner, never()).run(any(), eq(valveOpenAction), any());
-    }
-
-    @Test
-    void testWateringValveOpenFail() {
-        when(runner.run("test.", valveOpenAction, TestUtils.Objects.OUT)).thenReturn(TestUtils.ERROR_RESULT);
-        when(runner.run("test.", tanksOpenAction, null)).thenReturn(TestUtils.EMPTY_RESULT);
-        when(runner.run("test.", tanksCloseAction, null)).thenReturn(TestUtils.EMPTY_RESULT);
-        JobDto jobDto = new JobDto("test", null);
-
-        String error = assertThrows(ActionException.class, () -> job.doJob(jobDto)).getLocalizedMessage();
-
-        assertEquals("Action [id] failed: error", error);
-        verify(state).setState(SystemStatus.WATERING);
-        verify(runner).run("test.", tanksOpenAction, null);
-        verify(runner).run("test.", valveOpenAction, TestUtils.Objects.OUT);
-        verify(runner, never()).run(any(), eq(tanksCloseAction), any());
-        verify(runner, never()).run(any(), eq(valveCloseAction), any());
-    }
-
-    @Test
-    void testWateringTanksCloseFail() throws InterruptedException {
-        when(runner.run("test.", tanksOpenAction, null)).thenReturn(TestUtils.EMPTY_RESULT);
-        when(runner.run("test.", valveOpenAction, TestUtils.Objects.OUT)).thenReturn(TestUtils.EMPTY_RESULT);
-        when(runner.run("test.", valveCloseAction, TestUtils.Objects.OUT)).thenReturn(TestUtils.EMPTY_RESULT);
-        when(runner.run("test.", valveOpenAction, TestUtils.Objects.OUT2)).thenReturn(TestUtils.EMPTY_RESULT);
-        when(runner.run("test.", valveCloseAction, TestUtils.Objects.OUT2)).thenReturn(TestUtils.EMPTY_RESULT);
-        when(runner.run("test.", tanksCloseAction, null)).thenReturn(TestUtils.ERROR_RESULT);
-        JobDto jobDto = new JobDto("test", null);
-
-        job.doJob(jobDto);
-
-        Thread.sleep(1500);
-        verify(state).setState(SystemStatus.WATERING);
-        verify(runner).run("test.", tanksOpenAction, null);
-        verify(runner).run("test.", valveOpenAction, TestUtils.Objects.OUT);
-        verify(runner).run("test.", valveCloseAction, TestUtils.Objects.OUT);
-        verify(runner).run("test.", valveOpenAction, TestUtils.Objects.OUT2);
-        verify(runner).run("test.", valveCloseAction, TestUtils.Objects.OUT2);
-        verify(runner).run("test.", tanksCloseAction, null);
-    }
-
-    @Test
-    void testWateringValveCloseFail() throws InterruptedException {
-        when(runner.run("test.", tanksOpenAction, null)).thenReturn(TestUtils.EMPTY_RESULT);
-        when(runner.run("test.", valveOpenAction, TestUtils.Objects.OUT)).thenReturn(TestUtils.EMPTY_RESULT);
-        when(runner.run("test.", valveCloseAction, TestUtils.Objects.OUT)).thenReturn(TestUtils.ERROR_RESULT);
-        when(runner.run("test.", valveOpenAction, TestUtils.Objects.OUT2)).thenReturn(TestUtils.EMPTY_RESULT);
-        when(runner.run("test.", valveCloseAction, TestUtils.Objects.OUT2)).thenReturn(TestUtils.ERROR_RESULT);
-        when(runner.run("test.", tanksCloseAction, null)).thenReturn(TestUtils.EMPTY_RESULT);
-        JobDto jobDto = new JobDto("test", null);
-
-        job.doJob(jobDto);
-
-        Thread.sleep(1500);
-        verify(state).setState(SystemStatus.WATERING);
-        verify(runner).run("test.", tanksOpenAction, null);
-        verify(runner).run("test.", valveOpenAction, TestUtils.Objects.OUT);
-        verify(runner).run("test.", valveCloseAction, TestUtils.Objects.OUT);
-        verify(runner).run("test.", valveOpenAction, TestUtils.Objects.OUT2);
-        verify(runner).run("test.", valveCloseAction, TestUtils.Objects.OUT2);
-        verify(runner, never()).run(any(), eq(tanksCloseAction), any());
+        ArgumentCaptor<WateringDto> captor = ArgumentCaptor.forClass(WateringDto.class);
+        verify(runner).run(eq("test."), eq(wateringAction), captor.capture());
+        WateringDto value = captor.getValue();
+        assertEquals(2, value.getCounter().get());
+        value.setCounter(null);
+        WateringDto wateringDto = new WateringDto(TestUtils.Objects.OUT.getId(), TestUtils.Objects.OUT, 1, null);
+        assertEquals(wateringDto, value);
+        verifyNoMoreInteractions(runner);
     }
 
     @ParameterizedTest

@@ -1,7 +1,9 @@
 package com.github.lulewiczg.watering.service.job;
 
 import com.github.lulewiczg.watering.config.MasterConfig;
-import com.github.lulewiczg.watering.service.actions.*;
+import com.github.lulewiczg.watering.service.actions.ActionRunner;
+import com.github.lulewiczg.watering.service.actions.WateringAction;
+import com.github.lulewiczg.watering.service.actions.dto.WateringDto;
 import com.github.lulewiczg.watering.service.dto.JobDto;
 import com.github.lulewiczg.watering.state.AppState;
 import com.github.lulewiczg.watering.state.SystemStatus;
@@ -16,7 +18,6 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
@@ -30,21 +31,13 @@ import java.util.stream.Collectors;
 @ConditionalOnProperty("com.github.lulewiczg.watering.schedule.watering.enabled")
 public class ScheduledWatering extends ScheduledJob {
 
-    private final TanksOpenAction tanksOpenAction;
-
-    private final TanksCloseAction tanksCloseAction;
-
-    private final ValveOpenAction valveOpenAction;
-
-    private final ValveCloseAction valveCloseAction;
+    private final WateringAction wateringAction;
 
     private final AppState state;
 
     private final JobRunner jobRunner;
 
     private final ActionRunner actionRunner;
-
-    private final ScheduledExecutorService exec = Executors.newSingleThreadScheduledExecutor();
 
     @Scheduled(cron = "${com.github.lulewiczg.watering.schedule.watering.cron}")
     void schedule() {
@@ -73,26 +66,10 @@ public class ScheduledWatering extends ScheduledJob {
 
     @Override
     public void doJob(JobDto job) {
-        state.setState(SystemStatus.WATERING);
-        runNested(actionRunner, job, tanksOpenAction, null);
         List<Valve> outputs = state.getOutputs().stream().filter(i -> i.getWateringTime() != null).collect(Collectors.toList());
+        log.debug("Starting watering job for valves {}", outputs);
         AtomicInteger counter = new AtomicInteger(outputs.size());
-        outputs.forEach(i -> {
-            log.info("Opening valve {}", i.getId());
-            runNested(actionRunner, job, valveOpenAction, i);
-            exec.schedule(() -> finish(job, i, counter), i.getWateringTime(), TimeUnit.SECONDS);
-        });
+        outputs.forEach(i -> runNested(actionRunner, job, wateringAction, new WateringDto(i.getId(), i, i.getWateringTime(), counter)));
     }
 
-    private void finish(JobDto job, Valve valve, AtomicInteger counter) {
-        log.info("Closing valve {}", valve.getId());
-        runNested(actionRunner, job, valveCloseAction, valve);
-        int c = counter.decrementAndGet();
-        if (c == 0) {
-            log.info("Stopping watering job...");
-            runNested(actionRunner, job, tanksCloseAction, null);
-            state.setState(SystemStatus.IDLE);
-            log.info("Watering finished!");
-        }
-    }
 }
