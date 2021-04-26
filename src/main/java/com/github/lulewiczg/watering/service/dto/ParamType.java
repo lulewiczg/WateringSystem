@@ -17,7 +17,7 @@ import java.util.function.Predicate;
 public enum ParamType {
 
     STRING(String.class, i -> i != null && i.getClass() == String.class),
-    VOID(Void.class, Objects::isNull), WATERING_DTO(WateringDto.class, i -> i instanceof Map);
+    VOID(Void.class, Objects::isNull), WATERING_DTO(WateringDto.class, Map.class::isInstance);
 
     private final Class<?> type;
 

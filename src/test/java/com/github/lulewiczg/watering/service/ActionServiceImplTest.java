@@ -24,8 +24,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 @SpringBootTest
@@ -110,7 +109,7 @@ class ActionServiceImplTest {
     void testRunActionVoidType() {
         ActionDto dto = new ActionDto(deCapitalize(EmergencyStopAction.class.getSimpleName()), null);
 
-        service.runAction(dto);
+        assertDoesNotThrow(() -> service.runAction(dto));
     }
 
     @Test
@@ -126,7 +125,7 @@ class ActionServiceImplTest {
     void testRunActionWithCustomParam() throws InterruptedException {
         ActionDto dto = new ActionDto(deCapitalize(WateringAction.class.getSimpleName()), Map.of("valveId", "out", "seconds", 1));
 
-        service.runAction(dto);
+        assertDoesNotThrow(() -> service.runAction(dto));
 
         Thread.sleep(1000);
     }

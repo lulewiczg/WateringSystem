@@ -36,7 +36,7 @@ public class ActionParamService {
 
     private final LocalValidatorFactoryBean validator;
 
-    private final Map<Class<?>, Function<ActionDto, Object>> HANDLERS = Map.of(
+    private final Map<Class<?>, Function<ActionDto, Object>> handlers = Map.of(
             Valve.class, i -> getState().findValve(i.getParam().toString()),
             Sensor.class, i -> getState().findSensor(i.getParam().toString()),
             WateringDto.class, this::handleWateringDto);
@@ -44,7 +44,7 @@ public class ActionParamService {
     @SneakyThrows
     public Object mapParam(ActionDto actionDto, ActionDefinitionDto definition) {
         Class<?> destType = definition.getParameterDestinationType();
-        Function<ActionDto, Object> handler = HANDLERS.get(destType);
+        Function<ActionDto, Object> handler = handlers.get(destType);
         if (handler != null) {
             return handler.apply(actionDto);
         }

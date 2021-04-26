@@ -1,15 +1,11 @@
 package com.github.lulewiczg.watering.service.actions;
 
 import com.github.lulewiczg.watering.TestUtils;
-import com.github.lulewiczg.watering.config.dto.ValveType;
 import com.github.lulewiczg.watering.exception.ActionException;
 import com.github.lulewiczg.watering.service.actions.dto.WateringDto;
 import com.github.lulewiczg.watering.service.dto.ActionDto;
-import com.github.lulewiczg.watering.service.dto.JobDto;
 import com.github.lulewiczg.watering.state.AppState;
 import com.github.lulewiczg.watering.state.SystemStatus;
-import com.github.lulewiczg.watering.state.dto.Valve;
-import com.pi4j.io.gpio.RaspiPin;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -20,7 +16,6 @@ import org.springframework.context.annotation.PropertySource;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
-import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -127,8 +122,9 @@ class WateringActionTest {
         when(runner.run("test.", tanksOpenAction, null)).thenReturn(TestUtils.ERROR_RESULT);
         ActionDto actionDto = new ActionDto("test");
         AtomicInteger counter = new AtomicInteger(1);
+        WateringDto dto = new WateringDto("test", TestUtils.Objects.OUT, 1, counter);
 
-        String error = assertThrows(ActionException.class, () ->  action.doAction(actionDto, new WateringDto("test", TestUtils.Objects.OUT, 1, counter))).getLocalizedMessage();
+        String error = assertThrows(ActionException.class, () -> action.doAction(actionDto, dto)).getLocalizedMessage();
 
         assertEquals("Action [id] failed: error", error);
         verify(state).setState(SystemStatus.WATERING);
@@ -145,8 +141,9 @@ class WateringActionTest {
         when(runner.run("test.", tanksCloseAction, null)).thenReturn(TestUtils.EMPTY_RESULT);
         ActionDto actionDto = new ActionDto("test");
         AtomicInteger counter = new AtomicInteger(1);
+        WateringDto dto = new WateringDto("test", TestUtils.Objects.OUT, 1, counter);
 
-        String error = assertThrows(ActionException.class, () ->  action.doAction(actionDto, new WateringDto("test", TestUtils.Objects.OUT, 1, counter))).getLocalizedMessage();
+        String error = assertThrows(ActionException.class, () -> action.doAction(actionDto, dto)).getLocalizedMessage();
 
         assertEquals("Action [id] failed: error", error);
         verify(state).setState(SystemStatus.WATERING);
