@@ -4,7 +4,6 @@ import com.github.lulewiczg.watering.exception.ValidationException;
 import com.github.lulewiczg.watering.service.actions.dto.WateringDto;
 import com.github.lulewiczg.watering.service.actions.dto.WateringDtoMapper;
 import com.github.lulewiczg.watering.service.dto.ActionDefinitionDto;
-import com.github.lulewiczg.watering.service.dto.ActionDto;
 import com.github.lulewiczg.watering.state.AppState;
 import com.github.lulewiczg.watering.state.dto.Sensor;
 import com.github.lulewiczg.watering.state.dto.Valve;
@@ -36,23 +35,30 @@ public class ActionParamService {
 
     private final LocalValidatorFactoryBean validator;
 
-    private final Map<Class<?>, Function<ActionDto, Object>> handlers = Map.of(
-            Valve.class, i -> getState().findValve(i.getParam().toString()),
-            Sensor.class, i -> getState().findSensor(i.getParam().toString()),
+    private final Map<Class<?>, Function<Object, Object>> handlers = Map.of(
+            Valve.class, i -> getState().findValve(i.toString()),
+            Sensor.class, i -> getState().findSensor(i.toString()),
             WateringDto.class, this::handleWateringDto);
 
+    /**
+     * Resolves action param
+     *
+     * @param definition action definition
+     * @param value      value
+     * @return resolved param
+     */
     @SneakyThrows
-    public Object mapParam(ActionDto actionDto, ActionDefinitionDto definition) {
+    public Object mapParam(ActionDefinitionDto definition, Object value) {
         Class<?> destType = definition.getParameterDestinationType();
-        Function<ActionDto, Object> handler = handlers.get(destType);
+        Function<Object, Object> handler = handlers.get(destType);
         if (handler != null) {
-            return handler.apply(actionDto);
+            return handler.apply(value);
         }
         return null;
     }
 
-    private WateringDto handleWateringDto(ActionDto actionDto) {
-        WateringDto wateringDto = wateringDtoMapper.map((Map<String, Object>) actionDto.getParam());
+    private WateringDto handleWateringDto(Object value) {
+        WateringDto wateringDto = wateringDtoMapper.map((Map<String, Object>) value);
         Set<ConstraintViolation<WateringDto>> errors = validator.validate(wateringDto);
         Optional<ConstraintViolation<WateringDto>> error = errors.stream().min(Comparator.comparing(i -> i.getPropertyPath().toString()));
         if (error.isPresent()) {

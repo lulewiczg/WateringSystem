@@ -13,7 +13,7 @@ import javax.validation.constraints.NotNull;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
- * DTO fro watering action.
+ * DTO for watering action.
  */
 @Data
 @NoArgsConstructor

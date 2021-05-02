@@ -76,7 +76,7 @@ public class ActionServiceImpl implements ActionService {
             log.error(e);
             throw new IllegalArgumentException("Job not found: " + jobDto.getName());
         }
-        log.trace("Running job {}", job::getName);
+        log.trace("Running job {}", job.getName());
         jobDto.setJob(job);
         return jobRunner.run(jobDto);
     }
@@ -90,7 +90,7 @@ public class ActionServiceImpl implements ActionService {
             throw new IllegalArgumentException("Action not found: " + actionDto.getName());
         }
         try {
-            Object param = actionParamService.mapParam(actionDto, actionDef);
+            Object param = actionParamService.mapParam(actionDef, actionDto.getParam());
             actionDto.setAction(action);
             return actionRunner.run(actionDto, param);
         } catch (Exception e) {
