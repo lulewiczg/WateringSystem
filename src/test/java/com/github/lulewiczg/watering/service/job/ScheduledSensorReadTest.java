@@ -51,6 +51,7 @@ class ScheduledSensorReadTest {
     @AfterEach
     void after() {
         verifyNoInteractions(readAction);
+        TestUtils.Objects.reset();
     }
 
     @BeforeEach

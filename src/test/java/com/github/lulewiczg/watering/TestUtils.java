@@ -57,13 +57,24 @@ public final class TestUtils {
         public static final Valve TAP_VALVE = new Valve("tap", "tap", ValveType.INPUT, false, false, 1, RaspiPin.GPIO_21);
         public static final Valve OUT = new Valve("out", "out", ValveType.OUTPUT, false, false, 1, RaspiPin.GPIO_30);
         public static final Valve OUT2 = new Valve("out2", "out2", ValveType.OUTPUT, false, true, 2, RaspiPin.GPIO_31);
-        public static final Sensor SENSOR = new Sensor("sensor1", 12, 21, null, Address.ADDR_40, RaspiPin.GPIO_10, 10, 1000, 100, 12);
-        public static final Sensor SENSOR2 = new Sensor("sensor2", 5, 100, null, Address.ADDR_41, null, 20, 50, 60, 5);
-        public static final Tank TANK = new Tank("tank", 100, SENSOR, VALVE);
-        public static final Tank TANK2 = new Tank("tank2", 100, SENSOR2, VALVE2);
+        public static Sensor SENSOR;
+        public static Sensor SENSOR2;
+        public static Tank TANK;
+        public static Tank TANK2;
         public static final WaterSource TAP = new WaterSource("water", TAP_VALVE);
         public static final Sensor OVERFLOW_SENSOR = new Sensor("overflowSensor", 10, 90, 100, Address.ADDR_40, null, 10, 12, 100, 200);
         public static final Tank OVERFLOW_TANK = new Tank("overflow", 100, OVERFLOW_SENSOR, VALVE);
+
+        public static void reset() {
+            SENSOR = new Sensor("sensor1", 12, 21, null, Address.ADDR_40, RaspiPin.GPIO_10, 10, 1000, 100, 12);
+            SENSOR2 = new Sensor("sensor2", 5, 100, null, Address.ADDR_41, null, 20, 50, 60, 5);
+            TANK = new Tank("tank", 100, SENSOR, VALVE);
+            TANK2 = new Tank("tank2", 100, SENSOR2, VALVE2);
+        }
+
+        static {
+            reset();
+        }
     }
 
     /**

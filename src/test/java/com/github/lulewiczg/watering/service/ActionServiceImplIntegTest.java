@@ -15,6 +15,7 @@ import com.github.lulewiczg.watering.service.dto.JobDto;
 import com.github.lulewiczg.watering.service.io.IOService;
 import com.github.lulewiczg.watering.service.job.*;
 import com.github.lulewiczg.watering.state.AppState;
+import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -44,6 +45,11 @@ class ActionServiceImplIntegTest {
 
     @Autowired
     private ObjectMapper mapper;
+
+    @AfterAll
+    static void after() {
+        TestUtils.Objects.reset();
+    }
 
     @Test
     void testGetActions() {

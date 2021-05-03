@@ -6,6 +6,7 @@ import com.github.lulewiczg.watering.service.io.IOService;
 import com.github.lulewiczg.watering.service.io.SensorService;
 import com.github.lulewiczg.watering.state.AppState;
 import com.github.lulewiczg.watering.state.dto.Tank;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,6 +36,11 @@ class WaterLevelReadActionTest {
 
     @Autowired
     private WaterLevelReadAction action;
+
+    @AfterEach
+    void after() {
+        TestUtils.Objects.reset();
+    }
 
     @Test
     void testAction() {
