@@ -1,10 +1,12 @@
 package com.github.lulewiczg.watering.service;
 
+import com.github.lulewiczg.watering.exception.HandlerNotFoundException;
 import com.github.lulewiczg.watering.exception.ValidationException;
 import com.github.lulewiczg.watering.service.actions.dto.WateringDto;
 import com.github.lulewiczg.watering.service.actions.dto.WateringDtoMapper;
 import com.github.lulewiczg.watering.service.dto.ActionDefinitionDto;
 import com.github.lulewiczg.watering.state.AppState;
+import com.github.lulewiczg.watering.state.dto.Pump;
 import com.github.lulewiczg.watering.state.dto.Sensor;
 import com.github.lulewiczg.watering.state.dto.Valve;
 import org.junit.jupiter.api.Test;
@@ -19,7 +21,8 @@ import org.springframework.validation.beanvalidation.LocalValidatorFactoryBean;
 
 import java.util.Map;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.when;
 
 @ActiveProfiles("test")
@@ -30,14 +33,14 @@ class ActionParamServiceTest {
     @MockBean
     private AppState state;
 
-    @MockBean
-    private WateringDtoMapper wateringDtoMapper;
-
     @Mock
     private Valve valve;
 
     @Mock
     private Sensor sensor;
+
+    @Mock
+    private Pump pump;
 
     @Autowired
     private ActionParamService service;
@@ -68,12 +71,22 @@ class ActionParamServiceTest {
     }
 
     @Test
+    void testResolvePump() {
+        when(state.findPump("id")).thenReturn(pump);
+        ActionDefinitionDto def = new ActionDefinitionDto();
+        def.setParameterDestinationType(Pump.class);
+
+        Object result = service.mapParam(def, "id");
+
+        assertEquals(pump, result);
+    }
+
+    @Test
     void testResolveWateringDto() {
         ActionDefinitionDto def = new ActionDefinitionDto();
         def.setParameterDestinationType(WateringDto.class);
         Map<String, Object> map = Map.of("valveId", "id", "seconds", 1);
         WateringDto dto = new WateringDto("id", null, 1, null);
-        when(wateringDtoMapper.map(map)).thenReturn(dto);
         Object result = service.mapParam(def, map);
 
         assertEquals(dto, result);
@@ -85,7 +98,6 @@ class ActionParamServiceTest {
         def.setParameterDestinationType(WateringDto.class);
         Map<String, Object> map = Map.of("seconds", 1);
         WateringDto dto = new WateringDto(null, null, 1, null);
-        when(wateringDtoMapper.map(map)).thenReturn(dto);
 
         String message = assertThrows(ValidationException.class, () -> service.mapParam(def, map)).getMessage();
 
@@ -98,7 +110,6 @@ class ActionParamServiceTest {
         def.setParameterDestinationType(WateringDto.class);
         Map<String, Object> map = Map.of("valveId", "id");
         WateringDto dto = new WateringDto("id", null, null, null);
-        when(wateringDtoMapper.map(map)).thenReturn(dto);
 
         String message = assertThrows(ValidationException.class, () -> service.mapParam(def, map)).getMessage();
 
@@ -110,8 +121,8 @@ class ActionParamServiceTest {
         ActionDefinitionDto def = new ActionDefinitionDto();
         def.setParameterDestinationType(Object.class);
 
-        Object result = service.mapParam(def, "id");
+        String message = assertThrows(HandlerNotFoundException.class, () -> service.mapParam(def, "id")).getMessage();
 
-        assertNull(result);
+        assertEquals("No handler found to handle [id] as [class java.lang.Object]!", message);
     }
 }

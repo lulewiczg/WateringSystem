@@ -99,6 +99,7 @@ class ActionServiceImplTest {
         when(applicationContext.getBeansOfType(Action.class))
                 .thenReturn(Map.of(deCapitalize(ValveOpenAction.class.getSimpleName()), valveOpenAction,
                         "action", action));
+        service.reloadJobs();
 
         List<ActionDefinitionDto> actions = service.getActions();
 
@@ -110,6 +111,7 @@ class ActionServiceImplTest {
     void testGetJobs() {
         when(applicationContext.getBeansOfType(ScheduledJob.class))
                 .thenReturn(Map.of(deCapitalize(ScheduledValveRead.class.getSimpleName()), job));
+        service.reloadJobs();
 
         List<JobDefinitionDto> jobs = service.getJobs();
 
@@ -124,6 +126,7 @@ class ActionServiceImplTest {
         when(valve.getId()).thenReturn("id");
         when(applicationContext.getBeansOfType(Action.class))
                 .thenReturn(Map.of(deCapitalize(ValveOpenAction.class.getSimpleName()), valveOpenAction));
+        service.reloadJobs();
         valveOpenActionDef.setAllowedValues(List.of("id"));
         ActionDto dto = new ActionDto(deCapitalize(ValveOpenAction.class.getSimpleName()), "id");
         when(actionParamService.mapParam(valveOpenActionDef, "id")).thenReturn(valve);
@@ -148,6 +151,7 @@ class ActionServiceImplTest {
         when(valve.getId()).thenReturn("id");
         when(applicationContext.getBeansOfType(Action.class))
                 .thenReturn(Map.of(deCapitalize(ValveOpenAction.class.getSimpleName()), valveOpenAction));
+        service.reloadJobs();
         valveOpenActionDef.setAllowedValues(List.of("id"));
         ActionDto dto = new ActionDto(deCapitalize(ValveOpenAction.class.getSimpleName()), "invalid");
         when(actionParamService.mapParam(valveOpenActionDef, dto)).thenReturn(valve);
@@ -163,6 +167,7 @@ class ActionServiceImplTest {
         when(valve.getId()).thenReturn("id");
         when(applicationContext.getBeansOfType(Action.class))
                 .thenReturn(Map.of(deCapitalize(ValveOpenAction.class.getSimpleName()), valveOpenAction));
+        service.reloadJobs();
         valveOpenActionDef.setAllowedValues(List.of("id"));
         ActionDto dto = new ActionDto(deCapitalize(ValveOpenAction.class.getSimpleName()), null);
         when(actionParamService.mapParam(valveOpenActionDef, dto)).thenReturn(valve);
@@ -178,6 +183,7 @@ class ActionServiceImplTest {
         when(valve.getId()).thenReturn("id");
         when(applicationContext.getBeansOfType(Action.class))
                 .thenReturn(Map.of(deCapitalize(ValveOpenAction.class.getSimpleName()), valveOpenAction));
+        service.reloadJobs();
         valveOpenActionDef.setAllowedValues(List.of("id"));
         ActionDto dto = new ActionDto(deCapitalize(ValveOpenAction.class.getSimpleName()), 1);
         when(actionParamService.mapParam(valveOpenActionDef, dto)).thenReturn(valve);
@@ -193,6 +199,7 @@ class ActionServiceImplTest {
         when(valve.getId()).thenReturn("id");
         when(applicationContext.getBeansOfType(Action.class))
                 .thenReturn(Map.of(deCapitalize(ValveOpenAction.class.getSimpleName()), outputsOpenAction));
+        service.reloadJobs();
         ActionDto dto = new ActionDto(deCapitalize(OutputsOpenAction.class.getSimpleName()), null);
         when(actionParamService.mapParam(outputsOpenActionDef, dto)).thenReturn(valve);
 
@@ -207,6 +214,7 @@ class ActionServiceImplTest {
         when(valve.getId()).thenReturn("id");
         when(applicationContext.getBeansOfType(Action.class))
                 .thenReturn(Map.of(deCapitalize(ValveOpenAction.class.getSimpleName()), outputsOpenAction));
+        service.reloadJobs();
         ActionDto dto = new ActionDto(deCapitalize(OutputsOpenAction.class.getSimpleName()), "some value");
         when(actionParamService.mapParam(outputsOpenActionDef, dto)).thenReturn(valve);
 
@@ -223,6 +231,7 @@ class ActionServiceImplTest {
         when(action.getAllowedValues()).thenReturn(null);
         String actionName = deCapitalize(action.getClass().getSimpleName());
         when(applicationContext.getBeansOfType(Action.class)).thenReturn(Map.of(actionName, action));
+        service.reloadJobs();
         Map<String, Object> param = Map.of("valveId", "out", "seconds", 1);
         ActionDto dto = new ActionDto(actionName, param);
         WateringDto expected = new WateringDto("out", null, 1, null);
@@ -241,6 +250,7 @@ class ActionServiceImplTest {
         when(action.getAllowedValues()).thenReturn(null);
         String actionName = deCapitalize(action.getClass().getSimpleName());
         when(applicationContext.getBeansOfType(Action.class)).thenReturn(Map.of(actionName, action));
+        service.reloadJobs();
         ActionDto dto = new ActionDto(actionName, null);
 
         String message = assertThrows(TypeMismatchException.class, () -> service.runAction(dto)).getMessage();
@@ -256,6 +266,7 @@ class ActionServiceImplTest {
         when(action.getAllowedValues()).thenReturn(null);
         String actionName = deCapitalize(action.getClass().getSimpleName());
         when(applicationContext.getBeansOfType(Action.class)).thenReturn(Map.of(actionName, action));
+        service.reloadJobs();
         ActionDto dto = new ActionDto(actionName, 1);
 
         String message = assertThrows(TypeMismatchException.class, () -> service.runAction(dto)).getMessage();
@@ -266,9 +277,10 @@ class ActionServiceImplTest {
     @Test
     void testRunJob() {
         String name = deCapitalize(setDefaults.getClass().getSimpleName());
-        when(applicationContext.getBeansOfType(ScheduledJob.class))
-                .thenReturn(Map.of(name, setDefaults));
+        when(setDefaults.canBeStarted()).thenReturn(true);
+        when(applicationContext.getBeansOfType(ScheduledJob.class)).thenReturn(Map.of(name, setDefaults));
         when(applicationContext.getBean(name, ScheduledJob.class)).thenReturn(setDefaults);
+        service.reloadJobs();
         when(setDefaults.canBeStarted()).thenReturn(true);
         JobDto dto = new JobDto(name);
         service.runJob(dto);

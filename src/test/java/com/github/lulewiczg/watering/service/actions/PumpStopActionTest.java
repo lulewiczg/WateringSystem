@@ -12,13 +12,14 @@ import org.springframework.context.annotation.Import;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.mockito.Mockito.verify;
 
 @ActiveProfiles("test")
-@Import(ValveCloseAction.class)
+@Import(PumpStopAction.class)
 @ExtendWith(SpringExtension.class)
-class ValveCloseActionTest {
+class PumpStopActionTest {
 
     @MockBean
     private IOService service;
@@ -27,21 +28,21 @@ class ValveCloseActionTest {
     private AppState state;
 
     @Autowired
-    private ValveCloseAction action;
+    private PumpStopAction action;
 
     @Test
     void testClose() {
-        action.doAction(new ActionDto(), TestUtils.Objects.VALVE);
+        action.doAction(new ActionDto(), TestUtils.Objects.PUMP);
 
-        verify(service).toggleOff(TestUtils.Objects.VALVE.getPin());
-        assertFalse(TestUtils.Objects.VALVE.isOpen());
+        verify(service).toggleOff(TestUtils.Objects.PUMP.getPin());
+        assertFalse(TestUtils.Objects.PUMP.isRunning());
     }
 
     @Test
     void testAlreadyClosed() {
-        action.doAction(new ActionDto(), TestUtils.Objects.VALVE);
+        action.doAction(new ActionDto(), TestUtils.Objects.PUMP);
 
-        verify(service).toggleOff(TestUtils.Objects.VALVE.getPin());
-        assertFalse(TestUtils.Objects.VALVE.isOpen());
+        verify(service).toggleOff(TestUtils.Objects.PUMP.getPin());
+        assertFalse(TestUtils.Objects.PUMP.isRunning());
     }
 }

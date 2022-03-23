@@ -7,10 +7,7 @@ import com.github.lulewiczg.watering.config.dto.TankType;
 import com.github.lulewiczg.watering.config.dto.ValveType;
 import com.github.lulewiczg.watering.exception.SensorNotFoundException;
 import com.github.lulewiczg.watering.exception.ValveNotFoundException;
-import com.github.lulewiczg.watering.state.dto.Sensor;
-import com.github.lulewiczg.watering.state.dto.Tank;
-import com.github.lulewiczg.watering.state.dto.Valve;
-import com.github.lulewiczg.watering.state.dto.WaterSource;
+import com.github.lulewiczg.watering.state.dto.*;
 import com.github.lulewiczg.watering.state.mapper.TankMapper;
 import com.github.lulewiczg.watering.state.mapper.ValveMapper;
 import com.github.lulewiczg.watering.state.mapper.WaterSourceMapper;
@@ -49,6 +46,8 @@ public class AppState {
 
     private List<Valve> outputs;
 
+    private List<Pump> pumps;
+
     /**
      * Finds valve with given ID.
      *
@@ -63,7 +62,7 @@ public class AppState {
     }
 
     /**
-     * Finds senor with given ID.
+     * Finds sensor with given ID.
      *
      * @param id ID
      * @return sensor
@@ -71,6 +70,16 @@ public class AppState {
     public Sensor findSensor(String id) {
         return tanks.stream().map(Tank::getSensor).filter(i -> i != null && i.getId().equals(id)).findFirst()
                 .orElseThrow(() -> new SensorNotFoundException(id));
+    }
+
+    /**
+     * Finds pump with given ID.
+     *
+     * @param id ID
+     * @return pump
+     */
+    public Pump findPump(String id) {
+        return pumps.stream().filter(i -> i.getId().equals(id)).findFirst().orElseThrow(() -> new SensorNotFoundException(id));
     }
 
     /**
@@ -114,5 +123,7 @@ public class AppState {
 
         this.outputs = valveMapper.map(config.getValves().stream()
                 .filter(i -> i.getType() == ValveType.OUTPUT).collect(Collectors.toList()));
+
+        this.pumps = tanks.stream().map(Tank::getPump).filter(Objects::nonNull).collect(Collectors.toList());
     }
 }

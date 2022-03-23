@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.github.lulewiczg.watering.state.dto.Valve;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
 import javax.validation.constraints.Max;
@@ -32,6 +33,7 @@ public class WateringDto {
     private Integer seconds;
 
     @JsonIgnore
+    @EqualsAndHashCode.Exclude
     private AtomicInteger counter = new AtomicInteger(1);
 
 }

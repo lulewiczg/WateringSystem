@@ -1,15 +1,17 @@
-tank,123,testSensor,testValve,DEFAULT,
-tank,555,,testValve,DEFAULT,
-tank,321,testSensor,testValve,UNLIMITED,
-tank,,,testValve,UNLIMITED,
-tank,112233,,testValve,UNLIMITED,
-tank,22,testSensor,,DEFAULT,
-tank,22,testSensor,,UNLIMITED,
-tank,-1,testSensor,testValve,DEFAULT,tanks[0].volume must be greater than or equal to 0
-tank,445566,testSensor,testValve,,tanks[0].type must not be null
-tank,9999,noSensor,testValve,DEFAULT,Can not find water level sensor for tank: tank
-tank,9999,noSensor,testValve,UNLIMITED,Can not find water level sensor for tank: tank
-tank,44444,testSensor,noValve,DEFAULT,Can not find valve for tank: tank
-tank,44444,testSensor,noValve,UNLIMITED,Can not find valve for tank: tank
-,123,testSensor,testValve,DEFAULT,tanks[0].id must not be empty
-tank,22,testSensor,invalidValve,UNLIMITED,Can not find valve for tank: tank
+tank,123,testSensor,testValve,pump1,DEFAULT,
+tank,555,,testValve,pump1,DEFAULT,
+tank,321,testSensor,testValve,pump1,UNLIMITED,
+tank,,,testValve,pump1,UNLIMITED,
+tank,112233,,testValve,pump1,UNLIMITED,
+tank,22,testSensor,,pump1,DEFAULT,
+tank,22,testSensor,,pump1,UNLIMITED,
+tank,-1,testSensor,testValve,pump1,DEFAULT,tanks[0].volume must be greater than or equal to 0
+tank,445566,testSensor,testValve,pump1,,tanks[0].type must not be null
+tank,9999,noSensor,testValve,pump1,DEFAULT,Can not find water level sensor for tank: tank
+tank,9999,noSensor,testValve,pump1,UNLIMITED,Can not find water level sensor for tank: tank
+tank,44444,testSensor,noValve,pump1,DEFAULT,Can not find valve for tank: tank
+tank,44444,testSensor,noValve,pump1,UNLIMITED,Can not find valve for tank: tank
+,123,testSensor,testValve,pump1,DEFAULT,tanks[0].id must not be empty
+tank,22,testSensor,invalidValve,pump1,UNLIMITED,Can not find valve for tank: tank
+tank,22,testSensor,,pump2,DEFAULT,Can not find pump for tank: tank
+tank,22,testSensor,,pump2,UNLIMITED,Can not find pump for tank: tank

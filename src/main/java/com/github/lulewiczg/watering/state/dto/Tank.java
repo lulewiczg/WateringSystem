@@ -20,4 +20,6 @@ public class Tank {
 
     private Valve valve;
 
+    private Pump pump;
+
 }

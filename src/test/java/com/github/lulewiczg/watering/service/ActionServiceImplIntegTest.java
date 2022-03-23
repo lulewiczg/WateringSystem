@@ -8,6 +8,7 @@ import com.github.lulewiczg.watering.exception.TypeMismatchException;
 import com.github.lulewiczg.watering.exception.ValueNotAllowedException;
 import com.github.lulewiczg.watering.service.actions.EmergencyStopAction;
 import com.github.lulewiczg.watering.service.actions.WaterLevelReadAction;
+import com.github.lulewiczg.watering.service.actions.dto.WateringDto;
 import com.github.lulewiczg.watering.service.dto.ActionDefinitionDto;
 import com.github.lulewiczg.watering.service.dto.ActionDto;
 import com.github.lulewiczg.watering.service.dto.JobDefinitionDto;
@@ -20,14 +21,17 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 @SpringBootTest
@@ -63,10 +67,35 @@ class ActionServiceImplIntegTest {
     @Test
     void testGetJobs() {
         List<JobDefinitionDto> jobs = service.getJobs();
-        List<JobDefinitionDto> expected = List.of(ScheduledOverflowWaterControl.class, ScheduledSensorRead.class, ScheduledValveRead.class,
-                ScheduledWaterEscapeControl.class, ScheduledWaterFillControl.class, ScheduledWatering.class, SetDefaults.class)
-                .stream().map(i -> new JobDefinitionDto(deCapitalize(i.getSimpleName()), true)).collect(Collectors.toList());
+        List<JobDefinitionDto> expected = Stream.of(ScheduledOverflowWaterControl.class, ScheduledSensorRead.class, ScheduledValveRead.class,
+                        ScheduledWaterEscapeControl.class, ScheduledWaterFillControl.class, ScheduledWatering.class, SetDefaults.class)
+                .map(i -> new JobDefinitionDto(deCapitalize(i.getSimpleName()), true)).collect(Collectors.toList());
         assertEquals(expected, jobs);
+    }
+
+
+    @Test
+    @DirtiesContext
+    void testActions() {
+        List<ActionDefinitionDto> actions = service.getActions();
+        actions.forEach(i -> {
+            Object param = Optional.ofNullable(i.getAllowedValues()).map(j -> j.get(0)).orElse(null);
+            if (i.getParameterDestinationType() == WateringDto.class) {
+                param = Map.of("valveId","valve1", "seconds", 2);
+            }
+            ActionDto action = new ActionDto(i.getActionName(), param);
+            assertDoesNotThrow(() -> service.runAction(action));
+        });
+    }
+
+    @Test
+    @DirtiesContext
+    void testJobs() {
+        List<JobDefinitionDto> jobs = service.getJobs();
+        jobs.forEach(i -> {
+            JobDto action = new JobDto("test", i.getJobName());
+            assertDoesNotThrow(() -> service.runJob(action));
+        });
     }
 
     @Test

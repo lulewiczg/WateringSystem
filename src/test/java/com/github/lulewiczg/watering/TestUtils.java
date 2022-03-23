@@ -6,10 +6,7 @@ import com.github.lulewiczg.watering.exception.ApiError;
 import com.github.lulewiczg.watering.service.dto.ActionResultDto;
 import com.github.lulewiczg.watering.service.ina219.enums.Address;
 import com.github.lulewiczg.watering.state.AppState;
-import com.github.lulewiczg.watering.state.dto.Sensor;
-import com.github.lulewiczg.watering.state.dto.Tank;
-import com.github.lulewiczg.watering.state.dto.Valve;
-import com.github.lulewiczg.watering.state.dto.WaterSource;
+import com.github.lulewiczg.watering.state.dto.*;
 import com.pi4j.io.gpio.RaspiPin;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
@@ -61,15 +58,16 @@ public final class TestUtils {
         public static Sensor SENSOR2;
         public static Tank TANK;
         public static Tank TANK2;
+        public static final Pump PUMP = new Pump("pump1", "pump", false, RaspiPin.GPIO_25);
         public static final WaterSource TAP = new WaterSource("water", TAP_VALVE);
         public static final Sensor OVERFLOW_SENSOR = new Sensor("overflowSensor", 10, 90, 100, Address.ADDR_40, null, 10, 12, 100, 200);
-        public static final Tank OVERFLOW_TANK = new Tank("overflow", 100, OVERFLOW_SENSOR, VALVE);
+        public static final Tank OVERFLOW_TANK = new Tank("overflow", 100, OVERFLOW_SENSOR, VALVE, PUMP);
 
         public static void reset() {
             SENSOR = new Sensor("sensor1", 12, 21, null, Address.ADDR_40, RaspiPin.GPIO_10, 10, 1000, 100, 12);
             SENSOR2 = new Sensor("sensor2", 5, 100, null, Address.ADDR_41, null, 20, 50, 60, 5);
-            TANK = new Tank("tank", 100, SENSOR, VALVE);
-            TANK2 = new Tank("tank2", 100, SENSOR2, VALVE2);
+            TANK = new Tank("tank", 100, SENSOR, VALVE, PUMP);
+            TANK2 = new Tank("tank2", 100, SENSOR2, VALVE2, null);
         }
 
         static {
@@ -87,10 +85,11 @@ public final class TestUtils {
         public static final ValveConfig OUT = new ValveConfig("out", "out", ValveType.OUTPUT, "GPIO 6", true, true, 333L);
         public static final WaterLevelSensorConfig SENSOR = new WaterLevelSensorConfig("sensor1", 12, 21, Address.ADDR_40, "GPIO 10", 10, 1000, 100, 12);
         public static final WaterLevelSensorConfig SENSOR2 = new WaterLevelSensorConfig("sensor2", 5, 100, Address.ADDR_41, "", 20, 50, 60, 5);
-        public static final TankConfig TANK = new TankConfig("tank1", 123, "sensor1", "valve1", TankType.DEFAULT);
-        public static final TankConfig TANK2 = new TankConfig("tank2", 321, "sensor2", "valve2", TankType.DEFAULT);
-        public static final TankConfig TAP = new TankConfig("tap", null, null, "tap", TankType.UNLIMITED);
-        public static final TankConfig TANK_NO_SENSOR = new TankConfig("tank1", 123, null, "valve1", TankType.DEFAULT);
+        public static final TankConfig TANK = new TankConfig("tank1", 123, "sensor1", "valve1", "pump1", TankType.DEFAULT);
+        public static final TankConfig TANK2 = new TankConfig("tank2", 321, "sensor2", "valve2", null, TankType.DEFAULT);
+        public static final TankConfig TAP = new TankConfig("tap", null, null, "tap", null, TankType.UNLIMITED);
+        public static final TankConfig TANK_NO_SENSOR = new TankConfig("tank1", 123, null, "valve1", null, TankType.DEFAULT);
+        public static final PumpConfig PUMP = new PumpConfig("pump1", "Pump 1", "GPIO 15");
     }
 
     /**
@@ -163,8 +162,8 @@ public final class TestUtils {
         ApiError expected = new ApiError(403, FORBIDDEN, FORBIDDEN_MSG);
 
         String json = mvc.perform(post(url)
-                .content(mapper.writeValueAsString(payload))
-                .contentType(MediaType.APPLICATION_JSON))
+                        .content(mapper.writeValueAsString(payload))
+                        .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isForbidden())
                 .andReturn().getResponse().getContentAsString();
 
@@ -184,8 +183,8 @@ public final class TestUtils {
         ApiError expected = new ApiError(401, UNAUTHORIZED, UNAUTHORIZED_MSG);
 
         String json = mvc.perform(post(url)
-                .content(mapper.writeValueAsString(payload))
-                .contentType(MediaType.APPLICATION_JSON))
+                        .content(mapper.writeValueAsString(payload))
+                        .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isUnauthorized())
                 .andReturn().getResponse().getContentAsString();
 
@@ -251,8 +250,8 @@ public final class TestUtils {
     @SneakyThrows
     public static void tesNotFoundPost(MockMvc mvc, ObjectMapper mapper, String url, Object payload) {
         mvc.perform(post(url)
-                .content(mapper.writeValueAsString(payload))
-                .contentType(MediaType.APPLICATION_JSON))
+                        .content(mapper.writeValueAsString(payload))
+                        .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNotFound());
     }
 

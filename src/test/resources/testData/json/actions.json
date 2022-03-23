@@ -27,6 +27,28 @@
     "returnType": "java.lang.Void"
   },
   {
+    "actionName": "pumpStartAction",
+    "description": "Starts given pump",
+    "parameterType": "java.lang.String",
+    "parameterDestinationType": "com.github.lulewiczg.watering.state.dto.Pump",
+    "allowedValues": [
+      "pump1"
+    ],
+    "parameterDescription": "Pump ID",
+    "returnType": "java.lang.Void"
+  },
+  {
+    "actionName": "pumpStopAction",
+    "description": "Stops given pump",
+    "parameterType": "java.lang.String",
+    "parameterDestinationType": "com.github.lulewiczg.watering.state.dto.Pump",
+    "allowedValues": [
+      "pump1"
+    ],
+    "parameterDescription": "Pump ID",
+    "returnType": "java.lang.Void"
+  },
+  {
     "actionName": "tanksCloseAction",
     "description": "Closes tanks valves",
     "parameterType": "java.lang.Void",

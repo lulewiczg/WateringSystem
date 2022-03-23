@@ -2,10 +2,7 @@ package com.github.lulewiczg.watering.service.job;
 
 import com.github.lulewiczg.watering.TestUtils;
 import com.github.lulewiczg.watering.exception.ActionException;
-import com.github.lulewiczg.watering.service.actions.ActionRunner;
-import com.github.lulewiczg.watering.service.actions.TanksCloseAction;
-import com.github.lulewiczg.watering.service.actions.ValveCloseAction;
-import com.github.lulewiczg.watering.service.actions.ValveOpenAction;
+import com.github.lulewiczg.watering.service.actions.*;
 import com.github.lulewiczg.watering.service.dto.JobDto;
 import com.github.lulewiczg.watering.service.ina219.enums.Address;
 import com.github.lulewiczg.watering.state.AppState;
@@ -48,6 +45,9 @@ class ScheduledOverflowWaterControlTest {
     private ValveCloseAction valveCloseAction;
 
     @MockBean
+    private PumpStartAction pumpStartAction;
+
+    @MockBean
     private AppState state;
 
     @MockBean
@@ -64,6 +64,7 @@ class ScheduledOverflowWaterControlTest {
         verifyNoInteractions(tanksCloseAction);
         verifyNoInteractions(valveOpenAction);
         verifyNoInteractions(valveCloseAction);
+        verifyNoInteractions(pumpStartAction);
     }
 
     @Test
@@ -80,7 +81,7 @@ class ScheduledOverflowWaterControlTest {
     @CsvFileSource(resources = "/testData/overflow-running-test.csv")
     void testAlreadyRunning(int minLevel, int maxLevel, Integer level) {
         Sensor sensor = new Sensor("sensor", minLevel, maxLevel, level, Address.ADDR_40, RaspiPin.GPIO_10, 10, 12, 100, 200);
-        Tank tank = new Tank("tank", 100, sensor, TestUtils.Objects.VALVE);
+        Tank tank = new Tank("tank", 100, sensor, TestUtils.Objects.VALVE, null);
         when(state.getTanks()).thenReturn(List.of(tank));
         when(state.getOverflowValves()).thenReturn(List.of(TestUtils.Objects.OUT));
         JobDto jobDto = new JobDto("test", null);
@@ -90,6 +91,7 @@ class ScheduledOverflowWaterControlTest {
         verify(runner, never()).run(any(), eq(tanksCloseAction), any());
         verify(runner, never()).run(any(), eq(valveOpenAction), any());
         verify(runner, never()).run(any(), eq(valveCloseAction), any());
+        verify(runner, never()).run(any(), eq(pumpStartAction), any());
         verify(state, never()).setState(any());
     }
 
@@ -97,7 +99,7 @@ class ScheduledOverflowWaterControlTest {
     @CsvFileSource(resources = "/testData/overflow-ok-test.csv")
     void testAlreadyRunningNotFinished(int minLevel, int maxLevel, Integer level) {
         Sensor sensor = new Sensor("sensor", minLevel, maxLevel, level, Address.ADDR_40, RaspiPin.GPIO_10, 10, 12, 100, 200);
-        Tank tank = new Tank("tank", 100, sensor, TestUtils.Objects.VALVE);
+        Tank tank = new Tank("tank", 100, sensor, TestUtils.Objects.VALVE, null);
         when(state.getTanks()).thenReturn(List.of(tank));
         when(state.getOverflowValves()).thenReturn(List.of(TestUtils.Objects.OUT));
         JobDto jobDto = new JobDto("test", null);
@@ -110,7 +112,7 @@ class ScheduledOverflowWaterControlTest {
         verify(runner, never()).run(any(), eq(valveOpenAction), any());
         verify(runner).run("test.", valveCloseAction, TestUtils.Objects.OUT);
         verify(runner, never()).run("test.", valveCloseAction, TestUtils.Objects.VALVE);
-
+        verify(runner, never()).run(any(), eq(pumpStartAction), any());
         verify(state).setState(SystemStatus.IDLE);
     }
 
@@ -118,7 +120,7 @@ class ScheduledOverflowWaterControlTest {
     @CsvFileSource(resources = "/testData/overflow-ok-test.csv")
     void testOverflowOk(int minLevel, int maxLevel, Integer level) {
         Sensor sensor = new Sensor("sensor", minLevel, maxLevel, level, Address.ADDR_40, RaspiPin.GPIO_10, 10, 12, 100, 200);
-        Tank tank = new Tank("tank", 100, sensor, TestUtils.Objects.VALVE);
+        Tank tank = new Tank("tank", 100, sensor, TestUtils.Objects.VALVE, null);
         when(state.getTanks()).thenReturn(List.of(tank));
         when(state.getOverflowValves()).thenReturn(List.of(TestUtils.Objects.OUT));
         JobDto jobDto = new JobDto("test", null);
@@ -128,6 +130,7 @@ class ScheduledOverflowWaterControlTest {
         verify(runner, never()).run(any(), eq(tanksCloseAction), any());
         verify(runner, never()).run(any(), eq(valveOpenAction), any());
         verify(runner, never()).run(any(), eq(valveCloseAction), any());
+        verify(runner, never()).run(any(), eq(pumpStartAction), any());
         verify(state, never()).setState(any());
     }
 
@@ -135,12 +138,37 @@ class ScheduledOverflowWaterControlTest {
     @CsvFileSource(resources = "/testData/overflow-test.csv")
     void testOverflow(int minLevel, int maxLevel, int level) {
         Sensor sensor = new Sensor("sensor", minLevel, maxLevel, level, Address.ADDR_40, RaspiPin.GPIO_10, 10, 12, 100, 200);
-        Tank tank = new Tank("tank", 100, sensor, TestUtils.Objects.VALVE);
+        Tank tank = new Tank("tank", 100, sensor, TestUtils.Objects.VALVE, TestUtils.Objects.PUMP);
         when(state.getTanks()).thenReturn(List.of(tank, TestUtils.Objects.TANK2));
         when(state.getOverflowValves()).thenReturn(List.of(TestUtils.Objects.OUT));
         JobDto jobDto = new JobDto("test", null);
         when(runner.run("test.", valveOpenAction, TestUtils.Objects.OUT)).thenReturn(TestUtils.EMPTY_RESULT);
         when(runner.run("test.", valveOpenAction, TestUtils.Objects.VALVE)).thenReturn(TestUtils.EMPTY_RESULT);
+        when(runner.run("test.", pumpStartAction, TestUtils.Objects.PUMP)).thenReturn(TestUtils.EMPTY_RESULT);
+
+
+        job.doJob(jobDto);
+
+        verify(runner, never()).run(any(), eq(tanksCloseAction), any());
+        verify(runner).run("test.", valveOpenAction, TestUtils.Objects.OUT);
+        verify(runner).run("test.", valveOpenAction, TestUtils.Objects.VALVE);
+        verify(runner).run("test.", pumpStartAction, TestUtils.Objects.PUMP);
+        verify(runner, never()).run("test.", valveOpenAction, TestUtils.Objects.VALVE2);
+        verify(runner, never()).run(any(), eq(valveCloseAction), any());
+        verify(state).setState(SystemStatus.DRAINING);
+    }
+
+    @Test
+    void testOverflowNoPump() {
+        Sensor sensor = new Sensor("sensor", 0, 90, 100, Address.ADDR_40, RaspiPin.GPIO_10, 10, 12, 100, 200);
+        Tank tank = new Tank("tank", 100, sensor, TestUtils.Objects.VALVE, null);
+        when(state.getTanks()).thenReturn(List.of(tank, TestUtils.Objects.TANK2));
+        when(state.getOverflowValves()).thenReturn(List.of(TestUtils.Objects.OUT));
+        JobDto jobDto = new JobDto("test", null);
+        when(runner.run("test.", valveOpenAction, TestUtils.Objects.OUT)).thenReturn(TestUtils.EMPTY_RESULT);
+        when(runner.run("test.", valveOpenAction, TestUtils.Objects.VALVE)).thenReturn(TestUtils.EMPTY_RESULT);
+        when(runner.run("test.", pumpStartAction, TestUtils.Objects.PUMP)).thenReturn(TestUtils.EMPTY_RESULT);
+
 
         job.doJob(jobDto);
 
@@ -149,6 +177,7 @@ class ScheduledOverflowWaterControlTest {
         verify(runner).run("test.", valveOpenAction, TestUtils.Objects.VALVE);
         verify(runner, never()).run("test.", valveOpenAction, TestUtils.Objects.VALVE2);
         verify(runner, never()).run(any(), eq(valveCloseAction), any());
+        verify(runner, never()).run(any(), eq(pumpStartAction), any());
         verify(state).setState(SystemStatus.DRAINING);
     }
 
@@ -162,6 +191,25 @@ class ScheduledOverflowWaterControlTest {
         String error = assertThrows(ActionException.class, () -> job.doJob(jobDto)).getLocalizedMessage();
 
         assertEquals("Action [id] failed: error", error);
+        verify(runner, never()).run(any(), eq(tanksCloseAction), any());
+        verify(runner, never()).run(any(), eq(valveCloseAction), any());
+        verify(runner, never()).run(any(), eq(pumpStartAction), any());
+    }
+
+    @Test
+    void testPumpStartFail() {
+        when(state.getTanks()).thenReturn(List.of(TestUtils.Objects.OVERFLOW_TANK));
+        when(runner.run("test.", valveOpenAction, TestUtils.Objects.VALVE)).thenReturn(TestUtils.EMPTY_RESULT);
+        when(runner.run("test.", pumpStartAction, TestUtils.Objects.PUMP)).thenReturn(TestUtils.ERROR_RESULT);
+        when(state.getOverflowValves()).thenReturn(List.of(TestUtils.Objects.OUT));
+        JobDto jobDto = new JobDto("test", null);
+
+        String error = assertThrows(ActionException.class, () -> job.doJob(jobDto)).getLocalizedMessage();
+
+        assertEquals("Action [id] failed: error", error);
+        verify(runner).run("test.", valveOpenAction, TestUtils.Objects.VALVE);
+        verify(runner, never()).run("test.", valveOpenAction, TestUtils.Objects.OUT);
+        verify(runner, never()).run(any(), eq(tanksCloseAction), any());
         verify(runner, never()).run(any(), eq(tanksCloseAction), any());
         verify(runner, never()).run(any(), eq(valveCloseAction), any());
     }
@@ -178,6 +226,7 @@ class ScheduledOverflowWaterControlTest {
 
         assertEquals("Action [id] failed: error", error);
         verify(runner, never()).run(any(), eq(valveOpenAction), any());
+        verify(runner, never()).run(any(), eq(pumpStartAction), any());
     }
 
     @Test
@@ -192,12 +241,13 @@ class ScheduledOverflowWaterControlTest {
 
         verify(runner).run("test.", tanksCloseAction, null);
         verify(runner, never()).run(any(), eq(valveOpenAction), any());
+        verify(runner, never()).run(any(), eq(pumpStartAction), any());
         verify(state, never()).setState(any());
     }
 
     @Test
     void testNoSensor() {
-        Tank tank = new Tank("tank", 100, null, TestUtils.Objects.VALVE);
+        Tank tank = new Tank("tank", 100, null, TestUtils.Objects.VALVE, null);
         when(state.getTanks()).thenReturn(List.of(tank));
         when(state.getOverflowValves()).thenReturn(List.of(TestUtils.Objects.OUT));
         JobDto jobDto = new JobDto("test", null);
@@ -207,6 +257,7 @@ class ScheduledOverflowWaterControlTest {
         verify(runner, never()).run(any(), eq(tanksCloseAction), any());
         verify(runner, never()).run(any(), eq(valveOpenAction), any());
         verify(runner, never()).run(any(), eq(valveCloseAction), any());
+        verify(runner, never()).run(any(), eq(pumpStartAction), any());
         verify(state, never()).setState(any());
     }
 

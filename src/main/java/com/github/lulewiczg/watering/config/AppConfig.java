@@ -1,10 +1,7 @@
 package com.github.lulewiczg.watering.config;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.github.lulewiczg.watering.config.dto.TankConfig;
-import com.github.lulewiczg.watering.config.dto.ValveConfig;
-import com.github.lulewiczg.watering.config.dto.ValveType;
-import com.github.lulewiczg.watering.config.dto.WaterLevelSensorConfig;
+import com.github.lulewiczg.watering.config.dto.*;
 import com.pi4j.io.gpio.Pin;
 import com.pi4j.io.gpio.RaspiPin;
 import lombok.Data;
@@ -46,6 +43,9 @@ public class AppConfig {
     @NotNull
     private final List<WaterLevelSensorConfig> sensors;
 
+    @Valid
+    private final List<PumpConfig> pumps;
+
     @JsonIgnore
     @Value("#{${app.config.appConfig.runPostConstruct:true} && '${com.github.lulewiczg.watering.role:}' != 'master'}")
     private boolean runPostConstruct;
@@ -65,6 +65,9 @@ public class AppConfig {
         validatePins();
         validateAddresses();
         validateValves();
+        if (pumps != null) {
+            validatePumps();
+        }
     }
 
     private void validate(TankConfig tank) {
@@ -80,12 +83,23 @@ public class AppConfig {
             waterLevelSensor.validate();
             tank.setSensor(waterLevelSensor);
         }
+        if (tank.getPumpId() != null) {
+            if (pumps == null) {
+                throw new IllegalStateException("No pumps declared!");
+            }
+            PumpConfig pump = pumps.stream().filter(i -> i.getId().equals(tank.getPumpId())).findFirst()
+                    .orElseThrow(() -> new IllegalStateException("Can not find pump for tank: " + tank.getId()));
+            tank.setPump(pump);
+        }
     }
 
     private void validatePins() {
         List<String> usedPins = new ArrayList<>();
         valves.forEach(i -> validatePin(usedPins, i));
         sensors.forEach(i -> validateSensorPin(usedPins, i));
+        if (pumps != null) {
+            pumps.forEach(i -> validatePin(usedPins, i));
+        }
     }
 
     private void validateAddresses() {
@@ -95,8 +109,8 @@ public class AppConfig {
         }
     }
 
-    private void validatePin(List<String> usedPins, ValveConfig valve) {
-        String name = valve.getPinName();
+    private void validatePin(List<String> usedPins, PinnableConfig config) {
+        String name = config.getPinName();
         if (usedPins.contains(name)) {
             throw new IllegalStateException("Pin already in use: " + name);
         }
@@ -104,7 +118,7 @@ public class AppConfig {
         if (pin == null) {
             throw new IllegalStateException("Could not find pin: " + name);
         }
-        valve.setPin(pin);
+        config.setPin(pin);
         usedPins.add(name);
     }
 
@@ -131,6 +145,13 @@ public class AppConfig {
         Optional<ValveConfig> invalidInput = valves.stream().filter(i -> i.getType() == ValveType.INPUT && i.getWateringTime() != null).findFirst();
         if (invalidInput.isPresent()) {
             throw new IllegalStateException(String.format("Input valve %s cannot have watering time!", invalidInput.get().getId()));
+        }
+    }
+
+    private void validatePumps() {
+        Optional<PumpConfig> incorrect = pumps.stream().filter(i -> tanks.stream().noneMatch(j -> j.getPump() != null && j.getPump().getId().equals(i.getId()))).findFirst();
+        if (incorrect.isPresent()) {
+            throw new IllegalStateException(String.format("Pump %s has no mapping!", incorrect.get().getId()));
         }
     }
 }

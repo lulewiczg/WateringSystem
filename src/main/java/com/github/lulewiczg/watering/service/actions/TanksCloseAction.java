@@ -8,6 +8,8 @@ import lombok.extern.log4j.Log4j2;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.stereotype.Component;
 
+import java.util.Optional;
+
 /**
  * Action for closing tanks.
  */
@@ -21,12 +23,17 @@ public class TanksCloseAction extends Action<Void, Void> {
 
     private final ValveCloseAction closeAction;
 
+    private final PumpStopAction pumpStopAction;
+
     private final ActionRunner actionRunner;
 
     @Override
     protected Void doAction(ActionDto actionDto, Void param) {
         log.info("Closing tanks...");
-        state.getTanks().forEach(i -> runNested(actionRunner, actionDto, closeAction, i.getValve()));
+        state.getTanks().forEach(i -> {
+            Optional.ofNullable(i.getPump()).ifPresent(j -> runNested(actionRunner, actionDto, pumpStopAction, j));
+            runNested(actionRunner, actionDto, closeAction, i.getValve());
+        });
         return null;
     }
 

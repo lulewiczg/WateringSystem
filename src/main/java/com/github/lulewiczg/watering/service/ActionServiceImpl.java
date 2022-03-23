@@ -6,7 +6,7 @@ import com.github.lulewiczg.watering.service.actions.ActionRunner;
 import com.github.lulewiczg.watering.service.dto.*;
 import com.github.lulewiczg.watering.service.job.JobRunner;
 import com.github.lulewiczg.watering.service.job.ScheduledJob;
-import lombok.RequiredArgsConstructor;
+import lombok.Getter;
 import lombok.SneakyThrows;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.NoSuchBeanDefinitionException;
@@ -24,7 +24,6 @@ import java.util.stream.Collectors;
  */
 @Log4j2
 @Service
-@RequiredArgsConstructor
 @ConditionalOnMissingBean(MasterConfig.class)
 public class ActionServiceImpl implements ActionService {
 
@@ -35,6 +34,23 @@ public class ActionServiceImpl implements ActionService {
     private final JobRunner jobRunner;
 
     private final ActionParamService actionParamService;
+
+    @Getter
+    private List<JobDefinitionDto> jobs;
+
+    public ActionServiceImpl(ApplicationContext applicationContext, ActionRunner actionRunner, JobRunner jobRunner, ActionParamService actionParamService) {
+        this.applicationContext = applicationContext;
+        this.actionRunner = actionRunner;
+        this.jobRunner = jobRunner;
+        this.actionParamService = actionParamService;
+        reloadJobs();
+    }
+
+    void reloadJobs() {
+        this.jobs = applicationContext.getBeansOfType(ScheduledJob.class).values().stream()
+                .map(i -> new JobDefinitionDto(fixBeanName(i.getClass().getSimpleName()), i.canBeStarted()))
+                .collect(Collectors.toList());
+    }
 
     @Override
     @Cacheable
@@ -56,14 +72,6 @@ public class ActionServiceImpl implements ActionService {
     private Map<String, Action<?, ?>> getActionsMap() {
         return applicationContext.getBeansOfType(Action.class).values().stream().filter(Action::isEnabled).map(i -> (Action<?, ?>) i)
                 .collect(Collectors.toMap(i -> fixBeanName(i.getClass().getSimpleName()), i -> i));
-    }
-
-    @Override
-    @Cacheable
-    public List<JobDefinitionDto> getJobs() {
-        return applicationContext.getBeansOfType(ScheduledJob.class).values().stream()
-                .map(i -> new JobDefinitionDto(fixBeanName(i.getClass().getSimpleName()), i.canBeStarted()))
-                .collect(Collectors.toList());
     }
 
     @Override

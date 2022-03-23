@@ -105,7 +105,7 @@ class SetDefaultsTest {
 
     @Test
     void testJobNoTankValve() {
-        when(state.getTanks()).thenReturn(List.of(new Tank("id", 100, null, null)));
+        when(state.getTanks()).thenReturn(List.of(new Tank("id", 100, null, null, null)));
         when(runner.run(eq("test."), eq(openAction), any())).thenReturn(TestUtils.EMPTY_RESULT);
         when(runner.run(eq("test."), eq(closeAction), any())).thenReturn(TestUtils.EMPTY_RESULT);
         JobDto jobDto = new JobDto("test", null);

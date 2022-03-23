@@ -62,7 +62,7 @@ class ScheduledWaterEscapeControlTest {
     @CsvFileSource(resources = "/testData/leak-ok-test.csv")
     void testLeakOk(Integer level, Integer level2) {
         Sensor sensor = new Sensor("sensor", 0, 100, level, Address.ADDR_40, RaspiPin.GPIO_10, 10, 12, 100, 200);
-        Tank tank = new Tank("tank", 100, sensor, TestUtils.Objects.VALVE);
+        Tank tank = new Tank("tank", 100, sensor, TestUtils.Objects.VALVE, null);
         when(state.getTanks()).thenReturn(List.of(tank));
         when(runner.run("test.", emergencyStopAction, null)).thenReturn(TestUtils.EMPTY_RESULT);
         JobDto jobDto = new JobDto("test", null);
@@ -84,7 +84,7 @@ class ScheduledWaterEscapeControlTest {
     @CsvFileSource(resources = "/testData/leak-test.csv")
     void testLeak(int level, int level2) {
         Sensor sensor = new Sensor("sensor", 0, 100, level, Address.ADDR_40, RaspiPin.GPIO_10, 10, 12, 100, 200);
-        Tank tank = new Tank("tank", 100, sensor, TestUtils.Objects.VALVE);
+        Tank tank = new Tank("tank", 100, sensor, TestUtils.Objects.VALVE, null);
         when(state.getTanks()).thenReturn(List.of(tank, TestUtils.Objects.TANK2));
         when(runner.run("test.", emergencyStopAction, null)).thenReturn(TestUtils.EMPTY_RESULT);
         JobDto jobDto = new JobDto("test", null);
@@ -106,7 +106,7 @@ class ScheduledWaterEscapeControlTest {
     @DirtiesContext
     void testWaterUse() {
         Sensor sensor = new Sensor("sensor", 0, 90, 90, Address.ADDR_40, RaspiPin.GPIO_10, 10, 12, 100, 200);
-        Tank tank = new Tank("tank", 100, sensor, TestUtils.Objects.VALVE);
+        Tank tank = new Tank("tank", 100, sensor, TestUtils.Objects.VALVE, null);
         when(state.getTanks()).thenReturn(List.of(tank));
         when(runner.run("test.", emergencyStopAction, null)).thenReturn(TestUtils.EMPTY_RESULT);
         JobDto jobDto = new JobDto("test", null);
@@ -125,7 +125,7 @@ class ScheduledWaterEscapeControlTest {
     @DirtiesContext
     void testNestedFail() {
         Sensor sensor = new Sensor("sensor", 0, 90, 90, Address.ADDR_40, RaspiPin.GPIO_10, 10, 12, 100, 200);
-        Tank tank = new Tank("tank", 100, sensor, TestUtils.Objects.VALVE);
+        Tank tank = new Tank("tank", 100, sensor, TestUtils.Objects.VALVE, null);
         when(state.getTanks()).thenReturn(List.of(tank));
         when(runner.run("test.", emergencyStopAction, null)).thenReturn(TestUtils.ERROR_RESULT);
         JobDto jobDto = new JobDto("test", null);
@@ -141,7 +141,7 @@ class ScheduledWaterEscapeControlTest {
 
     @Test
     void testLeakOk() {
-        Tank tank = new Tank("tank", 100, null, TestUtils.Objects.VALVE);
+        Tank tank = new Tank("tank", 100, null, TestUtils.Objects.VALVE, null);
         when(state.getTanks()).thenReturn(List.of(tank));
         when(runner.run("test.", emergencyStopAction, null)).thenReturn(TestUtils.EMPTY_RESULT);
         JobDto jobDto = new JobDto("test", null);

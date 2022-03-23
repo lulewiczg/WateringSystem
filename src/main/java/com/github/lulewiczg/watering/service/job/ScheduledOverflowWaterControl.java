@@ -1,10 +1,7 @@
 package com.github.lulewiczg.watering.service.job;
 
 import com.github.lulewiczg.watering.config.MasterConfig;
-import com.github.lulewiczg.watering.service.actions.ActionRunner;
-import com.github.lulewiczg.watering.service.actions.TanksCloseAction;
-import com.github.lulewiczg.watering.service.actions.ValveCloseAction;
-import com.github.lulewiczg.watering.service.actions.ValveOpenAction;
+import com.github.lulewiczg.watering.service.actions.*;
 import com.github.lulewiczg.watering.service.dto.JobDto;
 import com.github.lulewiczg.watering.state.AppState;
 import com.github.lulewiczg.watering.state.SystemStatus;
@@ -17,6 +14,7 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 /**
@@ -34,6 +32,8 @@ public class ScheduledOverflowWaterControl extends ScheduledJob {
     private final ValveOpenAction valveOpenAction;
 
     private final ValveCloseAction valveCloseAction;
+
+    private final PumpStartAction pumpStartAction;
 
     private final AppState state;
 
@@ -71,7 +71,10 @@ public class ScheduledOverflowWaterControl extends ScheduledJob {
         state.setState(SystemStatus.DRAINING);
         log.info("Water level too high for {}", () -> tanks.stream().map(Tank::getId).collect(Collectors.toList()));
 
-        tanks.forEach(i -> runNested(actionRunner, job, valveOpenAction, i.getValve()));
+        tanks.forEach(i -> {
+            runNested(actionRunner, job, valveOpenAction, i.getValve());
+            Optional.ofNullable(i.getPump()).ifPresent(j -> runNested(actionRunner, job, pumpStartAction, j));
+        });
         state.getOverflowValves().forEach((i -> runNested(actionRunner, job, valveOpenAction, i)));
         log.info("Draining tanks started.");
     }

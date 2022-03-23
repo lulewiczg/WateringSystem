@@ -29,6 +29,8 @@ public class TankConfig {
 
     private String valveId;
 
+    private String pumpId;
+
     @NotNull
     private TankType type;
 
@@ -38,11 +40,15 @@ public class TankConfig {
     @EqualsAndHashCode.Exclude
     private ValveConfig valve;
 
-    public TankConfig(String id, Integer volume, String sensorId, String valveId, TankType type) {
+    @EqualsAndHashCode.Exclude
+    private PumpConfig pump;
+
+    public TankConfig(String id, Integer volume, String sensorId, String valveId, String pumpId, TankType type) {
         this.id = id;
         this.volume = volume;
         this.sensorId = sensorId;
         this.valveId = valveId;
+        this.pumpId = pumpId;
         this.type = type;
     }
 

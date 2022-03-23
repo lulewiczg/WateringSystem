@@ -27,6 +27,9 @@ class TanksCloseActionTest {
     private ValveCloseAction closeAction;
 
     @MockBean
+    private PumpStopAction pumpStopAction;
+
+    @MockBean
     private AppState state;
 
     @MockBean
@@ -48,26 +51,47 @@ class TanksCloseActionTest {
     @Test
     void testAction() {
         when(runner.run(eq("test."), eq(closeAction), any())).thenReturn(TestUtils.EMPTY_RESULT);
+        when(runner.run(eq("test."), eq(pumpStopAction), any())).thenReturn(TestUtils.EMPTY_RESULT);
         ActionDto actionDto = new ActionDto("test");
 
         action.doAction(actionDto, null);
 
         verify(runner).run("test.", closeAction, TestUtils.Objects.VALVE);
-        verify(runner).run("test.", closeAction, TestUtils.Objects.VALVE);
+        verify(runner).run("test.", closeAction, TestUtils.Objects.VALVE2);
+        verify(runner).run("test.", pumpStopAction, TestUtils.Objects.PUMP);
         verify(runner, never()).run("test.", closeAction, TestUtils.Objects.OUT);
         verify(runner, never()).run("test.", closeAction, TestUtils.Objects.OUT2);
         verify(runner, never()).run("test.", closeAction, TestUtils.Objects.TAP_VALVE);
     }
 
     @Test
-    void testActionNestedFail() {
+    void testNestedCloseFail() {
         when(runner.run(eq("test."), eq(closeAction), any())).thenReturn(TestUtils.ERROR_RESULT);
+        when(runner.run(eq("test."), eq(pumpStopAction), any())).thenReturn(TestUtils.EMPTY_RESULT);
         ActionDto actionDto = new ActionDto("test");
 
         String error = assertThrows(ActionException.class, () -> action.doAction(actionDto, null)).getLocalizedMessage();
 
         assertEquals("Action [id] failed: error", error);
+        verify(runner).run("test.", pumpStopAction, TestUtils.Objects.PUMP);
         verify(runner).run("test.", closeAction, TestUtils.Objects.VALVE);
+        verify(runner, never()).run("test.", closeAction, TestUtils.Objects.VALVE2);
+        verify(runner, never()).run("test.", closeAction, TestUtils.Objects.OUT);
+        verify(runner, never()).run("test.", closeAction, TestUtils.Objects.OUT2);
+        verify(runner, never()).run("test.", closeAction, TestUtils.Objects.TAP_VALVE);
+    }
+
+    @Test
+    void testNestedPumpStopFail() {
+        when(runner.run(eq("test."), eq(closeAction), any())).thenReturn(TestUtils.EMPTY_RESULT);
+        when(runner.run(eq("test."), eq(pumpStopAction), any())).thenReturn(TestUtils.ERROR_RESULT);
+        ActionDto actionDto = new ActionDto("test");
+
+        String error = assertThrows(ActionException.class, () -> action.doAction(actionDto, null)).getLocalizedMessage();
+
+        assertEquals("Action [id] failed: error", error);
+        verify(runner).run("test.", pumpStopAction, TestUtils.Objects.PUMP);
+        verify(runner, never()).run("test.", closeAction, TestUtils.Objects.VALVE);
         verify(runner, never()).run("test.", closeAction, TestUtils.Objects.VALVE2);
         verify(runner, never()).run("test.", closeAction, TestUtils.Objects.OUT);
         verify(runner, never()).run("test.", closeAction, TestUtils.Objects.OUT2);
