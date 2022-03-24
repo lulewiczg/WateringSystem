@@ -1,6 +1,7 @@
 package com.github.lulewiczg.watering.service.job;
 
 import com.github.lulewiczg.watering.TestUtils;
+import com.github.lulewiczg.watering.exception.ActionNotStartedException;
 import com.github.lulewiczg.watering.service.dto.ActionResultDto;
 import com.github.lulewiczg.watering.service.dto.JobDto;
 import org.junit.jupiter.api.Test;
@@ -136,4 +137,13 @@ class JobRunnerTest {
         verify(scheduledJob, never()).doJob(any());
     }
 
+    @Test
+    void testScheduledJobCantStart() {
+        JobDto job = new JobDto("sched.", "some job", scheduledJob);
+        doThrow(new ActionNotStartedException("some job")).when(scheduledJob).doJob(job);
+
+        ActionResultDto<Void> result = runner.run(job);
+
+        TestUtils.testActionResult(result, "Scheduled job [some job] could not be started!");
+    }
 }

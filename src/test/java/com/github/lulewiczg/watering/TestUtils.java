@@ -282,6 +282,19 @@ public final class TestUtils {
     }
 
     /**
+     * Tests failed result of action.
+     *
+     * @param result result.
+     * @param error  expected error
+     */
+    public static void testScheduledActionResult(ActionResultDto<?> result, String error) {
+        assertNotNull(result.getId());
+        assertNull(result.getResult());
+        assertEquals(error, result.getErrorMsg());
+        assertNull(result.getExecDate());
+    }
+
+    /**
      * Splits ID into segments.
      *
      * @param id ID

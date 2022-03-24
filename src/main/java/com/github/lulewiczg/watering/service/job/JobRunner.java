@@ -10,6 +10,8 @@ import org.springframework.stereotype.Component;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
+import static com.github.lulewiczg.watering.service.job.ScheduledJob.SCHED;
+
 /**
  * Runner for jobs.
  */
@@ -30,23 +32,38 @@ public class JobRunner {
         log.debug("Staring {} job with ID {} ...", jobDto.getName(), id);
         try {
             tryRun(jobDto);
-        } catch (Exception e) {
-            log.error(String.format("Job %s failed", id), e);
-            String message = e.getMessage();
-            if (message == null) {
-                message = "Unknown error!";
+        } catch (ActionNotStartedException e) {
+            if (id.startsWith(SCHED)) {
+                String error = String.format("Scheduled job [%s] could not be started!", jobDto.getName());
+                log.error(error);
+                return buildErrorMsg(jobDto, id, error);
             }
-            return ActionResultDto.<Void>builder()
-                    .id(id)
-                    .actionName(jobDto.getName())
-                    .execDate(LocalDateTime.now())
-                    .errorMsg(message)
-                    .build();
+            return handleJobError(jobDto, id, e);
+        } catch (Exception e) {
+            return handleJobError(jobDto, id, e);
         }
         return ActionResultDto.<Void>builder()
                 .id(id)
                 .actionName(jobDto.getName())
                 .execDate(LocalDateTime.now())
+                .build();
+    }
+
+    private ActionResultDto<Void> handleJobError(JobDto jobDto, String id, Exception e) {
+        log.error(String.format("Job %s failed", id), e);
+        String message = e.getMessage();
+        if (message == null) {
+            message = "Unknown error!";
+        }
+        return buildErrorMsg(jobDto, id, message);
+    }
+
+    private ActionResultDto<Void> buildErrorMsg(JobDto jobDto, String id, String message) {
+        return ActionResultDto.<Void>builder()
+                .id(id)
+                .actionName(jobDto.getName())
+                .execDate(LocalDateTime.now())
+                .errorMsg(message)
                 .build();
     }
 
