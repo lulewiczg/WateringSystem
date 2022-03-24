@@ -12,9 +12,11 @@ import org.springframework.context.annotation.Import;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
+import java.util.List;
+
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 @ActiveProfiles("test")
 @Import(PumpStopAction.class)
@@ -44,5 +46,24 @@ class PumpStopActionTest {
 
         verify(service).toggleOff(TestUtils.Objects.PUMP.getPin());
         assertFalse(TestUtils.Objects.PUMP.isRunning());
+    }
+
+
+    @Test
+    void testActionEnabled() {
+        when(state.getPumps()).thenReturn(List.of(TestUtils.Objects.PUMP));
+
+        assertTrue(action.isEnabled());
+    }
+
+    @Test
+    void testActionDisabled() {
+        assertFalse(action.isEnabled());
+    }
+
+    @Test
+    void testActionDisabledEmptyList() {
+        when(state.getPumps()).thenReturn(List.of());
+        assertFalse(action.isEnabled());
     }
 }
