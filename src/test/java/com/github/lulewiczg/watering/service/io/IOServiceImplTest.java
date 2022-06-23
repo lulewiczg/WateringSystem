@@ -155,7 +155,7 @@ class IOServiceImplTest {
         when(ina2192.getCurrent()).thenReturn(43.21);
         when(ina2192.getCurrent()).thenReturn(12.34);
         ioService = new IOServiceImpl(gpioController, resolver, config);
-        Sensor sensor = new Sensor("id", 0, 100, null, Address.ADDR_41, RaspiPin.GPIO_10, 10, 11, 12, 13);
+        Sensor sensor = new Sensor("id", null, 0, 100, Address.ADDR_41, RaspiPin.GPIO_10, 10, 11, 12, 13);
 
         double result = ioService.analogRead(sensor);
 

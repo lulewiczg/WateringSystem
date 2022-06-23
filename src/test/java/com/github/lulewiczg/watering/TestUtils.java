@@ -60,12 +60,12 @@ public final class TestUtils {
         public static Tank TANK2;
         public static final Pump PUMP = new Pump("pump1", "pump", false, RaspiPin.GPIO_25);
         public static final WaterSource TAP = new WaterSource("water", TAP_VALVE);
-        public static final Sensor OVERFLOW_SENSOR = new Sensor("overflowSensor", 10, 90, 100, Address.ADDR_40, null, 10, 12, 100, 200);
+        public static final Sensor OVERFLOW_SENSOR = new Sensor("overflowSensor", 100, 10, 90, Address.ADDR_40, null, 10, 12, 100, 200);
         public static final Tank OVERFLOW_TANK = new Tank("overflow", 100, OVERFLOW_SENSOR, VALVE, PUMP);
 
         public static void reset() {
-            SENSOR = new Sensor("sensor1", 12, 21, null, Address.ADDR_40, RaspiPin.GPIO_10, 10, 1000, 100, 12);
-            SENSOR2 = new Sensor("sensor2", 5, 100, null, Address.ADDR_41, null, 20, 50, 60, 5);
+            SENSOR = new Sensor("sensor1", null, 12, 21, Address.ADDR_40, RaspiPin.GPIO_10, 10, 1000, 100, 12);
+            SENSOR2 = new Sensor("sensor2", null, 5, 100, Address.ADDR_41, null, 20, 50, 60, 5);
             TANK = new Tank("tank", 100, SENSOR, VALVE, PUMP);
             TANK2 = new Tank("tank2", 100, SENSOR2, VALVE2, null);
         }

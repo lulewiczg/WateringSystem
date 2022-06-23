@@ -80,7 +80,7 @@ class ScheduledOverflowWaterControlTest {
     @ParameterizedTest
     @CsvFileSource(resources = "/testData/overflow-running-test.csv")
     void testAlreadyRunning(int minLevel, int maxLevel, Integer level) {
-        Sensor sensor = new Sensor("sensor", minLevel, maxLevel, level, Address.ADDR_40, RaspiPin.GPIO_10, 10, 12, 100, 200);
+        Sensor sensor = new Sensor("sensor", level, minLevel, maxLevel, Address.ADDR_40, RaspiPin.GPIO_10, 10, 12, 100, 200);
         Tank tank = new Tank("tank", 100, sensor, TestUtils.Objects.VALVE, null);
         when(state.getTanks()).thenReturn(List.of(tank));
         when(state.getOverflowValves()).thenReturn(List.of(TestUtils.Objects.OUT));
@@ -98,7 +98,7 @@ class ScheduledOverflowWaterControlTest {
     @ParameterizedTest
     @CsvFileSource(resources = "/testData/overflow-ok-test.csv")
     void testAlreadyRunningNotFinished(int minLevel, int maxLevel, Integer level) {
-        Sensor sensor = new Sensor("sensor", minLevel, maxLevel, level, Address.ADDR_40, RaspiPin.GPIO_10, 10, 12, 100, 200);
+        Sensor sensor = new Sensor("sensor", level, minLevel, maxLevel, Address.ADDR_40, RaspiPin.GPIO_10, 10, 12, 100, 200);
         Tank tank = new Tank("tank", 100, sensor, TestUtils.Objects.VALVE, null);
         when(state.getTanks()).thenReturn(List.of(tank));
         when(state.getOverflowValves()).thenReturn(List.of(TestUtils.Objects.OUT));
@@ -119,7 +119,7 @@ class ScheduledOverflowWaterControlTest {
     @ParameterizedTest
     @CsvFileSource(resources = "/testData/overflow-ok-test.csv")
     void testOverflowOk(int minLevel, int maxLevel, Integer level) {
-        Sensor sensor = new Sensor("sensor", minLevel, maxLevel, level, Address.ADDR_40, RaspiPin.GPIO_10, 10, 12, 100, 200);
+        Sensor sensor = new Sensor("sensor", level, minLevel, maxLevel, Address.ADDR_40, RaspiPin.GPIO_10, 10, 12, 100, 200);
         Tank tank = new Tank("tank", 100, sensor, TestUtils.Objects.VALVE, null);
         when(state.getTanks()).thenReturn(List.of(tank));
         when(state.getOverflowValves()).thenReturn(List.of(TestUtils.Objects.OUT));
@@ -137,7 +137,7 @@ class ScheduledOverflowWaterControlTest {
     @ParameterizedTest
     @CsvFileSource(resources = "/testData/overflow-test.csv")
     void testOverflow(int minLevel, int maxLevel, int level) {
-        Sensor sensor = new Sensor("sensor", minLevel, maxLevel, level, Address.ADDR_40, RaspiPin.GPIO_10, 10, 12, 100, 200);
+        Sensor sensor = new Sensor("sensor", level, minLevel, maxLevel, Address.ADDR_40, RaspiPin.GPIO_10, 10, 12, 100, 200);
         Tank tank = new Tank("tank", 100, sensor, TestUtils.Objects.VALVE, TestUtils.Objects.PUMP);
         when(state.getTanks()).thenReturn(List.of(tank, TestUtils.Objects.TANK2));
         when(state.getOverflowValves()).thenReturn(List.of(TestUtils.Objects.OUT));
@@ -160,7 +160,7 @@ class ScheduledOverflowWaterControlTest {
 
     @Test
     void testOverflowNoPump() {
-        Sensor sensor = new Sensor("sensor", 0, 90, 100, Address.ADDR_40, RaspiPin.GPIO_10, 10, 12, 100, 200);
+        Sensor sensor = new Sensor("sensor", 100, 0, 90, Address.ADDR_40, RaspiPin.GPIO_10, 10, 12, 100, 200);
         Tank tank = new Tank("tank", 100, sensor, TestUtils.Objects.VALVE, null);
         when(state.getTanks()).thenReturn(List.of(tank, TestUtils.Objects.TANK2));
         when(state.getOverflowValves()).thenReturn(List.of(TestUtils.Objects.OUT));

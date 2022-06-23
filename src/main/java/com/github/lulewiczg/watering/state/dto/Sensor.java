@@ -18,11 +18,11 @@ public class Sensor {
 
     private String id;
 
+    private Integer level;
+
     private Integer minLevel;
 
     private Integer maxLevel;
-
-    private Integer level;
 
     @EqualsAndHashCode.Exclude
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
@@ -39,6 +39,5 @@ public class Sensor {
     private int stepResistance;
 
     private double voltage;
-
 
 }

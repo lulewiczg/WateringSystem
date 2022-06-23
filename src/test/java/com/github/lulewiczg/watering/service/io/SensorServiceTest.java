@@ -24,7 +24,7 @@ class SensorServiceTest {
     @ParameterizedTest
     @CsvFileSource(resources = "/testData/levels-test.csv")
     void testLevelCalculation(double current, int resistorsNumber, int passiveResistance, int stepResistance, double voltage, double expected) {
-        Sensor sensor = new Sensor("sensor", 0, 1, null, Address.ADDR_40, RaspiPin.GPIO_10, resistorsNumber, passiveResistance, stepResistance, voltage);
+        Sensor sensor = new Sensor("sensor", null, 0, 1, Address.ADDR_40, RaspiPin.GPIO_10, resistorsNumber, passiveResistance, stepResistance, voltage);
 
         double result = service.calculateWaterLevel(current, sensor);
 
