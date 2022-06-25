@@ -15,6 +15,7 @@ import com.pi4j.io.gpio.Pin;
 import com.pi4j.io.gpio.PinState;
 import lombok.SneakyThrows;
 import lombok.extern.log4j.Log4j2;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.stereotype.Component;
@@ -32,6 +33,9 @@ import java.util.Map;
 @ConditionalOnMissingBean(MasterConfig.class)
 @ConditionalOnExpression("!${com.github.lulewiczg.watering.mockedIO:false}")
 public class IOServiceImpl implements IOService {
+
+    @Value("${com.github.lulewiczg.watering.io.maxRetries:3}")
+    private int maxRetrires;
 
     private static final String ERR = "Not yet implemented!";
 
@@ -79,15 +83,7 @@ public class IOServiceImpl implements IOService {
             toggleOn(powerControlPin);
             Thread.sleep(2000);
             double current = readCurrent(address, ina219);
-            log.info("Value {}", readCurrent(address, ina219));
-            log.info("Value {}", readCurrent(address, ina219));
-            log.info("Value {}", readCurrent(address, ina219));
-            log.info("Value {}", readCurrent(address, ina219));
-            log.info("Value {}", readCurrent(address, ina219));
-            log.info("Value {}", readCurrent(address, ina219));
-            log.info("Value {}", readCurrent(address, ina219));
-
-            Thread.sleep(1000);
+            Thread.sleep(100);
             toggleOff(powerControlPin);
             return current;
         }
@@ -105,9 +101,24 @@ public class IOServiceImpl implements IOService {
         return gpioPin;
     }
 
+    @SneakyThrows
     private double readCurrent(Address address, INA219 ina219) {
-        double current = ina219.getCurrent();
-        log.debug("Read current {} for address {}", current, address);
+        double current = 0;
+        for (int i = 0; i < 3; i++) {
+            current = ina219.getCurrent();
+            log.debug("Read current {} for address {}", current, address);
+            if (current > 0) {
+                break;
+            } else {
+                log.error("Invalid current, retrying...");
+                Thread.sleep(100);
+            }
+        }
+        if (current <= 0) {
+            log.error("Invalid current value!");
+            current = 0;
+        }
+
         return current;
     }
 

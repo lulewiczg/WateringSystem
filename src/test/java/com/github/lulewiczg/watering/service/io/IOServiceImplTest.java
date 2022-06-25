@@ -13,7 +13,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InOrder;
 import org.mockito.Mock;
-import org.mockito.internal.verification.Times;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
@@ -131,6 +130,32 @@ class IOServiceImplTest {
     }
 
     @Test
+    void testAnalogReadRetry() {
+        when(config.getSensors()).thenReturn(List.of(TestUtils.Config.SENSOR2));
+        when(resolver.get(Address.ADDR_41)).thenReturn(ina219);
+        when(ina219.getCurrent()).thenReturn(0d, 0d, 12.34);
+        ioService = new IOServiceImpl(gpioController, resolver, config);
+
+        double result = ioService.analogRead(TestUtils.Objects.SENSOR2);
+
+        assertEquals(12.34, result);
+        verify(ina219, times(3)).getCurrent();
+    }
+
+    @Test
+    void testAnalogReadRetryFail() {
+        when(config.getSensors()).thenReturn(List.of(TestUtils.Config.SENSOR2));
+        when(resolver.get(Address.ADDR_41)).thenReturn(ina219);
+        when(ina219.getCurrent()).thenReturn(0d, 0d, 0d);
+        ioService = new IOServiceImpl(gpioController, resolver, config);
+
+        double result = ioService.analogRead(TestUtils.Objects.SENSOR2);
+
+        assertEquals(0, result);
+        verify(ina219, times(3)).getCurrent();
+    }
+
+    @Test
     void testAnalogReadWithPowerControl() {
         when(gpioController.provisionDigitalOutputPin(RaspiPin.GPIO_10, RaspiPin.GPIO_10.getName(), PinState.LOW)).thenReturn(pin);
         when(config.getSensors()).thenReturn(List.of(TestUtils.Config.SENSOR));
@@ -143,7 +168,7 @@ class IOServiceImplTest {
         assertEquals(12.34, result);
         InOrder inOrder = inOrder(pin, ina219);
         inOrder.verify(pin).low();
-        inOrder.verify(ina219, atLeast(1)).getCurrent();//TODO?
+        inOrder.verify(ina219).getCurrent();
         inOrder.verify(pin).high();
     }
 
