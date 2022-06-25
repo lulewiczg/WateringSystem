@@ -20,22 +20,26 @@ public class SensorService {
      */
     public double calculateWaterLevel(double current, Sensor sensor) {
         double resistance = sensor.getVoltage() / current;
+        log.info("Sensor resistance: {}", resistance);
         double activeResistance = resistance - sensor.getPassiveResistance();
+        log.info("Active resistance: {}", activeResistance);
         long resistorNumber = Math.round(activeResistance / sensor.getStepResistance());
+        log.info("Resistor: {}", resistorNumber);
         double result = 100 - (resistorNumber / (double) sensor.getResistorsNumber() * 100d);
+        log.info("Result: {}", result);
         result = fixErrors(result);
         return result;
     }
 
     private double fixErrors(double result) {
-        if (result < 0) {
-            log.error("Invalid level value {}!", result);
-            result = 0;
-        }
-        if (result > 100) {
-            log.error("Invalid level value {}!", result);
-            result = 100;
-        }
+//        if (result < 0) {
+//            log.error("Invalid level value {}!", result);
+//            result = 0;
+//        }
+//        if (result > 100) {
+//            log.error("Invalid level value {}!", result);
+//            result = 100;
+//        }
         return result;
     }
 
