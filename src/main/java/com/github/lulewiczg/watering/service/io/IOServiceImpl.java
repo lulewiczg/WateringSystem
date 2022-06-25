@@ -35,7 +35,10 @@ import java.util.Map;
 public class IOServiceImpl implements IOService {
 
     @Value("${com.github.lulewiczg.watering.io.maxRetries:3}")
-    private int maxRetrires;
+    private int maxRetries;
+
+    @Value("${com.github.lulewiczg.watering.io.retryWait:500}")
+    private int retryWaitTime;
 
     private static final String ERR = "Not yet implemented!";
 
@@ -104,14 +107,14 @@ public class IOServiceImpl implements IOService {
     @SneakyThrows
     private double readCurrent(Address address, INA219 ina219) {
         double current = 0;
-        for (int i = 0; i < 3; i++) {
+        for (int i = 0; i < maxRetries; i++) {
             current = ina219.getCurrent();
             log.debug("Read current {} for address {}", current, address);
             if (current > 0 || current == Double.NEGATIVE_INFINITY) {
                 break;
             } else {
                 log.error("Invalid current, retrying...");
-                Thread.sleep(100);
+                Thread.sleep(retryWaitTime);
             }
         }
         if (current <= 0) {
