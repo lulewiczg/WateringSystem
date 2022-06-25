@@ -107,7 +107,7 @@ public class IOServiceImpl implements IOService {
         for (int i = 0; i < 3; i++) {
             current = ina219.getCurrent();
             log.debug("Read current {} for address {}", current, address);
-            if (current > 0) {
+            if (current > 0 || current == Double.NEGATIVE_INFINITY) {
                 break;
             } else {
                 log.error("Invalid current, retrying...");
