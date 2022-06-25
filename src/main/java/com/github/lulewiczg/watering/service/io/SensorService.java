@@ -21,11 +21,7 @@ public class SensorService {
     public double calculateWaterLevel(double current, Sensor sensor) {
         double resistance = sensor.getVoltage() / current;
         log.info("Sensor resistance: {}", resistance);
-        double activeResistance = resistance - sensor.getPassiveResistance();
-        log.info("Active resistance: {}", activeResistance);
-        long resistorNumber = Math.round(activeResistance / sensor.getStepResistance());
-        log.info("Resistor: {}", resistorNumber);
-        double result = 100 - (resistorNumber / (double) sensor.getResistorsNumber() * 100d);
+        double result = 100 - 100 * ((resistance - sensor.getMinResistance()) / (sensor.getMaxResistance() - sensor.getMinResistance()));
         log.info("Result: {}", result);
         result = fixErrors(result);
         return result;

@@ -9,10 +9,8 @@
         "id": "sensor1",
         "minLevel": 12,
         "maxLevel": 21,
-        "level": null,
-        "resistorsNumber": 10,
-        "passiveResistance": 1000,
-        "stepResistance": 100,
+        "minResistance": 10,
+        "maxResistance": 100,
         "voltage": 12.0
       },
       "valve": {
@@ -36,10 +34,8 @@
         "id": "sensor2",
         "minLevel": 5,
         "maxLevel": 100,
-        "level": null,
-        "resistorsNumber": 20,
-        "passiveResistance": 50,
-        "stepResistance": 60,
+        "minResistance": 20,
+        "maxResistance": 50,
         "voltage": 5.0
       },
       "valve": {

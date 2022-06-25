@@ -46,13 +46,10 @@ public class WaterLevelSensorConfig {
     private Pin powerControlPin;
 
     @Min(1)
-    private int resistorsNumber;
+    private int minResistance;
 
     @Min(1)
-    private int passiveResistance;
-
-    @Min(1)
-    private int stepResistance;
+    private int maxResistance;
 
     @Min(1)
     private double voltage;
@@ -64,15 +61,14 @@ public class WaterLevelSensorConfig {
     }
 
     public WaterLevelSensorConfig(String id, Integer minLevel, Integer maxLevel, Address address, String powerControlPinName,
-                                  int resistorsNumber, int passiveResistance, int stepResistance, double voltage) {
+                                  int minResistance, int maxResistance, double voltage) {
         this.id = id;
         this.minLevel = minLevel;
         this.maxLevel = maxLevel;
         this.address = address;
         this.powerControlPinName = powerControlPinName;
-        this.resistorsNumber = resistorsNumber;
-        this.passiveResistance = passiveResistance;
-        this.stepResistance = stepResistance;
+        this.minResistance = minResistance;
+        this.maxResistance = maxResistance;
         this.voltage = voltage;
     }
 }

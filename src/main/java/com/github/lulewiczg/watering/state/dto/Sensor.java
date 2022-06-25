@@ -32,11 +32,9 @@ public class Sensor {
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private Pin powerControlPin;
 
-    private int resistorsNumber;
+    private int minResistance;
 
-    private int passiveResistance;
-
-    private int stepResistance;
+    private int maxResistance;
 
     private double voltage;
 

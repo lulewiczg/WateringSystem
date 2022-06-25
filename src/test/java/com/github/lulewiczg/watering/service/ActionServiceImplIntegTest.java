@@ -160,13 +160,13 @@ class ActionServiceImplIntegTest {
 
     @Test
     void testRunJob() {
-        when(ioService.analogRead(TestUtils.Objects.SENSOR)).thenReturn(0.008);
-        when(ioService.analogRead(TestUtils.Objects.SENSOR2)).thenReturn(0.004201680672269);
+        when(ioService.analogRead(TestUtils.Objects.SENSOR)).thenReturn(0.24);
+        when(ioService.analogRead(TestUtils.Objects.SENSOR2)).thenReturn(0.2);
 
         service.runJob(new JobDto(deCapitalize(ScheduledSensorRead.class.getSimpleName())));
 
-        assertEquals(50, state.getTanks().get(0).getSensor().getLevel());
-        assertEquals(5, state.getTanks().get(1).getSensor().getLevel());
+        assertEquals(55, state.getTanks().get(0).getSensor().getLevel());
+        assertEquals(83 , state.getTanks().get(1).getSensor().getLevel());
 
     }
 

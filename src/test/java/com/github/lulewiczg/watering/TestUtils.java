@@ -60,12 +60,12 @@ public final class TestUtils {
         public static Tank TANK2;
         public static final Pump PUMP = new Pump("pump1", "pump", false, RaspiPin.GPIO_25);
         public static final WaterSource TAP = new WaterSource("water", TAP_VALVE);
-        public static final Sensor OVERFLOW_SENSOR = new Sensor("overflowSensor", 100, 10, 90, Address.ADDR_40, null, 10, 12, 100, 200);
+        public static final Sensor OVERFLOW_SENSOR = new Sensor("overflowSensor", 100, 10, 90, Address.ADDR_40, null, 10, 12, 200);
         public static final Tank OVERFLOW_TANK = new Tank("overflow", 100, OVERFLOW_SENSOR, VALVE, PUMP);
 
         public static void reset() {
-            SENSOR = new Sensor("sensor1", null, 12, 21, Address.ADDR_40, RaspiPin.GPIO_10, 10, 1000, 100, 12);
-            SENSOR2 = new Sensor("sensor2", null, 5, 100, Address.ADDR_41, null, 20, 50, 60, 5);
+            SENSOR = new Sensor("sensor1", null, 12, 21, Address.ADDR_40, RaspiPin.GPIO_10, 10, 100, 12);
+            SENSOR2 = new Sensor("sensor2", null, 5, 100, Address.ADDR_41, null, 20, 50, 5);
             TANK = new Tank("tank", 100, SENSOR, VALVE, PUMP);
             TANK2 = new Tank("tank2", 100, SENSOR2, VALVE2, null);
         }
@@ -83,8 +83,8 @@ public final class TestUtils {
         public static final ValveConfig VALVE2 = new ValveConfig("valve2", "Tank 2", ValveType.INPUT, "GPIO 4", false, false, null);
         public static final ValveConfig VALVE3 = new ValveConfig("tap", "tap water", ValveType.INPUT, "GPIO 5", false, false, null);
         public static final ValveConfig OUT = new ValveConfig("out", "out", ValveType.OUTPUT, "GPIO 6", true, true, 333L);
-        public static final WaterLevelSensorConfig SENSOR = new WaterLevelSensorConfig("sensor1", 12, 21, Address.ADDR_40, "GPIO 10", 10, 1000, 100, 12);
-        public static final WaterLevelSensorConfig SENSOR2 = new WaterLevelSensorConfig("sensor2", 5, 100, Address.ADDR_41, "", 20, 50, 60, 5);
+        public static final WaterLevelSensorConfig SENSOR = new WaterLevelSensorConfig("sensor1", 12, 21, Address.ADDR_40, "GPIO 10", 10, 100, 12);
+        public static final WaterLevelSensorConfig SENSOR2 = new WaterLevelSensorConfig("sensor2", 5, 100, Address.ADDR_41, "", 20, 50, 5);
         public static final TankConfig TANK = new TankConfig("tank1", 123, "sensor1", "valve1", "pump1", TankType.DEFAULT);
         public static final TankConfig TANK2 = new TankConfig("tank2", 321, "sensor2", "valve2", null, TankType.DEFAULT);
         public static final TankConfig TAP = new TankConfig("tap", null, null, "tap", null, TankType.UNLIMITED);

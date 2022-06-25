@@ -97,8 +97,8 @@ class AppConfigTest {
         ValveConfig valve2 = new ValveConfig("valve2", "abc2", ValveType.INPUT, pin2, false, false, null);
         List<ValveConfig> valves = List.of(valve, valve2);
         List<TankConfig> tanks = List.of(TestUtils.Config.TANK, TestUtils.Config.TANK2);
-        WaterLevelSensorConfig sensor = new WaterLevelSensorConfig("sensor1", 1, 2, address, powerPin, 10, 100, 200, 12);
-        WaterLevelSensorConfig sensor2 = new WaterLevelSensorConfig("sensor2", 1, 2, address2, powerPin2, 10, 100, 200, 12);
+        WaterLevelSensorConfig sensor = new WaterLevelSensorConfig("sensor1", 1, 2, address, powerPin, 10, 100, 12);
+        WaterLevelSensorConfig sensor2 = new WaterLevelSensorConfig("sensor2", 1, 2, address2, powerPin2, 10, 100, 12);
         List<WaterLevelSensorConfig> sensors = List.of(sensor, sensor2);
         PumpConfig pump = new PumpConfig("pump1", "pump1", pumpPin);
         List<PumpConfig> pumps = List.of(pump);
@@ -110,9 +110,9 @@ class AppConfigTest {
 
     @ParameterizedTest
     @CsvFileSource(resources = "/testData/sensor-test.csv")
-    void testSensor(String id, int min, int max, int resistorsNumber, int passiveResistance, int stepResistance, double voltage, String error) {
+    void testSensor(String id, int min, int max, int minResistance, int maxResistance, double voltage, String error) {
         List<ValveConfig> valves = List.of(TestUtils.Config.VALVE);
-        WaterLevelSensorConfig sensor = new WaterLevelSensorConfig(id, min, max, Address.ADDR_41, "GPIO 10", resistorsNumber, passiveResistance, stepResistance, voltage);
+        WaterLevelSensorConfig sensor = new WaterLevelSensorConfig(id, min, max, Address.ADDR_41, "GPIO 10", minResistance, maxResistance, voltage);
         List<WaterLevelSensorConfig> sensors = List.of(sensor);
         List<TankConfig> tanks = List.of(TestUtils.Config.TANK);
         List<PumpConfig> pumps = List.of(TestUtils.Config.PUMP);
@@ -139,7 +139,7 @@ class AppConfigTest {
     @CsvFileSource(resources = "/testData/tank-test.csv")
     void testTank(String id, Integer volume, String sensorId, String valveId, String pumpId, TankType type, String error) {
         List<ValveConfig> valves = List.of(new ValveConfig("testValve", "test valve", ValveType.INPUT, "GPIO 1", true, false, null));
-        List<WaterLevelSensorConfig> sensors = List.of(new WaterLevelSensorConfig("testSensor", 1, 2, Address.ADDR_41, "GPIO 10", 10, 100, 200, 12));
+        List<WaterLevelSensorConfig> sensors = List.of(new WaterLevelSensorConfig("testSensor", 1, 2, Address.ADDR_41, "GPIO 10", 10, 100, 12));
         List<TankConfig> tanks = List.of(new TankConfig(id, volume, sensorId, valveId, pumpId, type));
         List<PumpConfig> pumps = List.of((TestUtils.Config.PUMP));
 

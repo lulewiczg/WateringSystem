@@ -13,6 +13,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InOrder;
 import org.mockito.Mock;
+import org.mockito.internal.verification.Times;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
@@ -142,7 +143,7 @@ class IOServiceImplTest {
         assertEquals(12.34, result);
         InOrder inOrder = inOrder(pin, ina219);
         inOrder.verify(pin).low();
-        inOrder.verify(ina219).getCurrent();
+        inOrder.verify(ina219, atLeast(1)).getCurrent();//TODO?
         inOrder.verify(pin).high();
     }
 
@@ -155,7 +156,7 @@ class IOServiceImplTest {
         when(ina2192.getCurrent()).thenReturn(43.21);
         when(ina2192.getCurrent()).thenReturn(12.34);
         ioService = new IOServiceImpl(gpioController, resolver, config);
-        Sensor sensor = new Sensor("id", null, 0, 100, Address.ADDR_41, RaspiPin.GPIO_10, 10, 11, 12, 13);
+        Sensor sensor = new Sensor("id", null, 0, 100, Address.ADDR_41, RaspiPin.GPIO_10, 10, 11, 12);
 
         double result = ioService.analogRead(sensor);
 
