@@ -56,7 +56,7 @@ class IOServiceImplTest {
     @DirtiesContext
     void testToggleOn() {
         when(gpioController.provisionDigitalOutputPin(RaspiPin.GPIO_00, RaspiPin.GPIO_00.getName(), PinState.LOW)).thenReturn(pin);
-        ioService = new IOServiceImpl(gpioController, null, config);
+        ioService = new IOServiceImpl(gpioController, null, config, 3, 100);
 
         ioService.toggleOn(RaspiPin.GPIO_00);
 
@@ -69,7 +69,7 @@ class IOServiceImplTest {
     void testToggleOnMultipleTimes() {
         when(gpioController.provisionDigitalOutputPin(RaspiPin.GPIO_00, RaspiPin.GPIO_00.getName(), PinState.LOW)).thenReturn(pin);
         when(gpioController.provisionDigitalOutputPin(RaspiPin.GPIO_01, RaspiPin.GPIO_01.getName(), PinState.LOW)).thenReturn(pin2);
-        ioService = new IOServiceImpl(gpioController, null, config);
+        ioService = new IOServiceImpl(gpioController, null, config, 3, 100);
 
         ioService.toggleOn(RaspiPin.GPIO_00);
         ioService.toggleOn(RaspiPin.GPIO_01);
@@ -85,7 +85,7 @@ class IOServiceImplTest {
     @DirtiesContext
     void testToggleOff() {
         when(gpioController.provisionDigitalOutputPin(RaspiPin.GPIO_00, RaspiPin.GPIO_00.getName(), PinState.LOW)).thenReturn(pin);
-        ioService = new IOServiceImpl(gpioController, null, config);
+        ioService = new IOServiceImpl(gpioController, null, config, 3, 100);
 
         ioService.toggleOff(RaspiPin.GPIO_00);
 
@@ -98,7 +98,7 @@ class IOServiceImplTest {
     void testToggleOffMultipleTimes() {
         when(gpioController.provisionDigitalOutputPin(RaspiPin.GPIO_00, RaspiPin.GPIO_00.getName(), PinState.LOW)).thenReturn(pin);
         when(gpioController.provisionDigitalOutputPin(RaspiPin.GPIO_01, RaspiPin.GPIO_01.getName(), PinState.LOW)).thenReturn(pin2);
-        ioService = new IOServiceImpl(gpioController, null, config);
+        ioService = new IOServiceImpl(gpioController, null, config, 3, 100);
 
         ioService.toggleOff(RaspiPin.GPIO_00);
         ioService.toggleOff(RaspiPin.GPIO_01);
@@ -112,7 +112,7 @@ class IOServiceImplTest {
 
     @Test
     void testRead() {
-        ioService = new IOServiceImpl(gpioController, null, config);
+        ioService = new IOServiceImpl(gpioController, null, config, 3, 100);
 
         assertThrows(IllegalStateException.class, () -> ioService.readPin(RaspiPin.GPIO_00));
     }
@@ -122,7 +122,7 @@ class IOServiceImplTest {
         when(config.getSensors()).thenReturn(List.of(TestUtils.Config.SENSOR2));
         when(resolver.get(Address.ADDR_41)).thenReturn(ina219);
         when(ina219.getCurrent()).thenReturn(12.34);
-        ioService = new IOServiceImpl(gpioController, resolver, config);
+        ioService = new IOServiceImpl(gpioController, resolver, config, 3, 100);
 
         double result = ioService.analogRead(TestUtils.Objects.SENSOR2);
 
@@ -134,7 +134,7 @@ class IOServiceImplTest {
         when(config.getSensors()).thenReturn(List.of(TestUtils.Config.SENSOR2));
         when(resolver.get(Address.ADDR_41)).thenReturn(ina219);
         when(ina219.getCurrent()).thenReturn(0d, 0d, 12.34);
-        ioService = new IOServiceImpl(gpioController, resolver, config);
+        ioService = new IOServiceImpl(gpioController, resolver, config, 3, 100);
 
         double result = ioService.analogRead(TestUtils.Objects.SENSOR2);
 
@@ -147,7 +147,7 @@ class IOServiceImplTest {
         when(config.getSensors()).thenReturn(List.of(TestUtils.Config.SENSOR2));
         when(resolver.get(Address.ADDR_41)).thenReturn(ina219);
         when(ina219.getCurrent()).thenReturn(0d, 0d, 0d);
-        ioService = new IOServiceImpl(gpioController, resolver, config);
+        ioService = new IOServiceImpl(gpioController, resolver, config, 3, 100);
 
         double result = ioService.analogRead(TestUtils.Objects.SENSOR2);
 
@@ -161,7 +161,7 @@ class IOServiceImplTest {
         when(config.getSensors()).thenReturn(List.of(TestUtils.Config.SENSOR));
         when(resolver.get(Address.ADDR_40)).thenReturn(ina219);
         when(ina219.getCurrent()).thenReturn(12.34);
-        ioService = new IOServiceImpl(gpioController, resolver, config);
+        ioService = new IOServiceImpl(gpioController, resolver, config, 3, 100);
 
         double result = ioService.analogRead(TestUtils.Objects.SENSOR);
 
@@ -180,7 +180,7 @@ class IOServiceImplTest {
         when(resolver.get(Address.ADDR_41)).thenReturn(ina2192);
         when(ina2192.getCurrent()).thenReturn(43.21);
         when(ina2192.getCurrent()).thenReturn(12.34);
-        ioService = new IOServiceImpl(gpioController, resolver, config);
+        ioService = new IOServiceImpl(gpioController, resolver, config, 3, 100);
         Sensor sensor = new Sensor("id", null, 0, 100, Address.ADDR_41, RaspiPin.GPIO_10, 10, 11, 12);
 
         double result = ioService.analogRead(sensor);
@@ -193,7 +193,7 @@ class IOServiceImplTest {
         when(config.getSensors()).thenReturn(List.of(TestUtils.Config.SENSOR));
         when(resolver.get(Address.ADDR_40)).thenReturn(ina219);
         when(ina219.getCurrent()).thenReturn(12.34);
-        ioService = new IOServiceImpl(gpioController, resolver, config);
+        ioService = new IOServiceImpl(gpioController, resolver, config, 3, 100);
 
         String message = assertThrows(IllegalStateException.class, () -> ioService.analogRead(TestUtils.Objects.SENSOR2)).getMessage();
 

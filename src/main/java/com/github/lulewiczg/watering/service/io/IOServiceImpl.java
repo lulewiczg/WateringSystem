@@ -34,11 +34,9 @@ import java.util.Map;
 @ConditionalOnExpression("!${com.github.lulewiczg.watering.mockedIO:false}")
 public class IOServiceImpl implements IOService {
 
-    @Value("${com.github.lulewiczg.watering.io.maxRetries:3}")
-    private int maxRetries;
+    private final int maxRetries;
 
-    @Value("${com.github.lulewiczg.watering.io.retryWait:500}")
-    private int retryWaitTime;
+    private final int retryWaitTime;
 
     private static final String ERR = "Not yet implemented!";
 
@@ -49,8 +47,12 @@ public class IOServiceImpl implements IOService {
     private final Map<Address, INA219> sensors = new EnumMap<>(Address.class);
 
     @SneakyThrows
-    public IOServiceImpl(GpioController gpioController, INA219Resolver resolver, AppConfig config) {
+    public IOServiceImpl(GpioController gpioController, INA219Resolver resolver, AppConfig config,
+                         @Value("${com.github.lulewiczg.watering.io.maxRetries:3}") int maxRetries,
+                         @Value("${com.github.lulewiczg.watering.io.retryWait:500}") int retryWaitTime) {
         this.gpioController = gpioController;
+        this.maxRetries = maxRetries;
+        this.retryWaitTime = retryWaitTime;
         config.getSensors().stream().map(WaterLevelSensorConfig::getAddress).forEach(i -> sensors.put(i, resolver.get(i)));
     }
 
