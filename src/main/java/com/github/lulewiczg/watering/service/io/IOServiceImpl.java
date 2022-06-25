@@ -77,8 +77,16 @@ public class IOServiceImpl implements IOService {
         Pin powerControlPin = sensor.getPowerControlPin();
         if (powerControlPin != null) {
             toggleOn(powerControlPin);
-            Thread.sleep(1000);
+            Thread.sleep(2000);
             double current = readCurrent(address, ina219);
+            log.info("Value {}", readCurrent(address, ina219));
+            log.info("Value {}", readCurrent(address, ina219));
+            log.info("Value {}", readCurrent(address, ina219));
+            log.info("Value {}", readCurrent(address, ina219));
+            log.info("Value {}", readCurrent(address, ina219));
+            log.info("Value {}", readCurrent(address, ina219));
+            log.info("Value {}", readCurrent(address, ina219));
+
             Thread.sleep(1000);
             toggleOff(powerControlPin);
             return current;

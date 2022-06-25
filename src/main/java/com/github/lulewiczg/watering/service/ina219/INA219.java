@@ -37,7 +37,7 @@ public class INA219 extends INA219Base {
      * @param sadc               Shunt resistor voltage ADC sample size and averaging setting.
      * @throws java.io.IOException If the configuration or calibration registers cannot be written.
      */
-    public INA219(Address address, double shuntResistance, double maxExpectedCurrent,
+    public  INA219(Address address, double shuntResistance, double maxExpectedCurrent,
                   VoltageRange busVoltageRange, Pga pga, Adc badc, Adc sadc) throws IOException {
         super(new I2CRegisterImpl(address), shuntResistance, maxExpectedCurrent, busVoltageRange, pga, badc, sadc);
     }
