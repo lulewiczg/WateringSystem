@@ -32,7 +32,7 @@ public class TanksCloseAction extends Action<Void, Void> {
         log.info("Closing tanks...");
         state.getTanks().forEach(i -> {
             Optional.ofNullable(i.getPump()).ifPresent(j -> runNested(actionRunner, actionDto, pumpStopAction, j));
-            runNested(actionRunner, actionDto, closeAction, i.getValve());
+            Optional.ofNullable(i.getValve()).ifPresent(j -> runNested(actionRunner, actionDto, closeAction, j));
         });
         return null;
     }
