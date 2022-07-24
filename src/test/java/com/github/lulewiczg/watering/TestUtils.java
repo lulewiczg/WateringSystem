@@ -313,6 +313,7 @@ public final class TestUtils {
         when(state.getTanks()).thenReturn(List.of(Objects.TANK, Objects.TANK2));
         when(state.getTaps()).thenReturn(List.of(Objects.TAP));
         when(state.getOutputs()).thenReturn(List.of(Objects.OUT, Objects.OUT2));
+        when(state.getPumps()).thenReturn(List.of(Objects.PUMP));
     }
 
 }

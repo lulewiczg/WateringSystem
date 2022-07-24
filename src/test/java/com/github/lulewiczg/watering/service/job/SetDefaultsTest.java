@@ -3,6 +3,7 @@ package com.github.lulewiczg.watering.service.job;
 import com.github.lulewiczg.watering.TestUtils;
 import com.github.lulewiczg.watering.exception.ActionException;
 import com.github.lulewiczg.watering.service.actions.ActionRunner;
+import com.github.lulewiczg.watering.service.actions.PumpStopAction;
 import com.github.lulewiczg.watering.service.actions.ValveCloseAction;
 import com.github.lulewiczg.watering.service.actions.ValveOpenAction;
 import com.github.lulewiczg.watering.service.dto.JobDto;
@@ -45,6 +46,9 @@ class SetDefaultsTest {
     private ValveCloseAction closeAction;
 
     @MockBean
+    private PumpStopAction pumpStopAction;
+
+    @MockBean
     private ActionRunner runner;
 
     @MockBean
@@ -65,6 +69,7 @@ class SetDefaultsTest {
     void testJob() {
         when(runner.run(eq("test."), eq(openAction), any())).thenReturn(TestUtils.EMPTY_RESULT);
         when(runner.run(eq("test."), eq(closeAction), any())).thenReturn(TestUtils.EMPTY_RESULT);
+        when(runner.run(eq("test."), eq(pumpStopAction), any())).thenReturn(TestUtils.EMPTY_RESULT);
         JobDto jobDto = new JobDto("test", null);
 
         job.doJob(jobDto);
@@ -74,6 +79,7 @@ class SetDefaultsTest {
         verify(runner).run("test.", closeAction, TestUtils.Objects.OUT);
         verify(runner).run("test.", closeAction, TestUtils.Objects.OUT2);
         verify(runner).run("test.", closeAction, TestUtils.Objects.TAP_VALVE);
+        verify(runner).run("test.", pumpStopAction, TestUtils.Objects.PUMP);
         verify(ioService, times(1)).toggleOff(RaspiPin.GPIO_10);
     }
 
@@ -108,6 +114,7 @@ class SetDefaultsTest {
         when(state.getTanks()).thenReturn(List.of(new Tank("id", 100, null, null, null)));
         when(runner.run(eq("test."), eq(openAction), any())).thenReturn(TestUtils.EMPTY_RESULT);
         when(runner.run(eq("test."), eq(closeAction), any())).thenReturn(TestUtils.EMPTY_RESULT);
+        when(runner.run(eq("test."), eq(pumpStopAction), any())).thenReturn(TestUtils.EMPTY_RESULT);
         JobDto jobDto = new JobDto("test", null);
 
         assertDoesNotThrow(() -> job.doJob(jobDto));
