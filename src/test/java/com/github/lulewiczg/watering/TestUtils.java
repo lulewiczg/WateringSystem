@@ -58,6 +58,7 @@ public final class TestUtils {
         public static Sensor SENSOR2;
         public static Tank TANK;
         public static Tank TANK2;
+        public static Tank TANK3;
 
         public static Tank TANK_NO_PUMP;
         public static final Pump PUMP = new Pump("pump1", "pump", false, RaspiPin.GPIO_25);
@@ -70,6 +71,7 @@ public final class TestUtils {
             SENSOR2 = new Sensor("sensor2", null, 5, 100, Address.ADDR_41, null, 20, 50, 5);
             TANK = new Tank("tank", 100, SENSOR, VALVE, PUMP);
             TANK2 = new Tank("tank2", 100, SENSOR2, VALVE2, null);
+            TANK3 = new Tank("tank2", 100, null, null, null);
             TANK_NO_PUMP = new Tank("tankNoPump", 100, null, null, PUMP);
         }
 
@@ -313,7 +315,7 @@ public final class TestUtils {
      * @param state app state
      */
     public static void standardMock(AppState state) {
-        when(state.getTanks()).thenReturn(List.of(Objects.TANK, Objects.TANK2));
+        when(state.getTanks()).thenReturn(List.of(Objects.TANK, Objects.TANK2, Objects.TANK3));
         when(state.getTaps()).thenReturn(List.of(Objects.TAP));
         when(state.getOutputs()).thenReturn(List.of(Objects.OUT, Objects.OUT2));
         when(state.getPumps()).thenReturn(List.of(Objects.PUMP));
