@@ -15,6 +15,8 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
+import java.util.Objects;
+
 /**
  * Job for checking valves state.
  */
@@ -45,8 +47,8 @@ public class ScheduledValveRead extends ScheduledIoJob {
     public void doJob(JobDto job) {
         log.debug("Checking valves...");
         state.getOutputs().forEach(this::readValve);
-        state.getTaps().stream().map(WaterSource::getValve).forEach(this::readValve);
-        state.getTanks().stream().map(Tank::getValve).forEach(this::readValve);
+        state.getTaps().stream().map(WaterSource::getValve).filter(Objects::nonNull).forEach(this::readValve);
+        state.getTanks().stream().map(Tank::getValve).filter(Objects::nonNull).forEach(this::readValve);
         log.debug("Valves check finished.");
     }
 

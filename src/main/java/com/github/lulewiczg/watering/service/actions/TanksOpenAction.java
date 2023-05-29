@@ -31,10 +31,9 @@ public class TanksOpenAction extends Action<Void, Void> {
     protected Void doAction(ActionDto actionDto, Void param) {
         log.info("Opening tanks...");
         state.getTanks().forEach(i -> {
-            runNested(actionRunner, actionDto, openAction, i.getValve());
+            Optional.ofNullable(i.getValve()).ifPresent(j -> runNested(actionRunner, actionDto, openAction, j));
             Optional.ofNullable(i.getPump()).ifPresent(j -> runNested(actionRunner, actionDto, pumpStartAction, j));
         });
-
         return null;
     }
 

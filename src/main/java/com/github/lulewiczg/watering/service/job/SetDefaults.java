@@ -2,6 +2,7 @@ package com.github.lulewiczg.watering.service.job;
 
 import com.github.lulewiczg.watering.config.MasterConfig;
 import com.github.lulewiczg.watering.service.actions.ActionRunner;
+import com.github.lulewiczg.watering.service.actions.PumpStopAction;
 import com.github.lulewiczg.watering.service.actions.ValveCloseAction;
 import com.github.lulewiczg.watering.service.actions.ValveOpenAction;
 import com.github.lulewiczg.watering.service.dto.JobDto;
@@ -33,6 +34,8 @@ public class SetDefaults extends ScheduledJob {
     private final ValveOpenAction openAction;
 
     private final ValveCloseAction closeAction;
+
+    private final PumpStopAction pumpStopAction;
 
     private final JobRunner jobRunner;
 
@@ -68,6 +71,7 @@ public class SetDefaults extends ScheduledJob {
         state.getTaps().forEach(i -> setValveState(i.getValve(), job));
         state.getTanks().stream().map(Tank::getSensor).filter(Objects::nonNull).
                 map(Sensor::getPowerControlPin).distinct().forEach(ioService::toggleOff);
+        state.getPumps().forEach(i -> runNested(actionRunner, job, pumpStopAction, i));
     }
 
     private void setValveState(Valve i, JobDto jobDto) {

@@ -14,6 +14,8 @@ import org.springframework.context.annotation.Import;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
+import java.util.List;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.*;
@@ -62,6 +64,19 @@ class TanksCloseActionTest {
         verify(runner, never()).run("test.", closeAction, TestUtils.Objects.OUT);
         verify(runner, never()).run("test.", closeAction, TestUtils.Objects.OUT2);
         verify(runner, never()).run("test.", closeAction, TestUtils.Objects.TAP_VALVE);
+    }
+
+    @Test
+    void testActionNoValves() {
+        when(state.getTanks()).thenReturn(List.of(TestUtils.Objects.TANK_NO_PUMP));
+        when(runner.run(eq("test."), eq(pumpStopAction), any())).thenReturn(TestUtils.EMPTY_RESULT);
+
+        ActionDto actionDto = new ActionDto("test");
+
+        action.doAction(actionDto, null);
+
+        verify(runner, never()).run(any(), eq(closeAction), any());
+        verify(runner).run("test.", pumpStopAction, TestUtils.Objects.PUMP);
     }
 
     @Test
