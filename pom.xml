@@ -5,7 +5,7 @@
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>2.4.2</version>
+        <version>2.7.12</version>
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
     <groupId>com.github.lulewiczg</groupId>
@@ -16,7 +16,7 @@
 
     <properties>
         <build.timestamp>${maven.build.timestamp}</build.timestamp>
-        <java.version>11</java.version>
+        <java.version>17</java.version>
         <pi4j.version>1.4</pi4j.version>
         <mapstruct.version>1.4.2.Final</mapstruct.version>
     </properties>
@@ -50,18 +50,18 @@
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
-            <version>1.18.24</version>
+            <version>1.18.28</version>
             <optional>true</optional>
         </dependency>
         <dependency>
             <groupId>org.hibernate.validator</groupId>
             <artifactId>hibernate-validator</artifactId>
-            <version>6.0.16.Final</version>
+            <version>6.0.23.Final</version>
         </dependency>
         <dependency>
             <groupId>org.hibernate.validator</groupId>
             <artifactId>hibernate-validator-annotation-processor</artifactId>
-            <version>6.0.16.Final</version>
+            <version>6.0.23.Final</version>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -97,7 +97,7 @@
             <plugin>
                 <groupId>org.jacoco</groupId>
                 <artifactId>jacoco-maven-plugin</artifactId>
-                <version>0.8.6</version>
+                <version>0.8.10</version>
                 <executions>
                     <execution>
                         <id>prepare-agent</id>
@@ -128,7 +128,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
-                <version>3.8.1</version>
+                <version>3.11.0</version>
                 <configuration>
                     <source>${java.version}</source>
                     <target>${java.version}</target>
