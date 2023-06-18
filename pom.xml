@@ -16,7 +16,7 @@
 
     <properties>
         <build.timestamp>${maven.build.timestamp}</build.timestamp>
-        <java.version>17</java.version>
+        <java.version>11</java.version>
         <pi4j.version>1.4</pi4j.version>
         <mapstruct.version>1.4.2.Final</mapstruct.version>
     </properties>
