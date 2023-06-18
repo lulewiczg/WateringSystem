@@ -21,9 +21,7 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 
-import java.util.EnumMap;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Service for GPIO communication.
@@ -34,9 +32,9 @@ import java.util.Map;
 @ConditionalOnExpression("!${com.github.lulewiczg.watering.mockedIO:false}")
 public class IOServiceImpl implements IOService {
 
-    private final int maxRetries;
+    private final int numberOfReads;
 
-    private final int retryWaitTime;
+    private final int readInterval;
 
     private static final String ERR = "Not yet implemented!";
 
@@ -48,11 +46,11 @@ public class IOServiceImpl implements IOService {
 
     @SneakyThrows
     public IOServiceImpl(GpioController gpioController, INA219Resolver resolver, AppConfig config,
-                         @Value("${com.github.lulewiczg.watering.io.maxRetries:3}") int maxRetries,
-                         @Value("${com.github.lulewiczg.watering.io.retryWait:500}") int retryWaitTime) {
+                         @Value("${com.github.lulewiczg.watering.io.numberOfReads:100}") int numberOfReads,
+                         @Value("${com.github.lulewiczg.watering.io.retryWait:10}") int readInteval) {
         this.gpioController = gpioController;
-        this.maxRetries = maxRetries;
-        this.retryWaitTime = retryWaitTime;
+        this.numberOfReads = numberOfReads;
+        this.readInterval = readInteval;
         config.getSensors().stream().map(WaterLevelSensorConfig::getAddress).forEach(i -> sensors.put(i, resolver.get(i)));
     }
 
@@ -108,23 +106,26 @@ public class IOServiceImpl implements IOService {
 
     @SneakyThrows
     private double readCurrent(Address address, INA219 ina219) {
-        double current = 0;
-        for (int i = 0; i < maxRetries; i++) {
-            current = ina219.getCurrent();
-            log.debug("Read current {} for address {}", current, address);
+        int reads = 0;
+        List<Double> results = new ArrayList<>();
+        while (reads < numberOfReads) {
+            double current = ina219.getCurrent();
+            log.trace("Read current {} for address {}", current, address);
             if (current > 0) {
-                break;
+                reads++;
+                results.add(current);
             } else {
-                log.error("Invalid current, retrying...");
-                Thread.sleep(retryWaitTime);
+                log.trace("Invalid current, retrying...");
             }
+            Thread.sleep(readInterval);
         }
-        if (current <= 0) {
+        double avgCurrent = results.stream().reduce(Double::sum).orElse(0d) / (double) results.size();
+        if (avgCurrent <= 0) {
             log.error("Invalid current value!");
-            current = 0;
+            avgCurrent = 0;
         }
 
-        return current;
+        return avgCurrent;
     }
 
     /**
