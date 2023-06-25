@@ -21,6 +21,8 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.*;
 
 /**
@@ -34,6 +36,7 @@ public class IOServiceImpl implements IOService {
 
     private final int numberOfReads;
 
+    private final double readCurrentDeclineFactor;
     private final int readInterval;
 
     private static final String ERR = "Not yet implemented!";
@@ -47,10 +50,12 @@ public class IOServiceImpl implements IOService {
     @SneakyThrows
     public IOServiceImpl(GpioController gpioController, INA219Resolver resolver, AppConfig config,
                          @Value("${com.github.lulewiczg.watering.io.numberOfReads:100}") int numberOfReads,
-                         @Value("${com.github.lulewiczg.watering.io.retryWait:10}") int readInteval) {
+                         @Value("${com.github.lulewiczg.watering.io.readInterval:10}") int readInterval,
+                         @Value("${com.github.lulewiczg.watering.io.currentIgnoreFactor:1.5}") double currentIgnoreFactor) {
         this.gpioController = gpioController;
         this.numberOfReads = numberOfReads;
-        this.readInterval = readInteval;
+        this.readCurrentDeclineFactor = currentIgnoreFactor;
+        this.readInterval = readInterval;
         config.getSensors().stream().map(WaterLevelSensorConfig::getAddress).forEach(i -> sensors.put(i, resolver.get(i)));
     }
 
@@ -85,12 +90,12 @@ public class IOServiceImpl implements IOService {
         if (powerControlPin != null) {
             toggleOn(powerControlPin);
             Thread.sleep(2000);
-            double current = readCurrent(address, ina219);
+            double current = readCurrent(address, ina219, sensor);
             Thread.sleep(100);
             toggleOff(powerControlPin);
             return current;
         }
-        return readCurrent(address, ina219);
+        return readCurrent(address, ina219, sensor);
     }
 
     private GpioPinDigitalOutput getPin(Pin pin) {
@@ -105,13 +110,15 @@ public class IOServiceImpl implements IOService {
     }
 
     @SneakyThrows
-    private double readCurrent(Address address, INA219 ina219) {
+    private double readCurrent(Address address, INA219 ina219, Sensor sensor) {
         int reads = 0;
+        double minCurrent = sensor.getVoltage() / sensor.getMaxResistance() / readCurrentDeclineFactor;
+        double maxCurrent = sensor.getVoltage() / sensor.getMinLevel() * readCurrentDeclineFactor;
         List<Double> results = new ArrayList<>();
         while (reads < numberOfReads) {
             double current = ina219.getCurrent();
             log.trace("Read current {} for address {}", current, address);
-            if (current > 0) {
+            if (current > minCurrent && current < maxCurrent) {
                 reads++;
                 results.add(current);
             } else {
@@ -119,7 +126,8 @@ public class IOServiceImpl implements IOService {
             }
             Thread.sleep(readInterval);
         }
-        double avgCurrent = results.stream().reduce(Double::sum).orElse(0d) / (double) results.size();
+        double avgCurrent = BigDecimal.valueOf(results.stream().reduce(Double::sum).orElse(0d)).divide(BigDecimal.valueOf(results.size()),
+                RoundingMode.HALF_UP).setScale(2, RoundingMode.HALF_UP).doubleValue();
         if (avgCurrent <= 0) {
             log.error("Invalid current value!");
             avgCurrent = 0;
