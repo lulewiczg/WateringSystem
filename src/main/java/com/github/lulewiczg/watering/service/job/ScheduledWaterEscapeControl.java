@@ -7,8 +7,8 @@ import com.github.lulewiczg.watering.service.dto.JobDto;
 import com.github.lulewiczg.watering.state.AppState;
 import com.github.lulewiczg.watering.state.SystemStatus;
 import com.github.lulewiczg.watering.state.dto.Tank;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -24,20 +24,26 @@ import java.util.stream.Collectors;
  */
 @Log4j2
 @Service
-@RequiredArgsConstructor
 @ConditionalOnMissingBean(MasterConfig.class)
 @ConditionalOnProperty("com.github.lulewiczg.watering.schedule.escapeControl.enabled")
 public class ScheduledWaterEscapeControl extends ScheduledJob {
 
     private final EmergencyStopAction emergencyStopAction;
-
     private final AppState state;
-
     private final JobRunner jobRunner;
-
     private final ActionRunner actionRunner;
+    private final int levelDiff;
 
     private Map<String, Integer> prevLevels = new HashMap<>();
+
+    public ScheduledWaterEscapeControl(EmergencyStopAction emergencyStopAction, AppState state, JobRunner jobRunner, ActionRunner actionRunner,
+                                       @Value("${com.github.lulewiczg.job.waterEscape.levelDiff:3}") int levelDiff) {
+        this.emergencyStopAction = emergencyStopAction;
+        this.state = state;
+        this.jobRunner = jobRunner;
+        this.actionRunner = actionRunner;
+        this.levelDiff = levelDiff;
+    }
 
     @Scheduled(cron = "${com.github.lulewiczg.watering.schedule.escapeControl.cron}")
     void schedule() {
@@ -90,7 +96,7 @@ public class ScheduledWaterEscapeControl extends ScheduledJob {
         if (level == null || prevLevel == null) {
             return false;
         }
-        return level < prevLevel;
+        return level < prevLevel - levelDiff;
     }
 
     private Map<String, Integer> getLevels() {

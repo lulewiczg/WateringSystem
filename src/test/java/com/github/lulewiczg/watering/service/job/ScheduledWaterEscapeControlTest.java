@@ -114,7 +114,7 @@ class ScheduledWaterEscapeControlTest {
         job.doJob(jobDto);
         job.doJob(jobDto);
 
-        sensor.setLevel(89);
+        sensor.setLevel(84);
         job.doJob(jobDto);
 
         verify(runner).run("test.", emergencyStopAction, null);
@@ -131,7 +131,7 @@ class ScheduledWaterEscapeControlTest {
         JobDto jobDto = new JobDto("test", null);
         sensor.setLevel(90);
         job.doJob(jobDto);
-        sensor.setLevel(89);
+        sensor.setLevel(84);
 
         String error = assertThrows(ActionException.class, () -> job.doJob(jobDto)).getLocalizedMessage();
 
