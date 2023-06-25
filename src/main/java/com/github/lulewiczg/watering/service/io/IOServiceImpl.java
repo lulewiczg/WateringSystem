@@ -113,7 +113,7 @@ public class IOServiceImpl implements IOService {
     private double readCurrent(Address address, INA219 ina219, Sensor sensor) {
         int reads = 0;
         double minCurrent = sensor.getVoltage() / sensor.getMaxResistance() / readCurrentDeclineFactor;
-        double maxCurrent = sensor.getVoltage() / sensor.getMinLevel() * readCurrentDeclineFactor;
+        double maxCurrent = sensor.getVoltage() / sensor.getMinResistance() * readCurrentDeclineFactor;
         List<Double> results = new ArrayList<>();
         while (reads < numberOfReads) {
             double current = ina219.getCurrent();
@@ -127,7 +127,7 @@ public class IOServiceImpl implements IOService {
             Thread.sleep(readInterval);
         }
         double avgCurrent = BigDecimal.valueOf(results.stream().reduce(Double::sum).orElse(0d)).divide(BigDecimal.valueOf(results.size()),
-                RoundingMode.HALF_UP).setScale(2, RoundingMode.HALF_UP).doubleValue();
+                RoundingMode.HALF_UP).setScale(8, RoundingMode.HALF_UP).doubleValue();
         if (avgCurrent <= 0) {
             log.error("Invalid current value!");
             avgCurrent = 0;

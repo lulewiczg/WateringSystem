@@ -181,13 +181,13 @@ class IOServiceImplTest {
         when(resolver.get(Address.ADDR_40)).thenReturn(ina219);
         when(resolver.get(Address.ADDR_41)).thenReturn(ina2192);
         when(ina2192.getCurrent()).thenReturn(43.21);
-        when(ina2192.getCurrent()).thenReturn(12.34);
+        when(ina2192.getCurrent()).thenReturn(0.1234);
         ioService = new IOServiceImpl(gpioController, resolver, config, 3, 100, 1.5);
-        Sensor sensor = new Sensor("id", null, 0, 100, Address.ADDR_41, RaspiPin.GPIO_10, 10, 11, 12);
+        Sensor sensor = new Sensor("id", null, 0, 100, Address.ADDR_41, RaspiPin.GPIO_10, 10, 1000, 12);
 
         double result = ioService.analogRead(sensor);
 
-        assertEquals(12.34, result);
+        assertEquals(0.1234, result);
     }
 
     @Test
