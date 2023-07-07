@@ -1,6 +1,7 @@
 package com.github.lulewiczg.watering.service.actions.dto;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.github.lulewiczg.watering.state.dto.Valve;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -11,7 +12,7 @@ import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
-import java.util.concurrent.atomic.AtomicInteger;
+import java.time.Instant;
 
 /**
  * DTO for watering action.
@@ -34,6 +35,11 @@ public class WateringDto {
 
     @JsonIgnore
     @EqualsAndHashCode.Exclude
-    private AtomicInteger counter = new AtomicInteger(1);
+    private Instant startDate;
+
+    @JsonProperty
+    public long getSecondsLeft() {
+        return seconds - (Instant.now().getEpochSecond() - startDate.getEpochSecond());
+    }
 
 }

@@ -10,6 +10,9 @@ import lombok.extern.log4j.Log4j2;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.stereotype.Component;
 
+import java.time.Instant;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -39,7 +42,7 @@ public class WateringAction extends Action<WateringDto, Void> {
 
     @Override
     public String getParamDescription() {
-        return "Valves data";
+        return "Watering data";
     }
 
     @Override
@@ -55,6 +58,8 @@ public class WateringAction extends Action<WateringDto, Void> {
     @Override
     protected Void doAction(ActionDto actionDto, WateringDto wateringDto) {
         log.info("Running watering: {}", wateringDto);
+        wateringDto.setStartDate(Instant.now());
+        state.getRunningWaterings().add(wateringDto);
         state.setState(SystemStatus.WATERING);
         runNested(actionRunner, actionDto, tanksOpenAction, null);
         runNested(actionRunner, actionDto, openAction, wateringDto.getValve());
@@ -66,14 +71,19 @@ public class WateringAction extends Action<WateringDto, Void> {
     private void finish(ActionDto actionDto, WateringDto wateringDto) {
         log.info("Closing valve {}...", wateringDto.getValve().getId());
         runNested(actionRunner, actionDto, closeAction, wateringDto.getValve());
-        int c = wateringDto.getCounter().decrementAndGet();
-        if (c == 0) {
-            log.info("Stopping watering job...");
+        log.info("Stopping watering job...");
+        List<WateringDto> wateringList = new ArrayList<>(state.getRunningWaterings());
+        wateringList.remove(wateringDto);
+        if (!wateringList.isEmpty()) {
+            log.info("Other jobs are running, ignoring closing tanks");
+        } else {
             runNested(actionRunner, actionDto, tanksCloseAction, null);
             state.setState(SystemStatus.IDLE);
-            log.info("Watering finished!");
         }
+        log.info("Watering finished!");
+        state.getRunningWaterings().remove(wateringDto);
     }
+
 
     @Override
     public String getDescription() {

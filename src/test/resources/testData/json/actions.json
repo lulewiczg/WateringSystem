@@ -130,7 +130,7 @@
     "parameterType": "com.github.lulewiczg.watering.service.actions.dto.WateringDto",
     "parameterDestinationType": "com.github.lulewiczg.watering.service.actions.dto.WateringDto",
     "allowedValues": null,
-    "parameterDescription": "Valves data",
+    "parameterDescription": "Watering data",
     "returnType": "java.lang.Void"
   }
 ]

@@ -16,7 +16,6 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
 /**
@@ -66,8 +65,7 @@ public class ScheduledWatering extends ScheduledJob {
     public void doJob(JobDto job) {
         List<Valve> outputs = state.getOutputs().stream().filter(i -> i.getWateringTime() != null).collect(Collectors.toList());
         log.debug("Starting watering job for valves {}", outputs);
-        AtomicInteger counter = new AtomicInteger(outputs.size());
-        outputs.forEach(i -> runNested(actionRunner, job, wateringAction, new WateringDto(i.getId(), i, i.getWateringTime(), counter)));
+        outputs.forEach(i -> runNested(actionRunner, job, wateringAction, new WateringDto(i.getId(), i, i.getWateringTime(), null)));
     }
 
 }

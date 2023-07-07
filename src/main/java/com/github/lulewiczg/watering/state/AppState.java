@@ -7,6 +7,9 @@ import com.github.lulewiczg.watering.config.dto.TankType;
 import com.github.lulewiczg.watering.config.dto.ValveType;
 import com.github.lulewiczg.watering.exception.SensorNotFoundException;
 import com.github.lulewiczg.watering.exception.ValveNotFoundException;
+import com.github.lulewiczg.watering.service.actions.Action;
+import com.github.lulewiczg.watering.service.actions.WateringAction;
+import com.github.lulewiczg.watering.service.actions.dto.WateringDto;
 import com.github.lulewiczg.watering.state.dto.*;
 import com.github.lulewiczg.watering.state.mapper.TankMapper;
 import com.github.lulewiczg.watering.state.mapper.ValveMapper;
@@ -22,6 +25,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.stream.Collectors;
 
 /**
@@ -47,6 +51,8 @@ public class AppState {
     private List<Valve> outputs;
 
     private List<Pump> pumps;
+
+    private List<WateringDto> runningWaterings = new CopyOnWriteArrayList<>();
 
     /**
      * Finds valve with given ID.

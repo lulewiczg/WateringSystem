@@ -16,7 +16,8 @@ import org.springframework.context.annotation.PropertySource;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
-import java.util.concurrent.atomic.AtomicInteger;
+import java.util.ArrayList;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -66,11 +67,9 @@ class WateringActionTest {
         when(runner.run("test.", tanksOpenAction, null)).thenReturn(TestUtils.EMPTY_RESULT);
         when(runner.run("test.", tanksCloseAction, null)).thenReturn(TestUtils.EMPTY_RESULT);
         ActionDto actionDto = new ActionDto("test");
-        AtomicInteger counter = new AtomicInteger(1);
 
-        action.doAction(actionDto, new WateringDto("test", TestUtils.Objects.OUT, 1, counter));
+        action.doAction(actionDto, new WateringDto("test", TestUtils.Objects.OUT, 1, null));
 
-        assertEquals(1, counter.get());
         verify(state).setState(SystemStatus.WATERING);
         verify(runner, never()).run(any(), eq(tanksCloseAction), any());
         verify(runner, never()).run(any(), eq(valveCloseAction), any());
@@ -79,7 +78,6 @@ class WateringActionTest {
 
         Thread.sleep(1500);
 
-        assertEquals(0, counter.get());
         verify(state).setState(SystemStatus.IDLE);
         verify(runner).run("test.", tanksCloseAction, null);
         verify(runner).run("test.", valveCloseAction, TestUtils.Objects.OUT);
@@ -93,23 +91,27 @@ class WateringActionTest {
         when(runner.run("test.", valveCloseAction, TestUtils.Objects.OUT2)).thenReturn(TestUtils.EMPTY_RESULT);
         when(runner.run("test.", tanksOpenAction, null)).thenReturn(TestUtils.EMPTY_RESULT);
         when(runner.run("test.", tanksCloseAction, null)).thenReturn(TestUtils.EMPTY_RESULT);
+        WateringDto dto = new WateringDto("test", TestUtils.Objects.OUT, 1, null);
+        WateringDto dto2 = new WateringDto("test2", TestUtils.Objects.OUT2, 3, null);
+        List<WateringDto> dtoList = new ArrayList<>();
+        when(state.getRunningWaterings()).thenReturn(dtoList);
         ActionDto actionDto = new ActionDto("test");
-        AtomicInteger counter = new AtomicInteger(2);
 
-        action.doAction(actionDto, new WateringDto("test", TestUtils.Objects.OUT, 1, counter));
-        action.doAction(actionDto, new WateringDto("test2", TestUtils.Objects.OUT2, 1, counter));
+        action.doAction(actionDto, dto);
+        action.doAction(actionDto, dto2);
 
-        assertEquals(2, counter.get());
+        assertEquals(dtoList, List.of(dto, dto2));
+        Thread.sleep(1200);
+        assertEquals(dtoList, List.of(dto2));
+
         verify(state, atLeast(1)).setState(SystemStatus.WATERING);
         verify(runner, never()).run(any(), eq(tanksCloseAction), any());
-        verify(runner, never()).run(any(), eq(valveCloseAction), any());
         verify(runner, atLeast(1)).run("test.", tanksOpenAction, null);
         verify(runner).run("test.", valveOpenAction, TestUtils.Objects.OUT);
         verify(runner).run("test.", valveOpenAction, TestUtils.Objects.OUT2);
 
-        Thread.sleep(1500);
+        Thread.sleep(2500);
 
-        assertEquals(0, counter.get());
         verify(state, times(1)).setState(SystemStatus.IDLE);
         verify(runner).run("test.", tanksCloseAction, null);
         verify(runner).run("test.", valveCloseAction, TestUtils.Objects.OUT);
@@ -121,8 +123,7 @@ class WateringActionTest {
         when(runner.run("test.", tanksCloseAction, null)).thenReturn(TestUtils.EMPTY_RESULT);
         when(runner.run("test.", tanksOpenAction, null)).thenReturn(TestUtils.ERROR_RESULT);
         ActionDto actionDto = new ActionDto("test");
-        AtomicInteger counter = new AtomicInteger(1);
-        WateringDto dto = new WateringDto("test", TestUtils.Objects.OUT, 1, counter);
+        WateringDto dto = new WateringDto("test", TestUtils.Objects.OUT, 1, null);
 
         String error = assertThrows(ActionException.class, () -> action.doAction(actionDto, dto)).getLocalizedMessage();
 
@@ -140,8 +141,7 @@ class WateringActionTest {
         when(runner.run("test.", tanksOpenAction, null)).thenReturn(TestUtils.EMPTY_RESULT);
         when(runner.run("test.", tanksCloseAction, null)).thenReturn(TestUtils.EMPTY_RESULT);
         ActionDto actionDto = new ActionDto("test");
-        AtomicInteger counter = new AtomicInteger(1);
-        WateringDto dto = new WateringDto("test", TestUtils.Objects.OUT, 1, counter);
+        WateringDto dto = new WateringDto("test", TestUtils.Objects.OUT, 1, null);
 
         String error = assertThrows(ActionException.class, () -> action.doAction(actionDto, dto)).getLocalizedMessage();
 
@@ -160,9 +160,8 @@ class WateringActionTest {
         when(runner.run("test.", valveCloseAction, TestUtils.Objects.OUT)).thenReturn(TestUtils.EMPTY_RESULT);
         when(runner.run("test.", tanksCloseAction, null)).thenReturn(TestUtils.ERROR_RESULT);
         ActionDto actionDto = new ActionDto("test");
-        AtomicInteger counter = new AtomicInteger(1);
 
-        action.doAction(actionDto, new WateringDto("test", TestUtils.Objects.OUT, 1, counter));
+        action.doAction(actionDto, new WateringDto("test", TestUtils.Objects.OUT, 1, null));
 
         Thread.sleep(1500);
         verify(state).setState(SystemStatus.WATERING);
@@ -178,9 +177,8 @@ class WateringActionTest {
         when(runner.run("test.", valveCloseAction, TestUtils.Objects.OUT)).thenReturn(TestUtils.ERROR_RESULT);
         when(runner.run("test.", tanksCloseAction, null)).thenReturn(TestUtils.EMPTY_RESULT);
         ActionDto actionDto = new ActionDto("test");
-        AtomicInteger counter = new AtomicInteger(1);
 
-        action.doAction(actionDto, new WateringDto("test", TestUtils.Objects.OUT, 1, counter));
+        action.doAction(actionDto, new WateringDto("test", TestUtils.Objects.OUT, 1, null));
 
         Thread.sleep(1500);
         verify(state).setState(SystemStatus.WATERING);

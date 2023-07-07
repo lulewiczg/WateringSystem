@@ -75,14 +75,10 @@ class ScheduledWateringTest {
         List<WateringDto> values = captor.getAllValues();
         assertEquals(2, values.size());
         WateringDto value = values.get(0);
-        assertEquals(2, value.getCounter().get());
-        value.setCounter(null);
         WateringDto wateringDto = new WateringDto(TestUtils.Objects.OUT.getId(), TestUtils.Objects.OUT, 1, null);
         assertEquals(wateringDto, value);
 
         WateringDto value2 = values.get(1);
-        assertEquals(2, value2.getCounter().get());
-        value2.setCounter(null);
         WateringDto wateringDto2 = new WateringDto(TestUtils.Objects.OUT2.getId(), TestUtils.Objects.OUT2, 2, null);
         assertEquals(wateringDto2, value2);
 
@@ -100,8 +96,6 @@ class ScheduledWateringTest {
         ArgumentCaptor<WateringDto> captor = ArgumentCaptor.forClass(WateringDto.class);
         verify(runner).run(eq("test."), eq(wateringAction), captor.capture());
         WateringDto value = captor.getValue();
-        assertEquals(2, value.getCounter().get());
-        value.setCounter(null);
         WateringDto wateringDto = new WateringDto(TestUtils.Objects.OUT.getId(), TestUtils.Objects.OUT, 1, null);
         assertEquals(wateringDto, value);
         verifyNoMoreInteractions(runner);
