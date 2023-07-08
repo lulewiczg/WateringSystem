@@ -36,6 +36,7 @@ public class IOServiceImpl implements IOService {
 
     private final int numberOfReads;
 
+    private final int readsLimit;
     private final double readCurrentDeclineFactor;
     private final int readInterval;
 
@@ -50,10 +51,12 @@ public class IOServiceImpl implements IOService {
     @SneakyThrows
     public IOServiceImpl(GpioController gpioController, INA219Resolver resolver, AppConfig config,
                          @Value("${com.github.lulewiczg.watering.io.numberOfReads:100}") int numberOfReads,
+                         @Value("${com.github.lulewiczg.watering.io.readsLimit:200}") int readsLimit,
                          @Value("${com.github.lulewiczg.watering.io.readInterval:10}") int readInterval,
                          @Value("${com.github.lulewiczg.watering.io.currentIgnoreFactor:1.5}") double currentIgnoreFactor) {
         this.gpioController = gpioController;
         this.numberOfReads = numberOfReads;
+        this.readsLimit = readsLimit;
         this.readCurrentDeclineFactor = currentIgnoreFactor;
         this.readInterval = readInterval;
         config.getSensors().stream().map(WaterLevelSensorConfig::getAddress).forEach(i -> sensors.put(i, resolver.get(i)));
@@ -112,10 +115,11 @@ public class IOServiceImpl implements IOService {
     @SneakyThrows
     private double readCurrent(Address address, INA219 ina219, Sensor sensor) {
         int reads = 0;
+        int totalReads = 0;
         double minCurrent = sensor.getVoltage() / sensor.getMaxResistance() / readCurrentDeclineFactor;
         double maxCurrent = sensor.getVoltage() / sensor.getMinResistance() * readCurrentDeclineFactor;
         List<Double> results = new ArrayList<>();
-        while (reads < numberOfReads) {
+        while (reads < numberOfReads && totalReads < readsLimit) {
             double current = ina219.getCurrent();
             log.trace("Read current {} for address {}", current, address);
             if (current > minCurrent && current < maxCurrent) {
@@ -124,10 +128,16 @@ public class IOServiceImpl implements IOService {
             } else {
                 log.trace("Invalid current, retrying...");
             }
+            totalReads++;
             Thread.sleep(readInterval);
         }
-        double avgCurrent = BigDecimal.valueOf(results.stream().reduce(Double::sum).orElse(0d)).divide(BigDecimal.valueOf(results.size()),
-                RoundingMode.HALF_UP).setScale(8, RoundingMode.HALF_UP).doubleValue();
+        double avgCurrent;
+        if (reads == 0) {
+            avgCurrent = 0;
+        } else {
+            avgCurrent = BigDecimal.valueOf(results.stream().reduce(Double::sum).orElse(0d)).divide(BigDecimal.valueOf(results.size()),
+                    RoundingMode.HALF_UP).setScale(8, RoundingMode.HALF_UP).doubleValue();
+        }
         if (avgCurrent <= 0) {
             log.error("Invalid current value!");
             avgCurrent = 0;

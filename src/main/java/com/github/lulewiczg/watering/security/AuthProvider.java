@@ -24,7 +24,7 @@ public class AuthProvider implements AuthenticationProvider {
     public Authentication authenticate(Authentication authentication) {
         String name = authentication.getName();
         String password = authentication.getCredentials().toString();
-        log.debug("Trying to log with user: {}", name);
+        log.debug("Trying to log in with user: {}", name);
 
         User user = securityConfig.getUsers().stream().filter(i -> i.getName().equals(name)).findFirst()
                 .orElseThrow(() -> new BadCredentialsException("Invalid credentials"));
