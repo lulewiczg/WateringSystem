@@ -1,6 +1,7 @@
 package com.github.lulewiczg.watering.service.actions;
 
 import com.github.lulewiczg.watering.config.MasterConfig;
+import com.github.lulewiczg.watering.service.RunningAction;
 import com.github.lulewiczg.watering.service.actions.dto.WateringDto;
 import com.github.lulewiczg.watering.service.dto.ActionDto;
 import com.github.lulewiczg.watering.state.AppState;
@@ -11,8 +12,8 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean
 import org.springframework.stereotype.Component;
 
 import java.time.Instant;
-import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -38,7 +39,7 @@ public class WateringAction extends Action<WateringDto, Void> {
 
     private final ActionRunner actionRunner;
 
-    private final ScheduledExecutorService exec = Executors.newSingleThreadScheduledExecutor();
+    private ScheduledExecutorService exec = Executors.newSingleThreadScheduledExecutor();
 
     @Override
     public String getParamDescription() {
@@ -59,7 +60,7 @@ public class WateringAction extends Action<WateringDto, Void> {
     protected Void doAction(ActionDto actionDto, WateringDto wateringDto) {
         log.info("Running watering: {}", wateringDto);
         wateringDto.setStartDate(Instant.now());
-        state.getRunningWaterings().add(wateringDto);
+        state.getRunningActions().add(new RunningAction(this, wateringDto, this::kill));
         state.setState(SystemStatus.WATERING);
         runNested(actionRunner, actionDto, tanksOpenAction, null);
         runNested(actionRunner, actionDto, openAction, wateringDto.getValve());
@@ -72,18 +73,23 @@ public class WateringAction extends Action<WateringDto, Void> {
         log.info("Closing valve {}...", wateringDto.getValve().getId());
         runNested(actionRunner, actionDto, closeAction, wateringDto.getValve());
         log.info("Stopping watering job...");
-        List<WateringDto> wateringList = new ArrayList<>(state.getRunningWaterings());
-        wateringList.remove(wateringDto);
-        if (!wateringList.isEmpty()) {
-            log.info("Other jobs are running, ignoring closing tanks");
-        } else {
-            runNested(actionRunner, actionDto, tanksCloseAction, null);
-            state.setState(SystemStatus.IDLE);
-        }
+        Optional<RunningAction> action = state.getRunningActions().stream().filter(i -> i.getAction().getClass() == WateringAction.class && i.getParam().equals(wateringDto)).findFirst();
+        action.ifPresent(i -> state.getRunningActions().remove(i));
+        Optional<RunningAction> otherAction = state.getRunningActions().stream().filter(i -> i.getAction().getClass() == WateringAction.class).findFirst();
+
+        otherAction.ifPresentOrElse(i -> log.info("Other jobs are running, ignoring closing tanks"),
+                () -> {
+                    runNested(actionRunner, actionDto, tanksCloseAction, null);
+                    state.setState(SystemStatus.IDLE);
+                });
         log.info("Watering finished!");
-        state.getRunningWaterings().remove(wateringDto);
     }
 
+    public void kill() {
+        List<Runnable> jobs = exec.shutdownNow();
+        exec = Executors.newSingleThreadScheduledExecutor();
+        jobs.forEach(Runnable::run);
+    }
 
     @Override
     public String getDescription() {

@@ -7,9 +7,7 @@ import com.github.lulewiczg.watering.config.dto.TankType;
 import com.github.lulewiczg.watering.config.dto.ValveType;
 import com.github.lulewiczg.watering.exception.SensorNotFoundException;
 import com.github.lulewiczg.watering.exception.ValveNotFoundException;
-import com.github.lulewiczg.watering.service.actions.Action;
-import com.github.lulewiczg.watering.service.actions.WateringAction;
-import com.github.lulewiczg.watering.service.actions.dto.WateringDto;
+import com.github.lulewiczg.watering.service.RunningAction;
 import com.github.lulewiczg.watering.state.dto.*;
 import com.github.lulewiczg.watering.state.mapper.TankMapper;
 import com.github.lulewiczg.watering.state.mapper.ValveMapper;
@@ -52,7 +50,7 @@ public class AppState {
 
     private List<Pump> pumps;
 
-    private List<WateringDto> runningWaterings = new CopyOnWriteArrayList<>();
+    private List<RunningAction> runningActions = new CopyOnWriteArrayList<>();
 
     /**
      * Finds valve with given ID.

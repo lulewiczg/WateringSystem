@@ -2,6 +2,7 @@ package com.github.lulewiczg.watering.service.actions;
 
 import com.github.lulewiczg.watering.TestUtils;
 import com.github.lulewiczg.watering.exception.ActionException;
+import com.github.lulewiczg.watering.service.RunningAction;
 import com.github.lulewiczg.watering.service.actions.dto.WateringDto;
 import com.github.lulewiczg.watering.service.dto.ActionDto;
 import com.github.lulewiczg.watering.state.AppState;
@@ -93,16 +94,16 @@ class WateringActionTest {
         when(runner.run("test.", tanksCloseAction, null)).thenReturn(TestUtils.EMPTY_RESULT);
         WateringDto dto = new WateringDto("test", TestUtils.Objects.OUT, 1, null);
         WateringDto dto2 = new WateringDto("test2", TestUtils.Objects.OUT2, 3, null);
-        List<WateringDto> dtoList = new ArrayList<>();
-        when(state.getRunningWaterings()).thenReturn(dtoList);
+        List<RunningAction> actionsList = new ArrayList<>();
+        when(state.getRunningActions()).thenReturn(actionsList);
         ActionDto actionDto = new ActionDto("test");
 
         action.doAction(actionDto, dto);
         action.doAction(actionDto, dto2);
 
-        assertEquals(dtoList, List.of(dto, dto2));
+        assertEquals(actionsList, List.of(new RunningAction(action, dto, null), new RunningAction(action, dto2, null)));
         Thread.sleep(1200);
-        assertEquals(dtoList, List.of(dto2));
+        assertEquals(actionsList, List.of(new RunningAction(action, dto2, null)));
 
         verify(state, atLeast(1)).setState(SystemStatus.WATERING);
         verify(runner, never()).run(any(), eq(tanksCloseAction), any());

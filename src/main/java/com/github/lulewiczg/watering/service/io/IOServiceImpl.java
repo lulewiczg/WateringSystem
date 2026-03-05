@@ -146,6 +146,15 @@ public class IOServiceImpl implements IOService {
         return avgCurrent;
     }
 
+    //max I 0.005
+    //max lsb= 0.000 001 220 703 (1220 nA/bit)
+    //min lsb= 0.000 000 152 592 (152 nA/bit)
+    //CurrentLSB= 0.000 001 (1 uA)
+    //cal=4096600
+    //TODO krotsze podlewanie wylacza pompe, moze jakies lockowanie?
+    //TODO moze wyswietlanie wszystkich trwajacych akcji?
+    //TODO lista akcji i ubijanie ich przy stopie
+
     /**
      * Resolver for INA219
      */
@@ -154,7 +163,7 @@ public class IOServiceImpl implements IOService {
 
         @SneakyThrows
         INA219 get(Address address) {
-            return new INA219(address, 0.1, 1, VoltageRange.V16, Pga.GAIN_1, Adc.SAMPLES_128, Adc.SAMPLES_128);
+            return new INA219(address, 0.1, 0.4, VoltageRange.V16, Pga.GAIN_1, Adc.SAMPLES_128, Adc.SAMPLES_128);
         }
     }
 }
