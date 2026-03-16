@@ -47,13 +47,17 @@
           "id": "sensor1",
           "minLevel": 12,
           "maxLevel": 21,
-          "level": null
+          "level": null,
+          "minResistance": 1,
+          "maxResistance": 100,
+          "voltage": 12.2
         },
         "valve": {
           "id": "valve1",
           "name": "Tank 1",
           "type": "INPUT",
-          "open": false
+          "open": false,
+          "overflowOutput": false
         }
       },
       {
@@ -63,13 +67,17 @@
           "id": "sensor2",
           "minLevel": 99,
           "maxLevel": 100,
-          "level": null
+          "level": null,
+          "minResistance": 1,
+          "maxResistance": 100,
+          "voltage": 12.2
         },
         "valve": {
           "id": "valve2",
           "name": "Tank 2",
           "type": "INPUT",
-          "open": false
+          "open": false,
+          "overflowOutput": false
         }
       }
     ],
@@ -80,7 +88,8 @@
           "id": "tap",
           "name": "tap water",
           "type": "INPUT",
-          "open": false
+          "open": false,
+          "overflowOutput": false
         }
       }
     ],
@@ -89,7 +98,8 @@
         "id": "out",
         "name": "out",
         "type": "OUTPUT",
-        "open": true
+        "open": true,
+        "overflowOutput": false
       }
     ],
     "state": "IDLE"

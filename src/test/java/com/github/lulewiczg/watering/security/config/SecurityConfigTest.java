@@ -2,6 +2,7 @@ package com.github.lulewiczg.watering.security.config;
 
 import com.github.lulewiczg.watering.security.Role;
 import com.github.lulewiczg.watering.security.User;
+import jakarta.validation.ConstraintViolation;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -11,7 +12,6 @@ import org.springframework.context.annotation.Import;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.validation.beanvalidation.LocalValidatorFactoryBean;
 
-import javax.validation.ConstraintViolation;
 import java.util.*;
 import java.util.stream.Collectors;
 

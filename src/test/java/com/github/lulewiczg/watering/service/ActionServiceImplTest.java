@@ -22,9 +22,10 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.context.ApplicationContext;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.util.List;
@@ -37,26 +38,26 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-@ExtendWith(SpringExtension.class)
+@ExtendWith({SpringExtension.class, MockitoExtension.class})
 @ActiveProfiles({"test", "testJobs"})
 class ActionServiceImplTest {
 
-    @MockBean
+    @MockitoBean
     private AppState state;
 
-    @MockBean
+    @MockitoBean
     private IOService ioService;
 
-    @MockBean
+    @MockitoBean
     private ApplicationContext applicationContext;
 
-    @MockBean
+    @MockitoBean
     private ActionRunner actionRunner;
 
-    @MockBean
+    @MockitoBean
     private JobRunner jobRunner;
 
-    @MockBean
+    @MockitoBean
     private ActionParamService actionParamService;
 
     @Mock
@@ -196,7 +197,6 @@ class ActionServiceImplTest {
     @Test
     void testRunActionVoidType() {
         when(state.getAllValves()).thenReturn(List.of(valve));
-        when(valve.getId()).thenReturn("id");
         when(applicationContext.getBeansOfType(Action.class))
                 .thenReturn(Map.of(deCapitalize(ValveOpenAction.class.getSimpleName()), outputsOpenAction));
         service.reloadJobs();
@@ -211,7 +211,6 @@ class ActionServiceImplTest {
     @Test
     void testRunActionVoidWithParam() {
         when(state.getAllValves()).thenReturn(List.of(valve));
-        when(valve.getId()).thenReturn("id");
         when(applicationContext.getBeansOfType(Action.class))
                 .thenReturn(Map.of(deCapitalize(ValveOpenAction.class.getSimpleName()), outputsOpenAction));
         service.reloadJobs();
@@ -281,7 +280,6 @@ class ActionServiceImplTest {
         when(applicationContext.getBeansOfType(ScheduledJob.class)).thenReturn(Map.of(name, setDefaults));
         when(applicationContext.getBean(name, ScheduledJob.class)).thenReturn(setDefaults);
         service.reloadJobs();
-        when(setDefaults.canBeStarted()).thenReturn(true);
         JobDto dto = new JobDto(name);
         service.runJob(dto);
 

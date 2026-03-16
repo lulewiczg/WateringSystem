@@ -11,10 +11,10 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -27,16 +27,16 @@ import static org.mockito.Mockito.*;
 @PropertySource("classpath:application-testJobs.properties")
 class ScheduledValveReadTest {
 
-    @MockBean
+    @MockitoBean
     private AppState state;
 
-    @MockBean
+    @MockitoBean
     private IOService ioService;
 
     @Autowired
     private ScheduledValveRead job;
 
-    @MockBean
+    @MockitoBean
     private JobRunner jobRunner;
 
     @BeforeEach

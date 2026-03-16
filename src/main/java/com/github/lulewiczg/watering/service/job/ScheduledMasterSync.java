@@ -13,7 +13,6 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import lombok.extern.log4j.Log4j2;
-import org.apache.tomcat.util.codec.binary.Base64;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.http.HttpEntity;
@@ -26,6 +25,7 @@ import org.springframework.web.client.RestTemplate;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Base64;
 import java.util.List;
 
 /**
@@ -111,7 +111,7 @@ public class ScheduledMasterSync extends ScheduledJob {
 
     private MasterResponse connect() {
         String credentials = login + ":" + password;
-        String base64 = Base64.encodeBase64String(credentials.getBytes());
+        String base64 = Base64.getEncoder().encodeToString(credentials.getBytes());
         HttpHeaders headers = new HttpHeaders();
         headers.add("Authorization", "Basic " + base64);
         HttpEntity<SlaveStateDto> entity = new HttpEntity<>(

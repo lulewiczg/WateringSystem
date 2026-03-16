@@ -16,10 +16,10 @@ package com.github.lulewiczg.watering.service.ina219;
 
 import com.github.lulewiczg.watering.service.ina219.enums.Address;
 import com.github.lulewiczg.watering.service.ina219.enums.RegisterAddress;
-import com.pi4j.io.i2c.I2CBus;
-import com.pi4j.io.i2c.I2CDevice;
-import com.pi4j.io.i2c.I2CFactory;
-import com.pi4j.io.i2c.I2CFactory.UnsupportedBusNumberException;
+import com.pi4j.Pi4J;
+import com.pi4j.context.Context;
+import com.pi4j.io.i2c.I2C;
+import com.pi4j.io.i2c.I2CConfig;
 import lombok.extern.log4j.Log4j2;
 
 import java.io.IOException;
@@ -29,7 +29,7 @@ import java.io.IOException;
  */
 @Log4j2
 class I2CRegisterImpl implements INA219Register {
-    private I2CDevice device;
+    private I2C device;
 
     /**
      * Create a new I2CRegisterImple using the specified device address.
@@ -39,9 +39,15 @@ class I2CRegisterImpl implements INA219Register {
      */
     I2CRegisterImpl(Address address) throws IOException {
         try {
-            device = I2CFactory.getInstance(I2CBus.BUS_1).getDevice(address.getValue());
-        } catch (UnsupportedBusNumberException e) {
-            log.error("BUS_1 no supported", e);
+            Context pi4j = Pi4J.newAutoContext();
+            I2CConfig config = I2C.newConfigBuilder(pi4j)
+                    .id("INA219-" + address.getValue())
+                    .bus(1)
+                    .device(address.getValue())
+                    .build();
+            device = pi4j.create(config);
+        } catch (Exception e) {
+            log.error("Failed to create I2C device", e);
         }
     }
 
@@ -49,7 +55,7 @@ class I2CRegisterImpl implements INA219Register {
      * {@inheritDoc}
      */
     public void writeRegister(RegisterAddress ra, int value) throws IOException {
-        device.write(ra.getValue(), new byte[]{(byte) ((value >> 8) & 0xFF), (byte) (value & 0xFF)});
+        device.writeRegister(ra.getValue(), new byte[]{(byte) ((value >> 8) & 0xFF), (byte) (value & 0xFF)});
     }
 
     /**
@@ -57,7 +63,7 @@ class I2CRegisterImpl implements INA219Register {
      */
     public int readRegister(RegisterAddress ra) throws IOException {
         byte[] buf = new byte[2];
-        device.read(ra.getValue(), buf, 0, buf.length);
+        device.readRegister(ra.getValue(), buf);
         return ((buf[0] & 0xFF) << 8) | (buf[1] & 0xFF);
     }
 
@@ -66,7 +72,7 @@ class I2CRegisterImpl implements INA219Register {
      */
     public short readSignedRegister(RegisterAddress ra) throws IOException {
         byte[] buf = new byte[2];
-        device.read(ra.getValue(), buf, 0, buf.length);
+        device.readRegister(ra.getValue(), buf);
         return (short) ((buf[0] << 8) | (buf[1] & 0xFF));
     }
 

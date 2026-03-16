@@ -8,9 +8,9 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -22,19 +22,19 @@ import static org.mockito.Mockito.*;
 @ExtendWith(SpringExtension.class)
 class EmergencyStopActionTest {
 
-    @MockBean
+    @MockitoBean
     private AppState state;
 
-    @MockBean
+    @MockitoBean
     private TapsCloseAction tapsCloseAction;
 
-    @MockBean
+    @MockitoBean
     private TanksCloseAction tanksCloseAction;
 
-    @MockBean
+    @MockitoBean
     private OutputsCloseAction outputsCloseAction;
 
-    @MockBean
+    @MockitoBean
     private ActionRunner runner;
 
     @Autowired

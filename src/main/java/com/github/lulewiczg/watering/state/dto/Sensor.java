@@ -2,7 +2,6 @@ package com.github.lulewiczg.watering.state.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.github.lulewiczg.watering.service.ina219.enums.Address;
-import com.pi4j.io.gpio.Pin;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -30,7 +29,7 @@ public class Sensor {
 
     @EqualsAndHashCode.Exclude
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
-    private Pin powerControlPin;
+    private Integer powerControlPin;
 
     private int minResistance;
 

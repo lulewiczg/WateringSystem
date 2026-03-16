@@ -1,6 +1,5 @@
 package com.github.lulewiczg.watering.service;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.lulewiczg.watering.TestUtils;
 import com.github.lulewiczg.watering.exception.ActionNotFoundException;
 import com.github.lulewiczg.watering.exception.JobNotFoundException;
@@ -16,8 +15,9 @@ import com.github.lulewiczg.watering.service.job.SetDefaults;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
+import tools.jackson.databind.ObjectMapper;
 
 import java.util.Arrays;
 import java.util.List;
@@ -33,7 +33,7 @@ class ActionServiceDisabledTest {
     @Autowired
     private ActionServiceImpl service;
 
-    @MockBean
+    @MockitoBean
     private IOService ioService;
 
     @Autowired

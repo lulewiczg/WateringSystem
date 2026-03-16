@@ -2,15 +2,15 @@ package com.github.lulewiczg.watering.service.actions.dto;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.github.lulewiczg.watering.state.dto.Valve;
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
-import javax.validation.constraints.Max;
-import javax.validation.constraints.Min;
-import javax.validation.constraints.NotEmpty;
-import javax.validation.constraints.NotNull;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**

@@ -2,12 +2,11 @@ package com.github.lulewiczg.watering.service.dto;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.github.lulewiczg.watering.service.job.ScheduledJob;
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-
-import javax.validation.constraints.NotNull;
 
 /**
  * DTO for job.

@@ -16,10 +16,10 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 @EnableConfigurationProperties({AppConfig.class, SecurityConfig.class})
 public class WateringApplication implements CommandLineRunner {
 
-    public static void main(String[] args) {
+    static void main(String[] args) {
         SpringApplication.run(WateringApplication.class, args);
     }
-
+    
     @Override
     public void run(String... args) {
         // Do nothing

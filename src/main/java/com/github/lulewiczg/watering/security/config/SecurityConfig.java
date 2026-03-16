@@ -3,6 +3,9 @@ package com.github.lulewiczg.watering.security.config;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.github.lulewiczg.watering.security.Role;
 import com.github.lulewiczg.watering.security.User;
+import jakarta.annotation.PostConstruct;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotEmpty;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
@@ -12,9 +15,6 @@ import org.springframework.boot.context.properties.ConfigurationPropertiesScan;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.validation.annotation.Validated;
 
-import javax.annotation.PostConstruct;
-import javax.validation.Valid;
-import javax.validation.constraints.NotEmpty;
 import java.util.List;
 import java.util.stream.Collectors;
 

@@ -2,8 +2,10 @@ package com.github.lulewiczg.watering.config;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.github.lulewiczg.watering.config.dto.*;
-import com.pi4j.io.gpio.Pin;
-import com.pi4j.io.gpio.RaspiPin;
+import jakarta.annotation.PostConstruct;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
@@ -12,10 +14,6 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.boot.context.properties.ConfigurationPropertiesScan;
 import org.springframework.validation.annotation.Validated;
 
-import javax.annotation.PostConstruct;
-import javax.validation.Valid;
-import javax.validation.constraints.NotEmpty;
-import javax.validation.constraints.NotNull;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -94,47 +92,51 @@ public class AppConfig {
     }
 
     private void validatePins() {
-        List<String> usedPins = new ArrayList<>();
+        List<Integer> usedPins = new ArrayList<>();
         valves.forEach(i -> validatePin(usedPins, i));
-        sensors.forEach(i -> validateSensorPin(usedPins, i));
+        if (sensors != null) {
+            sensors.forEach(i -> validateSensorPin(usedPins, i));
+        }
         if (pumps != null) {
             pumps.forEach(i -> validatePin(usedPins, i));
         }
     }
 
     private void validateAddresses() {
-        long count = sensors.stream().map(WaterLevelSensorConfig::getAddress).distinct().count();
-        if (count != sensors.size()) {
-            throw new IllegalStateException("Duplicated sensor addresses found!");
+        if (sensors != null) {
+            long count = sensors.stream().map(WaterLevelSensorConfig::getAddress).distinct().count();
+            if (count != sensors.size()) {
+                throw new IllegalStateException("Duplicated sensor addresses found!");
+            }
         }
     }
 
-    private void validatePin(List<String> usedPins, PinnableConfig config) {
-        String name = config.getPinName();
-        if (usedPins.contains(name)) {
-            throw new IllegalStateException("Pin already in use: " + name);
-        }
-        Pin pin = RaspiPin.getPinByName(name);
+    private void validatePin(List<Integer> usedPins, PinnableConfig config) {
+        Integer pin = config.getPin();
         if (pin == null) {
-            throw new IllegalStateException("Could not find pin: " + name);
-        }
-        config.setPin(pin);
-        usedPins.add(name);
-    }
-
-    private void validateSensorPin(List<String> usedPins, WaterLevelSensorConfig sensor) {
-        String name = sensor.getPowerControlPinName();
-        if (name == null || name.isEmpty()) {
             return;
         }
-        if (usedPins.contains(name)) {
-            throw new IllegalStateException("Pin already in use: " + name);
-        }
-        Pin pin = RaspiPin.getPinByName(name);
+        validatePin(usedPins, pin);
+        config.setPin(pin);
+        usedPins.add(pin);
+    }
+
+    private void validateSensorPin(List<Integer> usedPins, WaterLevelSensorConfig sensor) {
+        Integer pin = sensor.getPowerControlPin();
         if (pin == null) {
-            throw new IllegalStateException("Could not find pin: " + name);
+            return;
         }
+        validatePin(usedPins, pin);
         sensor.setPowerControlPin(pin);
+    }
+
+    private void validatePin(List<Integer> usedPins, Integer pin) {
+        if (pin < 0 || pin > 40) {
+            throw new IllegalStateException("Invalid pin: " + pin);
+        }
+        if (usedPins.contains(pin)) {
+            throw new IllegalStateException("Pin already in use: " + pin);
+        }
     }
 
     private void validateValves() {

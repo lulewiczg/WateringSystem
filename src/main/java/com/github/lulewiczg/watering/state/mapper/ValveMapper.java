@@ -3,13 +3,14 @@ package com.github.lulewiczg.watering.state.mapper;
 import com.github.lulewiczg.watering.config.dto.ValveConfig;
 import com.github.lulewiczg.watering.state.dto.Valve;
 import org.mapstruct.Mapper;
+import org.mapstruct.MappingConstants;
 
 import java.util.List;
 
 /**
  * Mapper for valve.
  */
-@Mapper(componentModel = "spring")
+@Mapper(componentModel = MappingConstants.ComponentModel.SPRING)
 public interface ValveMapper {
 
     Valve map(ValveConfig valve);

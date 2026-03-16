@@ -1,12 +1,12 @@
 package com.github.lulewiczg.watering.controller;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.lulewiczg.watering.TestUtils;
 import com.github.lulewiczg.watering.config.MasterConfig;
 import com.github.lulewiczg.watering.exception.ActionNotFoundException;
 import com.github.lulewiczg.watering.exception.ApiError;
 import com.github.lulewiczg.watering.security.AuthEntryPoint;
 import com.github.lulewiczg.watering.security.AuthProvider;
+import com.github.lulewiczg.watering.security.WebSecurityConfig;
 import com.github.lulewiczg.watering.service.ActionService;
 import com.github.lulewiczg.watering.service.dto.ActionDefinitionDto;
 import com.github.lulewiczg.watering.service.dto.ActionDto;
@@ -16,15 +16,16 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
+import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
+import tools.jackson.databind.ObjectMapper;
 
 import java.time.LocalDateTime;
 import java.util.Arrays;
@@ -40,14 +41,14 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @AutoConfigureMockMvc
 @ActiveProfiles({"test", "testMaster"})
 @ExtendWith(SpringExtension.class)
-@Import({AuthEntryPoint.class, AuthProvider.class, MasterConfig.class, ActionMasterController.class})
+@Import({AuthEntryPoint.class, AuthProvider.class, WebSecurityConfig.class, MasterConfig.class, ActionMasterController.class})
 @WebMvcTest(ActionController.class)
 class ActionControllerMasterTest {
 
-    @MockBean
+    @MockitoBean
     private ActionService service;
 
-    @MockBean
+    @MockitoBean
     private MasterState masterState;
 
     @Autowired
@@ -194,8 +195,8 @@ class ActionControllerMasterTest {
         ApiError expected = new ApiError(400, "Bad Request", ex.getMessage());
 
         String json = mvc.perform(post("/rest/actions")
-                .content(mapper.writeValueAsString(actionDto))
-                .contentType(MediaType.APPLICATION_JSON))
+                        .content(mapper.writeValueAsString(actionDto))
+                        .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest())
                 .andReturn().getResponse().getContentAsString();
 
@@ -224,8 +225,8 @@ class ActionControllerMasterTest {
         ActionDto actionDto = new ActionDto("test", "test2");
         Mockito.<ActionResultDto<?>>when(service.runAction(actionDto)).thenReturn(result);
         mvc.perform(post("/rest/actions")
-                .content(mapper.writeValueAsString(actionDto))
-                .contentType(MediaType.APPLICATION_JSON))
+                        .content(mapper.writeValueAsString(actionDto))
+                        .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(content().json(mapper.writeValueAsString(result)));
     }

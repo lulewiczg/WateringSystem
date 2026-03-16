@@ -11,13 +11,13 @@ import com.github.lulewiczg.watering.state.AppState;
 import com.github.lulewiczg.watering.state.dto.Sensor;
 import com.github.lulewiczg.watering.state.dto.Tank;
 import com.github.lulewiczg.watering.state.dto.Valve;
+import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.stereotype.Service;
 
-import javax.annotation.PostConstruct;
 import java.util.Objects;
 
 /**
@@ -69,8 +69,8 @@ public class SetDefaults extends ScheduledJob {
         state.getTanks().stream().map(Tank::getValve).filter(Objects::nonNull).forEach(i -> setValveState(i, job));
         state.getOutputs().forEach(i -> setValveState(i, job));
         state.getTaps().forEach(i -> setValveState(i.getValve(), job));
-        state.getTanks().stream().map(Tank::getSensor).filter(Objects::nonNull).
-                map(Sensor::getPowerControlPin).distinct().forEach(ioService::toggleOff);
+        state.getTanks().stream().map(Tank::getSensor).filter(Objects::nonNull)
+                .map(Sensor::getPowerControlPin).filter(Objects::nonNull).distinct().forEach(ioService::toggleOff);
         state.getPumps().forEach(i -> runNested(actionRunner, job, pumpStopAction, i));
     }
 

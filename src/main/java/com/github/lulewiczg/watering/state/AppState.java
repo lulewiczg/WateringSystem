@@ -1,5 +1,6 @@
 package com.github.lulewiczg.watering.state;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.github.lulewiczg.watering.config.AppConfig;
@@ -12,7 +13,6 @@ import com.github.lulewiczg.watering.state.mapper.TankMapper;
 import com.github.lulewiczg.watering.state.mapper.ValveMapper;
 import com.github.lulewiczg.watering.state.mapper.WaterSourceMapper;
 import lombok.Data;
-import lombok.NoArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cache.annotation.Cacheable;
@@ -22,6 +22,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
 
 /**
@@ -29,13 +30,12 @@ import java.util.stream.Collectors;
  */
 @Data
 @Service
-@NoArgsConstructor
 public class AppState {
 
     @Value("#{'${com.github.lulewiczg.watering.role:}' != 'master' ? '${build.version} @ ${build.timestamp}' : null }")
     private String build;
 
-    private volatile SystemStatus state = SystemStatus.IDLE;
+    private AtomicReference<SystemStatus> state = new AtomicReference<>(SystemStatus.IDLE);
 
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     private LocalDateTime lastSync;
@@ -91,7 +91,7 @@ public class AppState {
     @JsonIgnore
     public List<Valve> getAllValves() {
         List<Valve> tankValves = tanks.stream().map(Tank::getValve).filter(Objects::nonNull).collect(Collectors.toList());
-        List<Valve> tapValves = taps.stream().map(WaterSource::getValve).collect(Collectors.toList());
+        List<Valve> tapValves = taps.stream().map(WaterSource::getValve).toList();
         tankValves.addAll(tapValves);
         tankValves.addAll(outputs);
 
@@ -113,6 +113,10 @@ public class AppState {
         return outputs;
     }
 
+    @JsonCreator
+    public AppState() {
+    }
+
     @Autowired
     public AppState(AppConfig config, ValveMapper valveMapper, TankMapper tankMapper, WaterSourceMapper waterSourceMapper) {
         this.tanks = tankMapper.map(config.getTanks().stream()
@@ -125,5 +129,13 @@ public class AppState {
                 .filter(i -> i.getType() == ValveType.OUTPUT).collect(Collectors.toList()));
 
         this.pumps = tanks.stream().map(Tank::getPump).filter(Objects::nonNull).collect(Collectors.toList());
+    }
+
+    public SystemStatus getState() {
+        return state.get();
+    }
+
+    public void setState(SystemStatus state) {
+        this.state.set(state);
     }
 }

@@ -3,7 +3,6 @@ package com.github.lulewiczg.watering.service;
 import com.github.lulewiczg.watering.exception.HandlerNotFoundException;
 import com.github.lulewiczg.watering.exception.ValidationException;
 import com.github.lulewiczg.watering.service.actions.dto.WateringDto;
-import com.github.lulewiczg.watering.service.actions.dto.WateringDtoMapper;
 import com.github.lulewiczg.watering.service.dto.ActionDefinitionDto;
 import com.github.lulewiczg.watering.state.AppState;
 import com.github.lulewiczg.watering.state.dto.Pump;
@@ -12,10 +11,11 @@ import com.github.lulewiczg.watering.state.dto.Valve;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.validation.beanvalidation.LocalValidatorFactoryBean;
 
@@ -27,10 +27,10 @@ import static org.mockito.Mockito.when;
 
 @ActiveProfiles("test")
 @Import({ActionParamService.class, LocalValidatorFactoryBean.class})
-@ExtendWith(SpringExtension.class)
+@ExtendWith({SpringExtension.class, MockitoExtension.class})
 class ActionParamServiceTest {
 
-    @MockBean
+    @MockitoBean
     private AppState state;
 
     @Mock

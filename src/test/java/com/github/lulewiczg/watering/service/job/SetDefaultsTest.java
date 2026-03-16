@@ -11,17 +11,16 @@ import com.github.lulewiczg.watering.service.io.IOService;
 import com.github.lulewiczg.watering.state.AppState;
 import com.github.lulewiczg.watering.state.SystemStatus;
 import com.github.lulewiczg.watering.state.dto.Tank;
-import com.pi4j.io.gpio.RaspiPin;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.util.List;
@@ -36,25 +35,25 @@ import static org.mockito.Mockito.*;
 @PropertySource("classpath:application-testJobs.properties")
 class SetDefaultsTest {
 
-    @MockBean
+    @MockitoBean
     private AppState state;
 
-    @MockBean
+    @MockitoBean
     private ValveOpenAction openAction;
 
-    @MockBean
+    @MockitoBean
     private ValveCloseAction closeAction;
 
-    @MockBean
+    @MockitoBean
     private PumpStopAction pumpStopAction;
 
-    @MockBean
+    @MockitoBean
     private ActionRunner runner;
 
-    @MockBean
+    @MockitoBean
     private JobRunner jobRunner;
 
-    @MockBean
+    @MockitoBean
     private IOService ioService;
 
     @Autowired
@@ -80,7 +79,7 @@ class SetDefaultsTest {
         verify(runner).run("test.", closeAction, TestUtils.Objects.OUT2);
         verify(runner).run("test.", closeAction, TestUtils.Objects.TAP_VALVE);
         verify(runner).run("test.", pumpStopAction, TestUtils.Objects.PUMP);
-        verify(ioService, times(1)).toggleOff(RaspiPin.GPIO_10);
+        verify(ioService, times(1)).toggleOff(10);
     }
 
     @Test

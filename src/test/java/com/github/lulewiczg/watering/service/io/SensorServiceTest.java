@@ -2,7 +2,6 @@ package com.github.lulewiczg.watering.service.io;
 
 import com.github.lulewiczg.watering.service.ina219.enums.Address;
 import com.github.lulewiczg.watering.state.dto.Sensor;
-import com.pi4j.io.gpio.RaspiPin;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvFileSource;
@@ -24,7 +23,7 @@ class SensorServiceTest {
     @ParameterizedTest
     @CsvFileSource(resources = "/testData/levels-test.csv")
     void testLevelCalculation(double current, int minResistance, int maxResistance, double voltage, double expected) {
-        Sensor sensor = new Sensor("sensor", null, 0, 1, Address.ADDR_40, RaspiPin.GPIO_10, minResistance, maxResistance, voltage);
+        Sensor sensor = new Sensor("sensor", null, 0, 1, Address.ADDR_40, 10, minResistance, maxResistance, voltage);
 
         double result = service.calculateWaterLevel(current, sensor);
 
