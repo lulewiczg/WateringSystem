@@ -11,7 +11,6 @@ import com.github.lulewiczg.watering.state.SystemStatus;
 import com.github.lulewiczg.watering.state.dto.Sensor;
 import com.github.lulewiczg.watering.state.dto.Tank;
 import com.github.lulewiczg.watering.state.dto.Valve;
-import com.pi4j.io.gpio.RaspiPin;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -19,10 +18,10 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvFileSource;
 import org.junit.jupiter.params.provider.EnumSource;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.util.List;
@@ -37,28 +36,28 @@ import static org.mockito.Mockito.*;
 @PropertySource("classpath:application-testJobs.properties")
 class ScheduledWaterFillControlTest {
 
-    @MockBean
+    @MockitoBean
     private TanksCloseAction tanksCloseAction;
 
-    @MockBean
+    @MockitoBean
     private TapsOpenAction tapsOpenAction;
 
-    @MockBean
+    @MockitoBean
     private TapsCloseAction tapsCloseAction;
 
-    @MockBean
+    @MockitoBean
     private ValveOpenAction valveOpenAction;
 
-    @MockBean
+    @MockitoBean
     private OutputsCloseAction outputsCloseAction;
 
-    @MockBean
+    @MockitoBean
     private AppState state;
 
-    @MockBean
+    @MockitoBean
     private ActionRunner runner;
 
-    @MockBean
+    @MockitoBean
     private JobRunner jobRunner;
 
     @Autowired
@@ -76,7 +75,7 @@ class ScheduledWaterFillControlTest {
     @ParameterizedTest
     @CsvFileSource(resources = "/testData/fill-ok-test.csv")
     void testNothingToDo(int minLevel, int maxLevel, Integer level) {
-        Sensor sensor = new Sensor("sensor", level, minLevel, maxLevel, Address.ADDR_40, RaspiPin.GPIO_10, 10, 12, 200);
+        Sensor sensor = new Sensor("sensor", level, minLevel, maxLevel, Address.ADDR_40, 10, 10, 12, 200);
         Tank tank = new Tank("tank", 100, sensor, TestUtils.Objects.VALVE, null);
         when(state.getTanks()).thenReturn(List.of(tank));
         JobDto jobDto = new JobDto("test", null);
@@ -94,7 +93,7 @@ class ScheduledWaterFillControlTest {
     @ParameterizedTest
     @CsvFileSource(resources = "/testData/fill-test.csv")
     void testFill(int minLevel, int maxLevel, int level) {
-        Sensor sensor = new Sensor("sensor", level, minLevel, maxLevel, Address.ADDR_40, RaspiPin.GPIO_10, 10, 12, 200);
+        Sensor sensor = new Sensor("sensor", level, minLevel, maxLevel, Address.ADDR_40, 10, 10, 12, 200);
         Tank tank = new Tank("tank", 100, sensor, TestUtils.Objects.VALVE, null);
         when(state.getTanks()).thenReturn(List.of(tank, TestUtils.Objects.TANK2));
         when(runner.run("test.", outputsCloseAction, null)).thenReturn(TestUtils.EMPTY_RESULT);
@@ -116,7 +115,7 @@ class ScheduledWaterFillControlTest {
     @ParameterizedTest
     @CsvFileSource(resources = "/testData/fill-ok-test.csv")
     void testRunningFinished(int minLevel, int maxLevel, Integer level) {
-        Sensor sensor = new Sensor("sensor", level, minLevel, maxLevel, Address.ADDR_40, RaspiPin.GPIO_10, 10, 12, 200);
+        Sensor sensor = new Sensor("sensor", level, minLevel, maxLevel, Address.ADDR_40, 10, 10, 12, 200);
         Tank tank = new Tank("tank", 100, sensor, TestUtils.Objects.VALVE, null);
         when(state.getTanks()).thenReturn(List.of(tank));
         when(runner.run("test.", tanksCloseAction, null)).thenReturn(TestUtils.EMPTY_RESULT);
@@ -136,7 +135,7 @@ class ScheduledWaterFillControlTest {
     @ParameterizedTest
     @CsvFileSource(resources = "/testData/fill-running-test.csv")
     void testRunning(int minLevel, int maxLevel, Integer level) {
-        Sensor sensor = new Sensor("sensor", level, minLevel, maxLevel, Address.ADDR_40, RaspiPin.GPIO_10, 10, 12, 200);
+        Sensor sensor = new Sensor("sensor", level, minLevel, maxLevel, Address.ADDR_40, 10, 10, 12, 200);
         Tank tank = new Tank("tank", 100, sensor, TestUtils.Objects.VALVE, null);
         when(state.getTanks()).thenReturn(List.of(tank));
         when(runner.run("test.", tanksCloseAction, null)).thenReturn(TestUtils.EMPTY_RESULT);
@@ -155,11 +154,11 @@ class ScheduledWaterFillControlTest {
 
     @Test
     void testOutputsCloseFail() {
-        Valve valve = new Valve("valve", "valve", ValveType.INPUT, true, false, null, RaspiPin.GPIO_00);
-        Sensor sensor = new Sensor("sensor", 10, 20, 100, Address.ADDR_40, RaspiPin.GPIO_10, 10, 12, 200);
+        Valve valve = new Valve("valve", "valve", ValveType.INPUT, true, false, null, 0);
+        Sensor sensor = new Sensor("sensor", 10, 20, 100, Address.ADDR_40, 10, 10, 12, 200);
         Tank tank = new Tank("tank", 100, sensor, valve, null);
-        Valve valve2 = new Valve("valve2", "valve2", ValveType.INPUT, true, false, null, RaspiPin.GPIO_02);
-        Sensor sensor2 = new Sensor("sensor2", 2, 1, 3, Address.ADDR_41, RaspiPin.GPIO_20, 10, 12, 200);
+        Valve valve2 = new Valve("valve2", "valve2", ValveType.INPUT, true, false, null, 2);
+        Sensor sensor2 = new Sensor("sensor2", 2, 1, 3, Address.ADDR_41, 20, 10, 12, 200);
         Tank tank2 = new Tank("tank2", 100, sensor2, valve2, null);
         when(state.getTanks()).thenReturn(List.of(tank, tank2));
         when(runner.run("test.", tapsOpenAction, null)).thenReturn(TestUtils.EMPTY_RESULT);
@@ -180,7 +179,7 @@ class ScheduledWaterFillControlTest {
 
     @Test
     void testTapsOpenFail() {
-        Sensor sensor = new Sensor("sensor", 10, 20, 100, Address.ADDR_40, RaspiPin.GPIO_10, 10, 12, 200);
+        Sensor sensor = new Sensor("sensor", 10, 20, 100, Address.ADDR_40, 10, 10, 12, 200);
         Tank tank = new Tank("tank", 100, sensor, TestUtils.Objects.VALVE, null);
         when(state.getTanks()).thenReturn(List.of(tank, TestUtils.Objects.TANK2));
         when(runner.run(eq("test."), eq(valveOpenAction), any())).thenReturn(TestUtils.EMPTY_RESULT);
@@ -202,7 +201,7 @@ class ScheduledWaterFillControlTest {
 
     @Test
     void testValveOpenFail() {
-        Sensor sensor = new Sensor("sensor", 10, 20, 100, Address.ADDR_40, RaspiPin.GPIO_10, 10, 12, 200);
+        Sensor sensor = new Sensor("sensor", 10, 20, 100, Address.ADDR_40, 10, 10, 12, 200);
         Tank tank = new Tank("tank", 100, sensor, TestUtils.Objects.VALVE, null);
         when(state.getTanks()).thenReturn(List.of(tank, TestUtils.Objects.TANK2));
         when(runner.run("test.", outputsCloseAction, null)).thenReturn(TestUtils.EMPTY_RESULT);
@@ -224,7 +223,7 @@ class ScheduledWaterFillControlTest {
 
     @Test
     void testTanksCloseFail() {
-        Sensor sensor = new Sensor("sensor", 101, 1, 100, Address.ADDR_40, RaspiPin.GPIO_10, 10, 12, 200);
+        Sensor sensor = new Sensor("sensor", 101, 1, 100, Address.ADDR_40, 10, 10, 12, 200);
         Tank tank = new Tank("tank", 100, sensor, TestUtils.Objects.VALVE, null);
         when(state.getTanks()).thenReturn(List.of(tank));
         when(runner.run("test.", tanksCloseAction, null)).thenReturn(TestUtils.ERROR_RESULT);
@@ -243,7 +242,7 @@ class ScheduledWaterFillControlTest {
 
     @Test
     void testTapsCloseFail() {
-        Sensor sensor = new Sensor("sensor", 101, 1, 100, Address.ADDR_40, RaspiPin.GPIO_10, 10, 12, 200);
+        Sensor sensor = new Sensor("sensor", 101, 1, 100, Address.ADDR_40, 10, 10, 12, 200);
         Tank tank = new Tank("tank", 100, sensor, TestUtils.Objects.VALVE, null);
         when(state.getTanks()).thenReturn(List.of(tank));
         when(runner.run("test.", tanksCloseAction, null)).thenReturn(TestUtils.EMPTY_RESULT);

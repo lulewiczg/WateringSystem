@@ -10,7 +10,6 @@ import com.github.lulewiczg.watering.service.dto.JobDto;
 import com.github.lulewiczg.watering.state.AppState;
 import com.github.lulewiczg.watering.state.SystemStatus;
 import com.github.lulewiczg.watering.state.dto.Valve;
-import com.pi4j.io.gpio.RaspiPin;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -19,10 +18,10 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
 import org.mockito.ArgumentCaptor;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.util.List;
@@ -36,16 +35,16 @@ import static org.mockito.Mockito.*;
 @PropertySource("classpath:application-testJobs.properties")
 class ScheduledWateringTest {
 
-    @MockBean
+    @MockitoBean
     private AppState state;
 
-    @MockBean
+    @MockitoBean
     private WateringAction wateringAction;
 
-    @MockBean
+    @MockitoBean
     private ActionRunner runner;
 
-    @MockBean
+    @MockitoBean
     private JobRunner jobRunner;
 
     @Autowired
@@ -63,7 +62,7 @@ class ScheduledWateringTest {
 
     @Test
     void testWateringOk() {
-        Valve valve = new Valve("no", "pls no", ValveType.OUTPUT, false, false, null, RaspiPin.GPIO_11);
+        Valve valve = new Valve("no", "pls no", ValveType.OUTPUT, false, false, null, 11);
         when(state.getOutputs()).thenReturn(List.of(TestUtils.Objects.OUT, TestUtils.Objects.OUT2, valve));
         when(runner.run(any(), eq(wateringAction), any())).thenReturn(TestUtils.EMPTY_RESULT);
         JobDto jobDto = new JobDto("test", null);

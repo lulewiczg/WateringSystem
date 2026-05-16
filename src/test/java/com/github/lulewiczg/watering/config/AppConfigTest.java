@@ -3,6 +3,7 @@ package com.github.lulewiczg.watering.config;
 import com.github.lulewiczg.watering.TestUtils;
 import com.github.lulewiczg.watering.config.dto.*;
 import com.github.lulewiczg.watering.service.ina219.enums.Address;
+import jakarta.validation.ConstraintViolation;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -12,7 +13,6 @@ import org.springframework.context.annotation.Import;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.validation.beanvalidation.LocalValidatorFactoryBean;
 
-import javax.validation.ConstraintViolation;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
@@ -92,7 +92,7 @@ class AppConfigTest {
 
     @ParameterizedTest
     @CsvFileSource(resources = "/testData/pins-test.csv")
-    void testPins(String pin, String pin2, Address address, Address address2, String powerPin, String powerPin2, String pumpPin, String error) {
+    void testPins(Integer pin, Integer pin2, Address address, Address address2, Integer powerPin, Integer powerPin2, Integer pumpPin, String error) {
         ValveConfig valve = new ValveConfig("valve1", "abc", ValveType.INPUT, pin, false, false, null);
         ValveConfig valve2 = new ValveConfig("valve2", "abc2", ValveType.INPUT, pin2, false, false, null);
         List<ValveConfig> valves = List.of(valve, valve2);
@@ -112,7 +112,7 @@ class AppConfigTest {
     @CsvFileSource(resources = "/testData/sensor-test.csv")
     void testSensor(String id, int min, int max, int minResistance, int maxResistance, double voltage, String error) {
         List<ValveConfig> valves = List.of(TestUtils.Config.VALVE);
-        WaterLevelSensorConfig sensor = new WaterLevelSensorConfig(id, min, max, Address.ADDR_41, "GPIO 10", minResistance, maxResistance, voltage);
+        WaterLevelSensorConfig sensor = new WaterLevelSensorConfig(id, min, max, Address.ADDR_41, 10, minResistance, maxResistance, voltage);
         List<WaterLevelSensorConfig> sensors = List.of(sensor);
         List<TankConfig> tanks = List.of(TestUtils.Config.TANK);
         List<PumpConfig> pumps = List.of(TestUtils.Config.PUMP);
@@ -125,7 +125,7 @@ class AppConfigTest {
     @ParameterizedTest
     @CsvFileSource(resources = "/testData/valve-test.csv")
     void testValve(String id, String name, ValveType type, boolean open, Long wateringTime, String error) {
-        List<ValveConfig> valves = List.of(new ValveConfig(id, name, type, "GPIO 1", open, false, wateringTime));
+        List<ValveConfig> valves = List.of(new ValveConfig(id, name, type, 1, open, false, wateringTime));
         List<WaterLevelSensorConfig> sensors = List.of(TestUtils.Config.SENSOR);
         List<TankConfig> tanks = List.of(TestUtils.Config.TANK);
         List<PumpConfig> pumps = List.of(TestUtils.Config.PUMP);
@@ -138,8 +138,8 @@ class AppConfigTest {
     @ParameterizedTest
     @CsvFileSource(resources = "/testData/tank-test.csv")
     void testTank(String id, Integer volume, String sensorId, String valveId, String pumpId, TankType type, String error) {
-        List<ValveConfig> valves = List.of(new ValveConfig("testValve", "test valve", ValveType.INPUT, "GPIO 1", true, false, null));
-        List<WaterLevelSensorConfig> sensors = List.of(new WaterLevelSensorConfig("testSensor", 1, 2, Address.ADDR_41, "GPIO 10", 10, 100, 12));
+        List<ValveConfig> valves = List.of(new ValveConfig("testValve", "test valve", ValveType.INPUT, 1, true, false, null));
+        List<WaterLevelSensorConfig> sensors = List.of(new WaterLevelSensorConfig("testSensor", 1, 2, Address.ADDR_41, 10, 10, 100, 12));
         List<TankConfig> tanks = List.of(new TankConfig(id, volume, sensorId, valveId, pumpId, type));
         List<PumpConfig> pumps = List.of((TestUtils.Config.PUMP));
 

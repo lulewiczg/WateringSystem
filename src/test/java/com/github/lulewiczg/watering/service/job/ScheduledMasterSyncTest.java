@@ -5,7 +5,6 @@ import com.github.lulewiczg.watering.service.dto.*;
 import com.github.lulewiczg.watering.state.AppState;
 import com.github.lulewiczg.watering.state.SystemStatus;
 import com.github.lulewiczg.watering.state.dto.MasterResponse;
-import org.apache.tomcat.util.codec.binary.Base64;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
@@ -13,17 +12,18 @@ import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Base64;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -36,19 +36,19 @@ class ScheduledMasterSyncTest {
     @Autowired
     private ScheduledMasterSync job;
 
-    @MockBean
+    @MockitoBean
     private AppState state;
 
-    @MockBean
+    @MockitoBean
     private RestTemplate restTemplate;
 
-    @MockBean
+    @MockitoBean
     private ActionService actionService;
 
-    @MockBean
+    @MockitoBean
     private MasterResponse response;
 
-    @MockBean
+    @MockitoBean
     private JobRunner jobRunner;
 
     @Value("${com.github.lulewiczg.watering.master.url}")
@@ -77,7 +77,7 @@ class ScheduledMasterSyncTest {
         job.setJobResults(List.of(jobResult));
 
         String credentials = login + ":" + password;
-        String base64 = Base64.encodeBase64String(credentials.getBytes());
+        String base64 = Base64.getEncoder().encodeToString(credentials.getBytes());
         HttpHeaders headers = new HttpHeaders();
         headers.add("Authorization", "Basic " + base64);
         HttpEntity<SlaveStateDto> entity = new HttpEntity<>(new SlaveStateDto(state, List.of(actionDef), List.of(jobDef), List.of(actionResult), List.of(jobResult)), headers);
@@ -113,7 +113,7 @@ class ScheduledMasterSyncTest {
         job.setJobResults(List.of(jobResult));
 
         String credentials = login + ":" + password;
-        String base64 = Base64.encodeBase64String(credentials.getBytes());
+        String base64 = Base64.getEncoder().encodeToString(credentials.getBytes());
         HttpHeaders headers = new HttpHeaders();
         headers.add("Authorization", "Basic " + base64);
         HttpEntity<SlaveStateDto> entity = new HttpEntity<>(new SlaveStateDto(state, List.of(actionDef), List.of(jobDef), List.of(actionResult), List.of(jobResult)), headers);
@@ -136,7 +136,7 @@ class ScheduledMasterSyncTest {
         when(actionService.getJobs()).thenReturn(List.of(jobDef));
 
         String credentials = login + ":" + password;
-        String base64 = Base64.encodeBase64String(credentials.getBytes());
+        String base64 = Base64.getEncoder().encodeToString(credentials.getBytes());
         HttpHeaders headers = new HttpHeaders();
         headers.add("Authorization", "Basic " + base64);
         HttpEntity<SlaveStateDto> entity = new HttpEntity<>(new SlaveStateDto(state, List.of(actionDef), List.of(jobDef), List.of(), List.of()), headers);

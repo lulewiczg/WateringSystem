@@ -4,13 +4,13 @@ import com.github.lulewiczg.watering.security.config.SecurityConfig;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.util.List;
@@ -26,7 +26,7 @@ class AuthProviderTest {
 
     private static final String PWD = "$2y$04$k2006CnDU05nvhXVKBKiBOII8f47fzbV515ozlkgijic7nhXsGuxW";
 
-    @MockBean
+    @MockitoBean
     private SecurityConfig securityConfig;
 
     @Autowired

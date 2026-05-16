@@ -15,6 +15,7 @@ import org.springframework.cache.annotation.Cacheable;
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Service;
 
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -49,6 +50,7 @@ public class ActionServiceImpl implements ActionService {
     void reloadJobs() {
         this.jobs = applicationContext.getBeansOfType(ScheduledJob.class).values().stream()
                 .map(i -> new JobDefinitionDto(fixBeanName(i.getClass().getSimpleName()), i.canBeStarted()))
+                .sorted(Comparator.comparing(JobDefinitionDto::getJobName))
                 .collect(Collectors.toList());
     }
 
@@ -65,6 +67,7 @@ public class ActionServiceImpl implements ActionService {
                         .parameterDescription(i.getParamDescription())
                         .returnType(i.getReturnType())
                         .build())
+                .sorted(Comparator.comparing(ActionDefinitionDto::getActionName))
                 .collect(Collectors.toList());
     }
 

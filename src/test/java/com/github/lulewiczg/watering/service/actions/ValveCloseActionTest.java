@@ -7,9 +7,9 @@ import com.github.lulewiczg.watering.state.AppState;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -20,10 +20,10 @@ import static org.mockito.Mockito.verify;
 @ExtendWith(SpringExtension.class)
 class ValveCloseActionTest {
 
-    @MockBean
+    @MockitoBean
     private IOService service;
 
-    @MockBean
+    @MockitoBean
     private AppState state;
 
     @Autowired

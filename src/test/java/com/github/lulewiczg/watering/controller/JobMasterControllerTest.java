@@ -1,12 +1,12 @@
 package com.github.lulewiczg.watering.controller;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.lulewiczg.watering.TestUtils;
 import com.github.lulewiczg.watering.config.MasterConfig;
 import com.github.lulewiczg.watering.exception.ActionNotFoundException;
 import com.github.lulewiczg.watering.exception.ApiError;
 import com.github.lulewiczg.watering.security.AuthEntryPoint;
 import com.github.lulewiczg.watering.security.AuthProvider;
+import com.github.lulewiczg.watering.security.WebSecurityConfig;
 import com.github.lulewiczg.watering.service.ActionService;
 import com.github.lulewiczg.watering.service.dto.ActionResultDto;
 import com.github.lulewiczg.watering.service.dto.JobDefinitionDto;
@@ -16,15 +16,16 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
+import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
+import tools.jackson.databind.ObjectMapper;
 
 import java.time.LocalDateTime;
 import java.util.Arrays;
@@ -42,15 +43,15 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @AutoConfigureMockMvc
 @ActiveProfiles({"test", "testMaster"})
-@WebMvcTest(JobController.class)
+@WebMvcTest(JobMasterController.class)
 @ExtendWith(SpringExtension.class)
-@Import({AuthEntryPoint.class, AuthProvider.class, MasterConfig.class, JobMasterController.class})
-class JobControllerMasterTest {
+@Import({AuthEntryPoint.class, AuthProvider.class, WebSecurityConfig.class, MasterConfig.class})
+class JobMasterControllerTest {
 
-    @MockBean
+    @MockitoBean
     private ActionService service;
 
-    @MockBean
+    @MockitoBean
     private MasterState masterState;
 
     @Autowired
@@ -176,12 +177,12 @@ class JobControllerMasterTest {
     @Test
     @WithMockUser(roles = "SLAVE")
     void testGetPendingSlave() {
-        TestUtils.testForbiddenGet(mvc, mapper, "/rest/jobs/pending/");
+        TestUtils.testForbiddenGet(mvc, mapper, "/rest/jobs/pending");
     }
 
     @Test
     void testGetPendingAnon() {
-        TestUtils.testUnauthorizedGet(mvc, mapper, "/rest/jobs/pending/");
+        TestUtils.testUnauthorizedGet(mvc, mapper, "/rest/jobs/pending");
     }
 
     @Test
@@ -193,8 +194,8 @@ class JobControllerMasterTest {
         Date date = new Date();
 
         String json = mvc.perform(post("/rest/jobs")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(mapper.writeValueAsString(job)))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(mapper.writeValueAsString(job)))
                 .andExpect(status().isBadRequest())
                 .andReturn().getResponse().getContentAsString();
 
@@ -216,9 +217,9 @@ class JobControllerMasterTest {
 
     private void testRun() throws Exception {
         Mockito.<ActionResultDto<?>>when(service.runJob(job)).thenReturn(result);
-        mvc.perform(post("/rest/jobs/")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(mapper.writeValueAsString(job)))
+        mvc.perform(post("/rest/jobs")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(mapper.writeValueAsString(job)))
                 .andExpect(status().isOk())
                 .andExpect(content().json(mapper.writeValueAsString(result)));
 

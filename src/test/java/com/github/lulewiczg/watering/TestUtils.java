@@ -1,18 +1,17 @@
 package com.github.lulewiczg.watering;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.lulewiczg.watering.config.dto.*;
 import com.github.lulewiczg.watering.exception.ApiError;
 import com.github.lulewiczg.watering.service.dto.ActionResultDto;
 import com.github.lulewiczg.watering.service.ina219.enums.Address;
 import com.github.lulewiczg.watering.state.AppState;
 import com.github.lulewiczg.watering.state.dto.*;
-import com.pi4j.io.gpio.RaspiPin;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import lombok.SneakyThrows;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
+import tools.jackson.databind.ObjectMapper;
 
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -39,7 +38,7 @@ public final class TestUtils {
 
     public static final String FORBIDDEN = "Forbidden";
 
-    public static final String FORBIDDEN_MSG = "Access is denied";
+    public static final String FORBIDDEN_MSG = "Access Denied";
 
     public static final ActionResultDto<Void> EMPTY_RESULT = new ActionResultDto<>("id", null, null, LocalDateTime.now(), null);
 
@@ -49,11 +48,11 @@ public final class TestUtils {
      * Object constants.
      */
     public static class Objects {
-        public static final Valve VALVE = new Valve("valve", "valve", ValveType.INPUT, true, false, 1, RaspiPin.GPIO_10);
-        public static final Valve VALVE2 = new Valve("valve2", "valve2", ValveType.INPUT, true, false, 1, RaspiPin.GPIO_11);
-        public static final Valve TAP_VALVE = new Valve("tap", "tap", ValveType.INPUT, false, false, 1, RaspiPin.GPIO_21);
-        public static final Valve OUT = new Valve("out", "out", ValveType.OUTPUT, false, false, 1, RaspiPin.GPIO_30);
-        public static final Valve OUT2 = new Valve("out2", "out2", ValveType.OUTPUT, false, true, 2, RaspiPin.GPIO_31);
+        public static final Valve VALVE = new Valve("valve", "valve", ValveType.INPUT, true, false, 1, 10);
+        public static final Valve VALVE2 = new Valve("valve2", "valve2", ValveType.INPUT, true, false, 1, 11);
+        public static final Valve TAP_VALVE = new Valve("tap", "tap", ValveType.INPUT, false, false, 1, 21);
+        public static final Valve OUT = new Valve("out", "out", ValveType.OUTPUT, false, false, 1, 30);
+        public static final Valve OUT2 = new Valve("out2", "out2", ValveType.OUTPUT, false, true, 2, 31);
         public static Sensor SENSOR;
         public static Sensor SENSOR2;
         public static Tank TANK;
@@ -61,13 +60,13 @@ public final class TestUtils {
         public static Tank TANK3;
 
         public static Tank TANK_NO_PUMP;
-        public static final Pump PUMP = new Pump("pump1", "pump", false, RaspiPin.GPIO_25);
+        public static final Pump PUMP = new Pump("pump1", "pump", false, 25);
         public static final WaterSource TAP = new WaterSource("water", TAP_VALVE);
         public static final Sensor OVERFLOW_SENSOR = new Sensor("overflowSensor", 100, 10, 90, Address.ADDR_40, null, 10, 12, 200);
         public static final Tank OVERFLOW_TANK = new Tank("overflow", 100, OVERFLOW_SENSOR, VALVE, PUMP);
 
         public static void reset() {
-            SENSOR = new Sensor("sensor1", null, 12, 21, Address.ADDR_40, RaspiPin.GPIO_10, 10, 100, 12);
+            SENSOR = new Sensor("sensor1", null, 12, 21, Address.ADDR_40, 10, 10, 100, 12);
             SENSOR2 = new Sensor("sensor2", null, 5, 100, Address.ADDR_41, null, 20, 50, 5);
             TANK = new Tank("tank", 100, SENSOR, VALVE, PUMP);
             TANK2 = new Tank("tank2", 100, SENSOR2, VALVE2, null);
@@ -84,17 +83,17 @@ public final class TestUtils {
      * Config constants.
      */
     public static class Config {
-        public static final ValveConfig VALVE = new ValveConfig("valve1", "Tank 1", ValveType.INPUT, "GPIO 3", false, false, null);
-        public static final ValveConfig VALVE2 = new ValveConfig("valve2", "Tank 2", ValveType.INPUT, "GPIO 4", false, false, null);
-        public static final ValveConfig VALVE3 = new ValveConfig("tap", "tap water", ValveType.INPUT, "GPIO 5", false, false, null);
-        public static final ValveConfig OUT = new ValveConfig("out", "out", ValveType.OUTPUT, "GPIO 6", true, true, 333L);
-        public static final WaterLevelSensorConfig SENSOR = new WaterLevelSensorConfig("sensor1", 12, 21, Address.ADDR_40, "GPIO 10", 10, 100, 12);
-        public static final WaterLevelSensorConfig SENSOR2 = new WaterLevelSensorConfig("sensor2", 5, 100, Address.ADDR_41, "", 20, 50, 5);
+        public static final ValveConfig VALVE = new ValveConfig("valve1", "Tank 1", ValveType.INPUT, 3, false, false, null);
+        public static final ValveConfig VALVE2 = new ValveConfig("valve2", "Tank 2", ValveType.INPUT, 4, false, false, null);
+        public static final ValveConfig VALVE3 = new ValveConfig("tap", "tap water", ValveType.INPUT, 5, false, false, null);
+        public static final ValveConfig OUT = new ValveConfig("out", "out", ValveType.OUTPUT, 6, true, true, 333L);
+        public static final WaterLevelSensorConfig SENSOR = new WaterLevelSensorConfig("sensor1", 12, 21, Address.ADDR_40, 10, 10, 100, 12);
+        public static final WaterLevelSensorConfig SENSOR2 = new WaterLevelSensorConfig("sensor2", 5, 100, Address.ADDR_41, null, 20, 50, 5);
         public static final TankConfig TANK = new TankConfig("tank1", 123, "sensor1", "valve1", "pump1", TankType.DEFAULT);
         public static final TankConfig TANK2 = new TankConfig("tank2", 321, "sensor2", "valve2", null, TankType.DEFAULT);
         public static final TankConfig TAP = new TankConfig("tap", null, null, "tap", null, TankType.UNLIMITED);
         public static final TankConfig TANK_NO_SENSOR = new TankConfig("tank1", 123, null, "valve1", null, TankType.DEFAULT);
-        public static final PumpConfig PUMP = new PumpConfig("pump1", "Pump 1", "GPIO 15");
+        public static final PumpConfig PUMP = new PumpConfig("pump1", "Pump 1", 15);
     }
 
     /**

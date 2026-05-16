@@ -1,6 +1,5 @@
 package com.github.lulewiczg.watering.service;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.lulewiczg.watering.TestUtils;
 import com.github.lulewiczg.watering.service.dto.ActionDto;
 import com.github.lulewiczg.watering.service.dto.ActionResultDto;
@@ -12,8 +11,9 @@ import com.github.lulewiczg.watering.state.dto.MasterResponse;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
+import tools.jackson.databind.ObjectMapper;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -32,10 +32,10 @@ class MasterServiceTest {
     @Autowired
     private ObjectMapper mapper;
 
-    @MockBean
+    @MockitoBean
     private MasterState masterState;
 
-    @MockBean
+    @MockitoBean
     private AppState state;
 
     @Test

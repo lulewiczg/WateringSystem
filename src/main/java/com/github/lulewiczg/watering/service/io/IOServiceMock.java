@@ -4,7 +4,6 @@ import com.github.lulewiczg.watering.state.AppState;
 import com.github.lulewiczg.watering.state.dto.Sensor;
 import com.github.lulewiczg.watering.state.dto.Tank;
 import com.github.lulewiczg.watering.state.dto.Valve;
-import com.pi4j.io.gpio.Pin;
 import lombok.Generated;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
@@ -26,20 +25,20 @@ public class IOServiceMock implements IOService {
     private final AppState state;
 
     @Override
-    public void toggleOn(Pin pin) {
+    public void toggleOn(int pin) {
         log.info("Mock toggle ON for pin {}", pin);
     }
 
     @Override
-    public void toggleOff(Pin pin) {
+    public void toggleOff(int pin) {
         log.info("Mock toggle OFF for pin {}", pin);
     }
 
     @Override
-    public boolean readPin(Pin pin) {
+    public boolean readPin(int pin) {
         log.info("Read for pin {}", pin);
-        Optional<Valve> first = state.getTanks().stream().map(Tank::getValve).filter(i -> i.getPin().equals(pin)).findFirst();
-        Valve tmpValve = state.getOutputs().stream().filter(i -> i.getPin().equals(pin)).findFirst().orElse(null);
+        Optional<Valve> first = state.getTanks().stream().map(Tank::getValve).filter(i -> i.getPin() == pin).findFirst();
+        Valve tmpValve = state.getOutputs().stream().filter(i -> i.getPin() == pin).findFirst().orElse(null);
         Valve valve = first.orElse(tmpValve);
         if (valve != null) {
             return valve.isOpen();

@@ -1,26 +1,27 @@
 package com.github.lulewiczg.watering.controller;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.lulewiczg.watering.TestUtils;
 import com.github.lulewiczg.watering.exception.ActionNotFoundException;
 import com.github.lulewiczg.watering.exception.ApiError;
 import com.github.lulewiczg.watering.security.AuthEntryPoint;
 import com.github.lulewiczg.watering.security.AuthProvider;
+import com.github.lulewiczg.watering.security.WebSecurityConfig;
 import com.github.lulewiczg.watering.service.ActionService;
 import com.github.lulewiczg.watering.service.dto.JobDefinitionDto;
 import com.github.lulewiczg.watering.service.dto.JobDto;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
+import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
+import tools.jackson.databind.ObjectMapper;
 
 import java.util.Arrays;
 import java.util.Date;
@@ -37,10 +38,10 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @ActiveProfiles({"test", "testSlave"})
 @WebMvcTest(JobController.class)
 @ExtendWith(SpringExtension.class)
-@Import({AuthEntryPoint.class, AuthProvider.class})
+@Import({AuthEntryPoint.class, AuthProvider.class, WebSecurityConfig.class})
 class JobControllerSlaveTest {
 
-    @MockBean
+    @MockitoBean
     private ActionService service;
 
     @Autowired
@@ -147,8 +148,8 @@ class JobControllerSlaveTest {
         Date date = new Date();
 
         String json = mvc.perform(post("/rest/jobs")
-                .content(mapper.writeValueAsString(job))
-                .contentType(MediaType.APPLICATION_JSON))
+                        .content(mapper.writeValueAsString(job))
+                        .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest())
                 .andReturn().getResponse().getContentAsString();
 
@@ -170,8 +171,8 @@ class JobControllerSlaveTest {
 
     private void testRun() throws Exception {
         mvc.perform(post("/rest/jobs")
-                .content(mapper.writeValueAsString(job))
-                .contentType(MediaType.APPLICATION_JSON))
+                        .content(mapper.writeValueAsString(job))
+                        .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(content().string(""));
 

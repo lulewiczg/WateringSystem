@@ -1,26 +1,27 @@
 package com.github.lulewiczg.watering.controller;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.lulewiczg.watering.TestUtils;
 import com.github.lulewiczg.watering.security.AuthEntryPoint;
 import com.github.lulewiczg.watering.security.AuthProvider;
+import com.github.lulewiczg.watering.security.WebSecurityConfig;
 import com.github.lulewiczg.watering.service.dto.SlaveStateDto;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
+import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
+import tools.jackson.databind.ObjectMapper;
 
 @AutoConfigureMockMvc
 @ActiveProfiles({"test", "testSlave"})
 @ExtendWith(SpringExtension.class)
 @WebMvcTest(StateMasterController.class)
-@Import({AuthEntryPoint.class, AuthProvider.class})
+@Import({AuthEntryPoint.class, AuthProvider.class, WebSecurityConfig.class})
 class StateMasterControllerSlaveTest {
 
     @Autowired

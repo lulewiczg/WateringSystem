@@ -1,6 +1,5 @@
 package com.github.lulewiczg.watering.service;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.lulewiczg.watering.exception.HandlerNotFoundException;
 import com.github.lulewiczg.watering.exception.ValidationException;
 import com.github.lulewiczg.watering.service.actions.dto.WateringDto;
@@ -9,14 +8,15 @@ import com.github.lulewiczg.watering.state.AppState;
 import com.github.lulewiczg.watering.state.dto.Pump;
 import com.github.lulewiczg.watering.state.dto.Sensor;
 import com.github.lulewiczg.watering.state.dto.Valve;
+import jakarta.validation.ConstraintViolation;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.beanvalidation.LocalValidatorFactoryBean;
+import tools.jackson.databind.ObjectMapper;
 
-import javax.validation.ConstraintViolation;
 import java.util.Comparator;
 import java.util.Map;
 import java.util.Optional;

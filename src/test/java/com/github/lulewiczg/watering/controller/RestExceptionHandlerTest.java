@@ -5,6 +5,7 @@ import com.github.lulewiczg.watering.exception.*;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.HttpStatus;
@@ -20,7 +21,7 @@ import java.util.List;
 import java.util.Objects;
 
 @ActiveProfiles("test")
-@ExtendWith(SpringExtension.class)
+@ExtendWith({SpringExtension.class, MockitoExtension.class})
 @Import(RestExceptionHandler.class)
 class RestExceptionHandlerTest {
 

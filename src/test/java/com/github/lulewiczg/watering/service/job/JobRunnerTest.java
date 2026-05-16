@@ -1,12 +1,12 @@
 package com.github.lulewiczg.watering.service.job;
 
 import com.github.lulewiczg.watering.TestUtils;
-import com.github.lulewiczg.watering.exception.ActionNotStartedException;
 import com.github.lulewiczg.watering.service.dto.ActionResultDto;
 import com.github.lulewiczg.watering.service.dto.JobDto;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Import;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
@@ -15,7 +15,7 @@ import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.Mockito.*;
 
 @Import(JobRunner.class)
-@ExtendWith(SpringExtension.class)
+@ExtendWith({SpringExtension.class, MockitoExtension.class})
 class JobRunnerTest {
 
     @Autowired
@@ -129,7 +129,6 @@ class JobRunnerTest {
     void testCantRun() {
         when(scheduledJob.getName()).thenReturn("some job");
         JobDto job = new JobDto("name", "id", scheduledJob);
-        doThrow(new RuntimeException("some error")).when(scheduledJob).doJobRunning(job);
 
         ActionResultDto<Void> result = runner.run(job);
 
@@ -140,7 +139,6 @@ class JobRunnerTest {
     @Test
     void testScheduledJobCantStart() {
         JobDto job = new JobDto("sched.", "some job", scheduledJob);
-        doThrow(new ActionNotStartedException("some job")).when(scheduledJob).doJob(job);
 
         ActionResultDto<Void> result = runner.run(job);
 

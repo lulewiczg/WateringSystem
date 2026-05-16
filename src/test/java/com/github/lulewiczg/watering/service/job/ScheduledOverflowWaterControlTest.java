@@ -9,7 +9,6 @@ import com.github.lulewiczg.watering.state.AppState;
 import com.github.lulewiczg.watering.state.SystemStatus;
 import com.github.lulewiczg.watering.state.dto.Sensor;
 import com.github.lulewiczg.watering.state.dto.Tank;
-import com.pi4j.io.gpio.RaspiPin;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -17,10 +16,10 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvFileSource;
 import org.junit.jupiter.params.provider.EnumSource;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.util.List;
@@ -35,25 +34,25 @@ import static org.mockito.Mockito.*;
 @PropertySource("classpath:application-testJobs.properties")
 class ScheduledOverflowWaterControlTest {
 
-    @MockBean
+    @MockitoBean
     private TanksCloseAction tanksCloseAction;
 
-    @MockBean
+    @MockitoBean
     private ValveOpenAction valveOpenAction;
 
-    @MockBean
+    @MockitoBean
     private ValveCloseAction valveCloseAction;
 
-    @MockBean
+    @MockitoBean
     private PumpStartAction pumpStartAction;
 
-    @MockBean
+    @MockitoBean
     private AppState state;
 
-    @MockBean
+    @MockitoBean
     private ActionRunner runner;
 
-    @MockBean
+    @MockitoBean
     private JobRunner jobRunner;
 
     @Autowired
@@ -80,7 +79,7 @@ class ScheduledOverflowWaterControlTest {
     @ParameterizedTest
     @CsvFileSource(resources = "/testData/overflow-running-test.csv")
     void testAlreadyRunning(int minLevel, int maxLevel, Integer level) {
-        Sensor sensor = new Sensor("sensor", level, minLevel, maxLevel, Address.ADDR_40, RaspiPin.GPIO_10, 10, 12, 200);
+        Sensor sensor = new Sensor("sensor", level, minLevel, maxLevel, Address.ADDR_40, 10, 10, 12, 200);
         Tank tank = new Tank("tank", 100, sensor, TestUtils.Objects.VALVE, null);
         when(state.getTanks()).thenReturn(List.of(tank));
         when(state.getOverflowValves()).thenReturn(List.of(TestUtils.Objects.OUT));
@@ -98,7 +97,7 @@ class ScheduledOverflowWaterControlTest {
     @ParameterizedTest
     @CsvFileSource(resources = "/testData/overflow-ok-test.csv")
     void testAlreadyRunningNotFinished(int minLevel, int maxLevel, Integer level) {
-        Sensor sensor = new Sensor("sensor", level, minLevel, maxLevel, Address.ADDR_40, RaspiPin.GPIO_10, 10, 12, 200);
+        Sensor sensor = new Sensor("sensor", level, minLevel, maxLevel, Address.ADDR_40, 10, 10, 12, 200);
         Tank tank = new Tank("tank", 100, sensor, TestUtils.Objects.VALVE, null);
         when(state.getTanks()).thenReturn(List.of(tank));
         when(state.getOverflowValves()).thenReturn(List.of(TestUtils.Objects.OUT));
@@ -119,7 +118,7 @@ class ScheduledOverflowWaterControlTest {
     @ParameterizedTest
     @CsvFileSource(resources = "/testData/overflow-ok-test.csv")
     void testOverflowOk(int minLevel, int maxLevel, Integer level) {
-        Sensor sensor = new Sensor("sensor", level, minLevel, maxLevel, Address.ADDR_40, RaspiPin.GPIO_10, 10, 12, 200);
+        Sensor sensor = new Sensor("sensor", level, minLevel, maxLevel, Address.ADDR_40, 10, 10, 12, 200);
         Tank tank = new Tank("tank", 100, sensor, TestUtils.Objects.VALVE, null);
         when(state.getTanks()).thenReturn(List.of(tank));
         when(state.getOverflowValves()).thenReturn(List.of(TestUtils.Objects.OUT));
@@ -137,7 +136,7 @@ class ScheduledOverflowWaterControlTest {
     @ParameterizedTest
     @CsvFileSource(resources = "/testData/overflow-test.csv")
     void testOverflow(int minLevel, int maxLevel, int level) {
-        Sensor sensor = new Sensor("sensor", level, minLevel, maxLevel, Address.ADDR_40, RaspiPin.GPIO_10, 10, 12, 200);
+        Sensor sensor = new Sensor("sensor", level, minLevel, maxLevel, Address.ADDR_40, 10, 10, 12, 200);
         Tank tank = new Tank("tank", 100, sensor, TestUtils.Objects.VALVE, TestUtils.Objects.PUMP);
         when(state.getTanks()).thenReturn(List.of(tank, TestUtils.Objects.TANK2));
         when(state.getOverflowValves()).thenReturn(List.of(TestUtils.Objects.OUT));
@@ -160,7 +159,7 @@ class ScheduledOverflowWaterControlTest {
 
     @Test
     void testOverflowNoPump() {
-        Sensor sensor = new Sensor("sensor", 100, 0, 90, Address.ADDR_40, RaspiPin.GPIO_10, 10, 12, 200);
+        Sensor sensor = new Sensor("sensor", 100, 0, 90, Address.ADDR_40, 10, 10, 12, 200);
         Tank tank = new Tank("tank", 100, sensor, TestUtils.Objects.VALVE, null);
         when(state.getTanks()).thenReturn(List.of(tank, TestUtils.Objects.TANK2));
         when(state.getOverflowValves()).thenReturn(List.of(TestUtils.Objects.OUT));

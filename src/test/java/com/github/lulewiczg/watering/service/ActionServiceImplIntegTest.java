@@ -1,6 +1,5 @@
 package com.github.lulewiczg.watering.service;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.lulewiczg.watering.TestUtils;
 import com.github.lulewiczg.watering.exception.ActionNotFoundException;
 import com.github.lulewiczg.watering.exception.JobNotFoundException;
@@ -20,9 +19,10 @@ import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
+import tools.jackson.databind.ObjectMapper;
 
 import java.util.Arrays;
 import java.util.List;
@@ -44,7 +44,7 @@ class ActionServiceImplIntegTest {
     @Autowired
     private AppState state;
 
-    @MockBean
+    @MockitoBean
     private IOService ioService;
 
     @Autowired
@@ -81,7 +81,7 @@ class ActionServiceImplIntegTest {
         actions.forEach(i -> {
             Object param = Optional.ofNullable(i.getAllowedValues()).map(j -> j.get(0)).orElse(null);
             if (i.getParameterDestinationType() == WateringDto.class) {
-                param = Map.of("valveId","valve1", "seconds", 2);
+                param = Map.of("valveId", "valve1", "seconds", 2);
             }
             ActionDto action = new ActionDto(i.getActionName(), param);
             assertDoesNotThrow(() -> service.runAction(action));
@@ -166,7 +166,7 @@ class ActionServiceImplIntegTest {
         service.runJob(new JobDto(deCapitalize(ScheduledSensorRead.class.getSimpleName())));
 
         assertEquals(55, state.getTanks().get(0).getSensor().getLevel());
-        assertEquals(83 , state.getTanks().get(1).getSensor().getLevel());
+        assertEquals(83, state.getTanks().get(1).getSensor().getLevel());
 
     }
 

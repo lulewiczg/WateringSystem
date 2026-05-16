@@ -1,7 +1,6 @@
 package com.github.lulewiczg.watering.service.io;
 
 import com.github.lulewiczg.watering.state.dto.Sensor;
-import com.pi4j.io.gpio.Pin;
 
 /**
  * Interface for IO communication.
@@ -13,14 +12,14 @@ public interface IOService {
      *
      * @param pin pin
      */
-    void toggleOn(Pin pin);
+    void toggleOn(int pin);
 
     /**
      * Turns pin off.
      *
      * @param pin pin
      */
-    void toggleOff(Pin pin);
+    void toggleOff(int pin);
 
     /**
      * Reads pin state.
@@ -28,7 +27,7 @@ public interface IOService {
      * @param pin pin
      * @return state
      */
-    boolean readPin(Pin pin);
+    boolean readPin(int pin);
 
     /**
      * Reads analog raw value from sensor.

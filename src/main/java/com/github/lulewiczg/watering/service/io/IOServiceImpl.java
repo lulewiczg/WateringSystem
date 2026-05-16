@@ -9,10 +9,11 @@ import com.github.lulewiczg.watering.service.ina219.enums.Address;
 import com.github.lulewiczg.watering.service.ina219.enums.Pga;
 import com.github.lulewiczg.watering.service.ina219.enums.VoltageRange;
 import com.github.lulewiczg.watering.state.dto.Sensor;
-import com.pi4j.io.gpio.GpioController;
-import com.pi4j.io.gpio.GpioPinDigitalOutput;
-import com.pi4j.io.gpio.Pin;
-import com.pi4j.io.gpio.PinState;
+import com.pi4j.context.Context;
+import com.pi4j.io.gpio.digital.DigitalOutput;
+import com.pi4j.io.gpio.digital.DigitalOutputConfig;
+import com.pi4j.io.gpio.digital.DigitalState;
+import jakarta.annotation.PreDestroy;
 import lombok.SneakyThrows;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Value;
@@ -40,38 +41,43 @@ public class IOServiceImpl implements IOService {
 
     private static final String ERR = "Not yet implemented!";
 
-    private final GpioController gpioController;
+    private final Context pi4jContext;
 
-    private final Map<Pin, GpioPinDigitalOutput> pins = new HashMap<>();
+    private final Map<Integer, DigitalOutput> pins = new HashMap<>();
 
     private final Map<Address, INA219> sensors = new EnumMap<>(Address.class);
 
     @SneakyThrows
-    public IOServiceImpl(GpioController gpioController, INA219Resolver resolver, AppConfig config,
+    public IOServiceImpl(Context pi4jContext, INA219Resolver resolver, AppConfig config,
                          @Value("${com.github.lulewiczg.watering.io.maxRetries:3}") int maxRetries,
                          @Value("${com.github.lulewiczg.watering.io.retryWait:500}") int retryWaitTime) {
-        this.gpioController = gpioController;
+        this.pi4jContext = pi4jContext;
         this.maxRetries = maxRetries;
         this.retryWaitTime = retryWaitTime;
         config.getSensors().stream().map(WaterLevelSensorConfig::getAddress).forEach(i -> sensors.put(i, resolver.get(i)));
     }
 
+    @PreDestroy
+    public void preDestroy() {
+        pi4jContext.shutdown();
+    }
+
     @Override
-    public void toggleOn(Pin pin) {
-        GpioPinDigitalOutput gpioPin = getPin(pin);
+    public void toggleOn(int pin) {
+        DigitalOutput gpioPin = getPin(pin);
         gpioPin.low();
         log.trace("Pin {} is set to ON", pin);
     }
 
     @Override
-    public void toggleOff(Pin pin) {
-        GpioPinDigitalOutput gpioPin = getPin(pin);
+    public void toggleOff(int pin) {
+        DigitalOutput gpioPin = getPin(pin);
         gpioPin.high();
         log.trace("Pin {} is set to OFF", pin);
     }
 
     @Override
-    public boolean readPin(Pin pin) {
+    public boolean readPin(int pin) {
         throw new IllegalStateException(ERR);
     }
 
@@ -83,7 +89,7 @@ public class IOServiceImpl implements IOService {
         if (ina219 == null) {
             throw new IllegalStateException("No sensor found for address: " + address);
         }
-        Pin powerControlPin = sensor.getPowerControlPin();
+        Integer powerControlPin = sensor.getPowerControlPin();
         if (powerControlPin != null) {
             toggleOn(powerControlPin);
             Thread.sleep(2000);
@@ -95,13 +101,18 @@ public class IOServiceImpl implements IOService {
         return readCurrent(address, ina219);
     }
 
-    private GpioPinDigitalOutput getPin(Pin pin) {
-        GpioPinDigitalOutput existing = pins.get(pin);
+    private DigitalOutput getPin(int pin) {
+        DigitalOutput existing = pins.get(pin);
         if (existing != null) {
             return existing;
         }
-        GpioPinDigitalOutput gpioPin = gpioController.provisionDigitalOutputPin(pin, pin.getName(), PinState.LOW);
-        gpioPin.setShutdownOptions(true, PinState.LOW);
+        DigitalOutputConfig config = DigitalOutput.newConfigBuilder(pi4jContext)
+                .id("pin-" + pin)
+                .bcm(pin)
+                .shutdown(DigitalState.LOW)
+                .initial(DigitalState.LOW)
+                .build();
+        DigitalOutput gpioPin = pi4jContext.create(config);
         pins.put(pin, gpioPin);
         return gpioPin;
     }
