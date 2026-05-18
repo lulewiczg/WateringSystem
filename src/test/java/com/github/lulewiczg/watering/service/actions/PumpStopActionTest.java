@@ -49,7 +49,6 @@ class PumpStopActionTest {
         assertFalse(TestUtils.Objects.PUMP.isRunning());
     }
 
-
     @Test
     void testActionEnabled() {
         when(state.getPumps()).thenReturn(List.of(TestUtils.Objects.PUMP));

@@ -67,7 +67,7 @@ class ActionServiceImplIntegTest {
     @Test
     void testGetJobs() {
         List<JobDefinitionDto> jobs = service.getJobs();
-        List<JobDefinitionDto> expected = Stream.of(ScheduledOverflowWaterControl.class, ScheduledSensorRead.class, ScheduledValveRead.class,
+        List<JobDefinitionDto> expected = Stream.of(ScheduledOverflowWaterControl.class, ScheduledSensorRead.class, ScheduledTemperatureRead.class, ScheduledValveRead.class,
                         ScheduledWaterEscapeControl.class, ScheduledWaterFillControl.class, ScheduledWatering.class, SetDefaults.class)
                 .map(i -> new JobDefinitionDto(deCapitalize(i.getSimpleName()), true)).collect(Collectors.toList());
         assertEquals(expected, jobs);

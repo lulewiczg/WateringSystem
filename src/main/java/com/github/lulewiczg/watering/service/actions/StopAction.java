@@ -25,7 +25,7 @@ public class StopAction extends Action<Void, Void> {
     @Override
     protected Void doAction(ActionDto actionDto, Void param) {
         log.info("Stopping!");
-        new Thread(() -> System.exit(100)).start();
+        new Thread(this::exit).start();
         return null;
     }
 
@@ -37,5 +37,9 @@ public class StopAction extends Action<Void, Void> {
     @Override
     public String getDescription() {
         return "Stops application";
+    }
+
+    void exit() {
+        System.exit(101);
     }
 }

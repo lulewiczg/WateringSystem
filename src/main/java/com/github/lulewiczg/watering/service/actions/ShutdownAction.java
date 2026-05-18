@@ -21,12 +21,15 @@ public class ShutdownAction extends Action<Void, Void> {
     @Value("${com.github.lulewiczg.watering.shutdownEnabled:false}")
     private boolean enabled;
 
+    @Value("${com.github.lulewiczg.watering.shutdown.command}")
+    private String command;
+
     @SneakyThrows
     @Override
     protected Void doAction(ActionDto actionDto, Void param) {
         log.info("Shutting down!");
-        Runtime.getRuntime().exec("shutdown"); //1 minute delay on Linux
-        new Thread(() -> System.exit(101)).start();
+        Runtime.getRuntime().exec(command.split(";"));
+        new Thread(this::exit).start();
         return null;
     }
 
@@ -38,5 +41,9 @@ public class ShutdownAction extends Action<Void, Void> {
     @Override
     public String getDescription() {
         return "Shuts down system";
+    }
+
+    void exit() {
+        System.exit(101);
     }
 }

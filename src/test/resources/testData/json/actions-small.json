@@ -45,6 +45,15 @@
     "returnType": "java.lang.Void"
   },
   {
+    "actionName": "temperatureReadAction",
+    "description": "Reads system temperature",
+    "parameterType": "java.lang.Void",
+    "parameterDestinationType": "java.lang.Void",
+    "allowedValues": null,
+    "parameterDescription": "",
+    "returnType": "java.math.BigDecimal"
+  },
+  {
     "actionName": "valveCloseAction",
     "description": "Closes given valve",
     "parameterType": "java.lang.String",
